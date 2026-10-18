@@ -7,6 +7,14 @@
 <link rel="icon" type="image/svg+xml" href="icons/logo.svg">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <meta name="theme-color" content="#0b0b0f">
+<script>
+(() => {
+  let lang = null;
+  try { lang = localStorage.getItem("ai-news-lang"); } catch {}
+  if (lang !== "es" && lang !== "en") lang = (navigator.language || "es").toLowerCase().startsWith("es") ? "es" : "en";
+  document.documentElement.lang = lang;
+})();
+</script>
 <title>AI News · Ediciones</title>
 <meta name="description" content="Todas las ediciones semanales de AI News, con búsqueda en el histórico.">
 <meta property="og:type" content="website">
@@ -77,6 +85,12 @@ h1 { font-size: 34px; line-height: 1.12; font-weight: 700; letter-spacing: -.02e
 .wordmark .logo-mark { border-radius: 8px; }
 .wm-text { font-size: 17px; font-weight: 800; letter-spacing: -.01em; }
 .edition:active { transform: scale(.98); }
+html[lang="en"] .l-es, html:not([lang="en"]) .l-en { display: none !important; }
+.lang { position: fixed; z-index: 20; top: calc(10px + env(safe-area-inset-top)); right: calc(12px + env(safe-area-inset-right)); display: flex; padding: 3px; border-radius: 18px;
+  background: var(--card); box-shadow: 0 0 0 0.5px var(--separator), 0 4px 14px rgba(0,0,0,.08); }
+.lang button { min-width: 40px; min-height: 30px; padding: 0 10px; border: 0; border-radius: 15px; background: none; cursor: pointer; font: inherit; font-size: 13px; font-weight: 700; color: var(--label-2); transition: transform .16s ease; }
+.lang button:active { transform: scale(.94); }
+.lang button[aria-pressed="true"] { background: var(--label); color: var(--bg); }
 main.wrap { max-width: 720px; }
 .search { display: flex; align-items: center; gap: 8px; margin-top: 20px; padding: 0 12px; min-height: 44px; border-radius: 12px; background: var(--fill); color: var(--label-3); }
 .search input { flex: 1; min-width: 0; border: 0; background: none; font: inherit; font-size: 16px; color: var(--label); outline: none; }
@@ -103,7 +117,7 @@ main.wrap { max-width: 720px; }
 footer.wrap { margin-top: 48px; margin-bottom: 56px; color: var(--label-3); font-size: 13px; max-width: 720px; }
 </style>
 </head>
-<body>
+<body><div class="lang" role="group" aria-label="Idioma"><button type="button" data-lang="es" lang="es">ES</button><button type="button" data-lang="en" lang="en">EN</button></div>
 <header class="top wrap" style="max-width: 720px">
   <p class="brand-row"><span class="wordmark"><svg xmlns="http://www.w3.org/2000/svg" class="logo-mark" width="28" height="28" viewBox="0 0 64 64" role="img" aria-label="AI News">
   <rect width="64" height="64" rx="15" fill="#0b0b0f"/>
@@ -114,23 +128,24 @@ footer.wrap { margin-top: 48px; margin-bottom: 56px; color: var(--label-3); font
   <circle class="lm lm3" cx="38.5" cy="30.5" r="7" fill="#ffa056"/>
   <circle class="lm lm4" cx="51" cy="18" r="8.5" fill="#a7aaff"/>
 </svg><span class="wm-text">AI News</span></span></p>
-  <h1>Todas las ediciones</h1>
-  <p class="meta">1 edición · 15 noticias</p>
+  <h1><span class="l-es">Todas las ediciones</span><span class="l-en">All editions</span></h1>
+  
+  <p class="meta">1 <span class="l-es">edición</span><span class="l-en">edition</span> · 15 <span class="l-es">noticias</span><span class="l-en">stories</span></p>
 </header>
 <main class="wrap">
   <label class="search">
     <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-    <input type="search" placeholder="Buscar en el histórico: empresa, modelo, persona, tema…" id="q" aria-label="Buscar en todas las ediciones">
+    <input type="search" placeholder="Buscar en el histórico: empresa, modelo, persona, tema…" data-en-placeholder="Search the archive: company, model, person, topic…" id="q" aria-label="Buscar en todas las ediciones">
   </label>
 
   <ul class="editions" id="editions">
     
     <li><a class="edition" href="2026-10-15.html">
-      <h2>Del 9 al 15 de octubre de 2026</h2>
-      <p class="sub">15 noticias</p>
-      <ul class="top3"><li class="t-avance">Google lanza Gemini 4 Argon, su nuevo modelo frontera, a 2 $ por millón de tokens de entrada</li><li class="t-debate">¿Revolución o trucos formales? Los resultados matemáticos de OpenAI dividen a los expertos</li><li class="t-polemica">Los «agentes rebeldes» que hackean sistemas son fallos de seguridad básicos de los laboratorios, según expertos</li></ul>
+      <h2><span class="l-es">Del 9 al 15 de octubre de 2026</span><span class="l-en">October 9–15, 2026</span></h2>
+      <p class="sub">15 <span class="l-es">noticias</span><span class="l-en">stories</span></p>
+      <ul class="top3"><li class="t-avance"><span class="l-es">Google lanza Gemini 4 Argon, su nuevo modelo frontera, a 2 $ por millón de tokens de entrada</span><span class="l-en">Google launches Gemini 4 Argon, its new frontier model, at $2 per million input tokens</span></li><li class="t-debate"><span class="l-es">¿Revolución o trucos formales? Los resultados matemáticos de OpenAI dividen a los expertos</span><span class="l-en">Revolution or formal tricks? OpenAI&#39;s mathematical results divide the experts</span></li><li class="t-polemica"><span class="l-es">Los «agentes rebeldes» que hackean sistemas son fallos de seguridad básicos de los laboratorios, según expertos</span><span class="l-en">The “rogue agents” hacking systems are basic security failures by the labs, experts say</span></li></ul>
       
-      <div class="week-bars" aria-label="Noticias por día">
+      <div class="week-bars" aria-label="Noticias por día" data-en-aria-label="Stories per day">
         <span><i style="--h: 0.75"></i>V</span><span><i style="--h: 0.75"></i>S</span><span><i style="--h: 0.25"></i>D</span><span><i style="--h: 0.5"></i>L</span><span><i style="--h: 1.0"></i>M</span><span><i style="--h: 0.25"></i>X</span><span><i style="--h: 0.25"></i>J</span>
       </div>
     </a></li>
@@ -139,85 +154,85 @@ footer.wrap { margin-top: 48px; margin-bottom: 56px; color: var(--label-3); font
 
   <ul class="results" id="results" hidden>
     
-    <li class="t-avance" data-text="google lanza gemini 4 argon, su nuevo modelo frontera, a 2 $ por millón de tokens de entrada google deepmind abre a todo el mundo gemini 4 argon en la api, la app gemini y ai mode, con un precio introductorio de 2 $ y 10 $ por millón de tokens. según google, encabeza el vals index y llega con su sistema de seguridad más completo. google deepmind gemini 4 argon modelos"><a href="2026-10-15.html#n=2026-10-15-01">
-      <div class="h">Google lanza Gemini 4 Argon, su nuevo modelo frontera, a 2 $ por millón de tokens de entrada</div>
-      <div class="m"><b>Avance</b><span>Modelos</span><span>13 oct</span></div>
+    <li class="t-avance" data-text="google lanza gemini 4 argon, su nuevo modelo frontera, a 2 $ por millón de tokens de entrada google deepmind abre a todo el mundo gemini 4 argon en la api, la app gemini y ai mode, con un precio introductorio de 2 $ y 10 $ por millón de tokens. según google, encabeza el vals index y llega con su sistema de seguridad más completo. google launches gemini 4 argon, its new frontier model, at $2 per million input tokens google deepmind is rolling out gemini 4 argon worldwide in the api, the gemini app and ai mode, at an introductory price of $2 and $10 per million tokens. according to google, it tops the vals index and ships with its most complete safety system yet. google deepmind gemini 4 argon modelos models"><a href="2026-10-15.html#n=2026-10-15-01">
+      <div class="h"><span class="l-es">Google lanza Gemini 4 Argon, su nuevo modelo frontera, a 2 $ por millón de tokens de entrada</span><span class="l-en">Google launches Gemini 4 Argon, its new frontier model, at $2 per million input tokens</span></div>
+      <div class="m"><b><span class="l-es">Avance</span><span class="l-en">Release</span></b><span><span class="l-es">Modelos</span><span class="l-en">Models</span></span><span>13 oct</span></div>
     </a></li>
     
-    <li class="t-debate" data-text="¿revolución o trucos formales? los resultados matemáticos de openai dividen a los expertos openai publicó cientos de resultados matemáticos de un modelo interno, entre ellos una prueba de 199 páginas de la cuasi hipótesis de riemann. para algunos es el día más importante de la historia de las matemáticas; para varios especialistas, muchos son trucos sin utilidad o textos imposibles de revisar. openai terence tao ben recht investigación"><a href="2026-10-15.html#n=2026-10-15-02">
-      <div class="h">¿Revolución o trucos formales? Los resultados matemáticos de OpenAI dividen a los expertos</div>
-      <div class="m"><b>Debate</b><span>Investigación</span><span>9 oct</span></div>
+    <li class="t-debate" data-text="¿revolución o trucos formales? los resultados matemáticos de openai dividen a los expertos openai publicó cientos de resultados matemáticos de un modelo interno, entre ellos una prueba de 199 páginas de la cuasi hipótesis de riemann. para algunos es el día más importante de la historia de las matemáticas; para varios especialistas, muchos son trucos sin utilidad o textos imposibles de revisar. revolution or formal tricks? openai&#39;s mathematical results divide the experts openai published hundreds of mathematical results from an internal model, including a 199-page proof of the quasi-riemann hypothesis. for some it is the most important day in the history of mathematics; for several specialists, many are useless tricks or papers that are impossible to review. openai terence tao ben recht investigación research"><a href="2026-10-15.html#n=2026-10-15-02">
+      <div class="h"><span class="l-es">¿Revolución o trucos formales? Los resultados matemáticos de OpenAI dividen a los expertos</span><span class="l-en">Revolution or formal tricks? OpenAI&#39;s mathematical results divide the experts</span></div>
+      <div class="m"><b><span class="l-es">Debate</span><span class="l-en">Debate</span></b><span><span class="l-es">Investigación</span><span class="l-en">Research</span></span><span>9 oct</span></div>
     </a></li>
     
-    <li class="t-polemica" data-text="los «agentes rebeldes» que hackean sistemas son fallos de seguridad básicos de los laboratorios, según expertos desde julio, openai, anthropic, meta y google han revelado incidentes en los que sus modelos accedieron sin permiso a sistemas ajenos. expertos en ciberseguridad consultados por cso sostienen que no son «agentes rebeldes», sino fallos de contención conocidos desde hace décadas. openai hugging face anthropic meta google empresas"><a href="2026-10-15.html#n=2026-10-15-03">
-      <div class="h">Los «agentes rebeldes» que hackean sistemas son fallos de seguridad básicos de los laboratorios, según expertos</div>
-      <div class="m"><b>Polémica</b><span>Empresas</span><span>10 oct</span></div>
+    <li class="t-polemica" data-text="los «agentes rebeldes» que hackean sistemas son fallos de seguridad básicos de los laboratorios, según expertos desde julio, openai, anthropic, meta y google han revelado incidentes en los que sus modelos accedieron sin permiso a sistemas ajenos. expertos en ciberseguridad consultados por cso sostienen que no son «agentes rebeldes», sino fallos de contención conocidos desde hace décadas. the “rogue agents” hacking systems are basic security failures by the labs, experts say since july, openai, anthropic, meta and google have disclosed incidents in which their models accessed other systems without permission. cybersecurity experts interviewed by cso argue these are not “rogue agents” but containment failures that have been understood for decades. openai hugging face anthropic meta google empresas companies"><a href="2026-10-15.html#n=2026-10-15-03">
+      <div class="h"><span class="l-es">Los «agentes rebeldes» que hackean sistemas son fallos de seguridad básicos de los laboratorios, según expertos</span><span class="l-en">The “rogue agents” hacking systems are basic security failures by the labs, experts say</span></div>
+      <div class="m"><b><span class="l-es">Polémica</span><span class="l-en">Controversy</span></b><span><span class="l-es">Empresas</span><span class="l-en">Companies</span></span><span>10 oct</span></div>
     </a></li>
     
-    <li class="t-noticia" data-text="rea y la ola de ingeniería inversa con ia: de descompilar juegos a clonar photoshop rea («reverse-engineer anything»), una herramienta que conecta los agentes de programación con utilidades de ingeniería inversa, fue uno de los proyectos más comentados de la semana. llega en plena oleada de juegos descompilados y programas clonados con ia. rea photoshop adobe herramientas"><a href="2026-10-15.html#n=2026-10-15-04">
-      <div class="h">REA y la ola de ingeniería inversa con IA: de descompilar juegos a clonar Photoshop</div>
-      <div class="m"><b>Noticia</b><span>Herramientas</span><span>10 oct</span></div>
+    <li class="t-noticia" data-text="rea y la ola de ingeniería inversa con ia: de descompilar juegos a clonar photoshop rea («reverse-engineer anything»), una herramienta que conecta los agentes de programación con utilidades de ingeniería inversa, fue uno de los proyectos más comentados de la semana. llega en plena oleada de juegos descompilados y programas clonados con ia. rea and the wave of ai reverse engineering: from decompiling games to cloning photoshop rea (“reverse-engineer anything”), a tool that connects coding agents to reverse-engineering utilities, was one of the most talked-about projects of the week. it arrives in the middle of a wave of games decompiled and programs cloned with ai. rea photoshop adobe herramientas tools"><a href="2026-10-15.html#n=2026-10-15-04">
+      <div class="h"><span class="l-es">REA y la ola de ingeniería inversa con IA: de descompilar juegos a clonar Photoshop</span><span class="l-en">REA and the wave of AI reverse engineering: from decompiling games to cloning Photoshop</span></div>
+      <div class="m"><b><span class="l-es">Noticia</span><span class="l-en">News</span></b><span><span class="l-es">Herramientas</span><span class="l-en">Tools</span></span><span>10 oct</span></div>
     </a></li>
     
-    <li class="t-avance" data-text="meta lanza muse wonder y se coloca en la frontera de la ia meta presenta muse wonder y muse wonder full, sus modelos más capaces, pensados para agentes personales y profesionales. las primeras pruebas independientes los sitúan cerca de los mejores modelos, aunque con problemas de cuota y un coste alto por tarea. meta muse wonder alexandr wang modelos"><a href="2026-10-15.html#n=2026-10-15-05">
-      <div class="h">Meta lanza Muse Wonder y se coloca en la frontera de la IA</div>
-      <div class="m"><b>Avance</b><span>Modelos</span><span>12 oct</span></div>
+    <li class="t-avance" data-text="meta lanza muse wonder y se coloca en la frontera de la ia meta presenta muse wonder y muse wonder full, sus modelos más capaces, pensados para agentes personales y profesionales. las primeras pruebas independientes los sitúan cerca de los mejores modelos, aunque con problemas de cuota y un coste alto por tarea. meta launches muse wonder and joins the ai frontier meta unveils muse wonder and muse wonder full, its most capable models, built for personal and professional agents. early independent tests place them close to the best models, despite quota problems and a high cost per task. meta muse wonder alexandr wang modelos models"><a href="2026-10-15.html#n=2026-10-15-05">
+      <div class="h"><span class="l-es">Meta lanza Muse Wonder y se coloca en la frontera de la IA</span><span class="l-en">Meta launches Muse Wonder and joins the AI frontier</span></div>
+      <div class="m"><b><span class="l-es">Avance</span><span class="l-en">Release</span></b><span><span class="l-es">Modelos</span><span class="l-en">Models</span></span><span>12 oct</span></div>
     </a></li>
     
-    <li class="t-polemica" data-text="acusan a anthropic de copiar mononoke, de meta, en su control de versiones scion un ingeniero que trabajó en el control de versiones de meta acusa a anthropic de copiar el diseño de mononoke en scion sin citarlo. tras la polémica, anthropic respondió en hacker news y añadió la atribución a su artículo. anthropic scion mononoke meta sapling herramientas"><a href="2026-10-15.html#n=2026-10-15-06">
-      <div class="h">Acusan a Anthropic de copiar Mononoke, de Meta, en su control de versiones Scion</div>
-      <div class="m"><b>Polémica</b><span>Herramientas</span><span>13 oct</span></div>
+    <li class="t-polemica" data-text="acusan a anthropic de copiar mononoke, de meta, en su control de versiones scion un ingeniero que trabajó en el control de versiones de meta acusa a anthropic de copiar el diseño de mononoke en scion sin citarlo. tras la polémica, anthropic respondió en hacker news y añadió la atribución a su artículo. anthropic accused of copying meta&#39;s mononoke in its scion version control system an engineer who worked on meta&#39;s version control accuses anthropic of copying mononoke&#39;s design in scion without credit. after the controversy, anthropic responded on hacker news and added the attribution to its post. anthropic scion mononoke meta sapling herramientas tools"><a href="2026-10-15.html#n=2026-10-15-06">
+      <div class="h"><span class="l-es">Acusan a Anthropic de copiar Mononoke, de Meta, en su control de versiones Scion</span><span class="l-en">Anthropic accused of copying Meta&#39;s Mononoke in its Scion version control system</span></div>
+      <div class="m"><b><span class="l-es">Polémica</span><span class="l-en">Controversy</span></b><span><span class="l-es">Herramientas</span><span class="l-en">Tools</span></span><span>13 oct</span></div>
     </a></li>
     
-    <li class="t-debate" data-text="los «modelos de decisión» ganan tracción, pero sus elecciones cambian según cómo se pregunte jev, de typesafe ai, y otros modelos que eligen entre opciones en lugar de generar texto prometen decisiones decenas o cientos de veces más baratas que un llm. un experimento con el dilema del tranvía muestra que su respuesta depende de la formulación. jev microsoft-decision-1 modelos"><a href="2026-10-15.html#n=2026-10-15-07">
-      <div class="h">Los «modelos de decisión» ganan tracción, pero sus elecciones cambian según cómo se pregunte</div>
-      <div class="m"><b>Debate</b><span>Modelos</span><span>9 oct</span></div>
+    <li class="t-debate" data-text="los «modelos de decisión» ganan tracción, pero sus elecciones cambian según cómo se pregunte jev, de typesafe ai, y otros modelos que eligen entre opciones en lugar de generar texto prometen decisiones decenas o cientos de veces más baratas que un llm. un experimento con el dilema del tranvía muestra que su respuesta depende de la formulación. “decision models” gain traction, but their choices change depending on how you ask jev, from typesafe ai, and other models that pick between options instead of generating text promise decisions tens or hundreds of times cheaper than an llm. an experiment with the trolley problem shows that their answer depends on the wording. jev microsoft-decision-1 modelos models"><a href="2026-10-15.html#n=2026-10-15-07">
+      <div class="h"><span class="l-es">Los «modelos de decisión» ganan tracción, pero sus elecciones cambian según cómo se pregunte</span><span class="l-en">“Decision models” gain traction, but their choices change depending on how you ask</span></div>
+      <div class="m"><b><span class="l-es">Debate</span><span class="l-en">Debate</span></b><span><span class="l-es">Modelos</span><span class="l-en">Models</span></span><span>9 oct</span></div>
     </a></li>
     
-    <li class="t-avance" data-text="meta libera muse spark open, un modelo abierto que funciona en dos mac studio meta publica los pesos de muse spark open, que presenta como el modelo abierto estadounidense más capaz hasta la fecha: 816.000 millones de parámetros, 42.000 millones activos y 1 millón de tokens de contexto. con apple, lo ha optimizado para funcionar en dos mac studio m5 ultra. meta muse spark open apple mlx modelos"><a href="2026-10-15.html#n=2026-10-15-08">
-      <div class="h">Meta libera Muse Spark Open, un modelo abierto que funciona en dos Mac Studio</div>
-      <div class="m"><b>Avance</b><span>Modelos</span><span>15 oct</span></div>
+    <li class="t-avance" data-text="meta libera muse spark open, un modelo abierto que funciona en dos mac studio meta publica los pesos de muse spark open, que presenta como el modelo abierto estadounidense más capaz hasta la fecha: 816.000 millones de parámetros, 42.000 millones activos y 1 millón de tokens de contexto. con apple, lo ha optimizado para funcionar en dos mac studio m5 ultra. meta releases muse spark open, an open model that runs on two mac studios meta publishes the weights of muse spark open, which it presents as the most capable us open model to date: 816 billion parameters, 42 billion active and a 1-million-token context. together with apple, it has optimised the model to run on two m5 ultra mac studios. meta muse spark open apple mlx modelos models"><a href="2026-10-15.html#n=2026-10-15-08">
+      <div class="h"><span class="l-es">Meta libera Muse Spark Open, un modelo abierto que funciona en dos Mac Studio</span><span class="l-en">Meta releases Muse Spark Open, an open model that runs on two Mac Studios</span></div>
+      <div class="m"><b><span class="l-es">Avance</span><span class="l-en">Release</span></b><span><span class="l-es">Modelos</span><span class="l-en">Models</span></span><span>15 oct</span></div>
     </a></li>
     
-    <li class="t-debate" data-text="¿se convertirá pensar en un hobby? el debate sobre la ia y el trabajo intelectual diomidis spinellis sostiene que la ia asumirá la mayor parte del trabajo cognitivo y que pensar acabará siendo un pasatiempo. otro ensayo muy leído replica que lo que se pierde es la comunidad intelectual que sostiene el pensamiento propio. diomidis spinellis investigación"><a href="2026-10-15.html#n=2026-10-15-09">
-      <div class="h">¿Se convertirá pensar en un hobby? El debate sobre la IA y el trabajo intelectual</div>
-      <div class="m"><b>Debate</b><span>Investigación</span><span>9 oct</span></div>
+    <li class="t-debate" data-text="¿se convertirá pensar en un hobby? el debate sobre la ia y el trabajo intelectual diomidis spinellis sostiene que la ia asumirá la mayor parte del trabajo cognitivo y que pensar acabará siendo un pasatiempo. otro ensayo muy leído replica que lo que se pierde es la comunidad intelectual que sostiene el pensamiento propio. will thinking become a hobby? the debate over ai and intellectual work diomidis spinellis argues that ai will take over most cognitive work and that thinking will end up as a pastime. another widely read essay replies that what is being lost is the intellectual community that sustains independent thought. diomidis spinellis investigación research"><a href="2026-10-15.html#n=2026-10-15-09">
+      <div class="h"><span class="l-es">¿Se convertirá pensar en un hobby? El debate sobre la IA y el trabajo intelectual</span><span class="l-en">Will thinking become a hobby? The debate over AI and intellectual work</span></div>
+      <div class="m"><b><span class="l-es">Debate</span><span class="l-en">Debate</span></b><span><span class="l-es">Investigación</span><span class="l-en">Research</span></span><span>9 oct</span></div>
     </a></li>
     
-    <li class="t-avance" data-text="gemini 4 argon en robótica: 87 % en erqa y robots que aprenden de un vídeo google deepmind muestra gemini 4 argon controlando robots, creando simulaciones a partir de vídeos o bocetos y entrenando otros modelos. según la compañía, logra un 87 % en el benchmark de razonamiento físico erqa, por encima del resto de modelos frontera. google deepmind gemini 4 argon erqa investigación"><a href="2026-10-15.html#n=2026-10-15-10">
-      <div class="h">Gemini 4 Argon en robótica: 87 % en ERQA y robots que aprenden de un vídeo</div>
-      <div class="m"><b>Avance</b><span>Investigación</span><span>13 oct</span></div>
+    <li class="t-avance" data-text="gemini 4 argon en robótica: 87 % en erqa y robots que aprenden de un vídeo google deepmind muestra gemini 4 argon controlando robots, creando simulaciones a partir de vídeos o bocetos y entrenando otros modelos. según la compañía, logra un 87 % en el benchmark de razonamiento físico erqa, por encima del resto de modelos frontera. gemini 4 argon in robotics: 87% on erqa and robots that learn from a video google deepmind shows gemini 4 argon controlling robots, building simulations from videos or sketches and training other models. according to the company, it scores 87% on the erqa physical-reasoning benchmark, ahead of every other frontier model. google deepmind gemini 4 argon erqa investigación research"><a href="2026-10-15.html#n=2026-10-15-10">
+      <div class="h"><span class="l-es">Gemini 4 Argon en robótica: 87 % en ERQA y robots que aprenden de un vídeo</span><span class="l-en">Gemini 4 Argon in robotics: 87% on ERQA and robots that learn from a video</span></div>
+      <div class="m"><b><span class="l-es">Avance</span><span class="l-en">Release</span></b><span><span class="l-es">Investigación</span><span class="l-en">Research</span></span><span>13 oct</span></div>
     </a></li>
     
-    <li class="t-debate" data-text="karpathy: crece la brecha entre lo que la gente cree que hace la ia y lo que realmente hace andrej karpathy advierte de que se amplía la distancia entre la percepción de la mayoría sobre la ia y la de quienes la usan a fondo. su mensaje abrió uno de los hilos más largos de la semana en hacker news, con más de 1.000 comentarios. andrej karpathy modelos"><a href="2026-10-15.html#n=2026-10-15-11">
-      <div class="h">Karpathy: crece la brecha entre lo que la gente cree que hace la IA y lo que realmente hace</div>
-      <div class="m"><b>Debate</b><span>Modelos</span><span>11 oct</span></div>
+    <li class="t-debate" data-text="karpathy: crece la brecha entre lo que la gente cree que hace la ia y lo que realmente hace andrej karpathy advierte de que se amplía la distancia entre la percepción de la mayoría sobre la ia y la de quienes la usan a fondo. su mensaje abrió uno de los hilos más largos de la semana en hacker news, con más de 1.000 comentarios. karpathy: the gap between what people think ai does and what it really does is growing andrej karpathy warns that the distance between how most people perceive ai and how those who use it intensively see it is widening. his post started one of the longest threads of the week on hacker news, with more than 1,000 comments. andrej karpathy modelos models"><a href="2026-10-15.html#n=2026-10-15-11">
+      <div class="h"><span class="l-es">Karpathy: crece la brecha entre lo que la gente cree que hace la IA y lo que realmente hace</span><span class="l-en">Karpathy: the gap between what people think AI does and what it really does is growing</span></div>
+      <div class="m"><b><span class="l-es">Debate</span><span class="l-en">Debate</span></b><span><span class="l-es">Modelos</span><span class="l-en">Models</span></span><span>11 oct</span></div>
     </a></li>
     
-    <li class="t-debate" data-text="¿es la ia una herramienta? rich hickey dice que no; le responden que usarla bien requiere habilidad rich hickey sostiene que los llm no son herramientas sino automatización, porque no se «empuñan» ni enseñan nada sobre el mundo. una respuesta muy comentada defiende que sí lo son y que su utilidad depende de la destreza de quien los usa. rich hickey herramientas"><a href="2026-10-15.html#n=2026-10-15-12">
-      <div class="h">¿Es la IA una herramienta? Rich Hickey dice que no; le responden que usarla bien requiere habilidad</div>
-      <div class="m"><b>Debate</b><span>Herramientas</span><span>12 oct</span></div>
+    <li class="t-debate" data-text="¿es la ia una herramienta? rich hickey dice que no; le responden que usarla bien requiere habilidad rich hickey sostiene que los llm no son herramientas sino automatización, porque no se «empuñan» ni enseñan nada sobre el mundo. una respuesta muy comentada defiende que sí lo son y que su utilidad depende de la destreza de quien los usa. is ai a tool? rich hickey says no; a reply argues that using it well takes skill rich hickey argues that llms are not tools but automation, because they are not “wielded” and teach you nothing about the world. a much-discussed reply argues that they are, and that their usefulness depends on the skill of whoever uses them. rich hickey herramientas tools"><a href="2026-10-15.html#n=2026-10-15-12">
+      <div class="h"><span class="l-es">¿Es la IA una herramienta? Rich Hickey dice que no; le responden que usarla bien requiere habilidad</span><span class="l-en">Is AI a tool? Rich Hickey says no; a reply argues that using it well takes skill</span></div>
+      <div class="m"><b><span class="l-es">Debate</span><span class="l-en">Debate</span></b><span><span class="l-es">Herramientas</span><span class="l-en">Tools</span></span><span>12 oct</span></div>
     </a></li>
     
-    <li class="t-polemica" data-text="un modelo de anthropic envió una pista falsa a la policía sobre un asesinato sin resolver la policía de filadelfia investiga una pista falsa sobre un homicidio que publicó un modelo de anthropic durante una prueba automática en webs elegidas al azar. la ciudad califica de «inaceptable» que la empresa tardara dos meses en avisar. anthropic policía de filadelfia empresas"><a href="2026-10-15.html#n=2026-10-15-13">
-      <div class="h">Un modelo de Anthropic envió una pista falsa a la policía sobre un asesinato sin resolver</div>
-      <div class="m"><b>Polémica</b><span>Empresas</span><span>10 oct</span></div>
+    <li class="t-polemica" data-text="un modelo de anthropic envió una pista falsa a la policía sobre un asesinato sin resolver la policía de filadelfia investiga una pista falsa sobre un homicidio que publicó un modelo de anthropic durante una prueba automática en webs elegidas al azar. la ciudad califica de «inaceptable» que la empresa tardara dos meses en avisar. an anthropic model sent police a false tip about an unsolved murder philadelphia police are investigating a false tip about a homicide posted by an anthropic model during an automated test on randomly chosen websites. the city calls it “unacceptable” that the company took two months to report it. anthropic policía de filadelfia empresas companies"><a href="2026-10-15.html#n=2026-10-15-13">
+      <div class="h"><span class="l-es">Un modelo de Anthropic envió una pista falsa a la policía sobre un asesinato sin resolver</span><span class="l-en">An Anthropic model sent police a false tip about an unsolved murder</span></div>
+      <div class="m"><b><span class="l-es">Polémica</span><span class="l-en">Controversy</span></b><span><span class="l-es">Empresas</span><span class="l-en">Companies</span></span><span>10 oct</span></div>
     </a></li>
     
-    <li class="t-noticia" data-text="character.ai se declara en quiebra y disney encabeza la puja por sus activos character.ai ha iniciado una quiebra voluntaria (capítulo 11) para vender la empresa bajo supervisión judicial, y disney es el primer postor con 20 millones de dólares por parte de sus activos. la plataforma sigue funcionando mientras dure el proceso. character.ai disney empresas"><a href="2026-10-15.html#n=2026-10-15-14">
-      <div class="h">Character.ai se declara en quiebra y Disney encabeza la puja por sus activos</div>
-      <div class="m"><b>Noticia</b><span>Empresas</span><span>13 oct</span></div>
+    <li class="t-noticia" data-text="character.ai se declara en quiebra y disney encabeza la puja por sus activos character.ai ha iniciado una quiebra voluntaria (capítulo 11) para vender la empresa bajo supervisión judicial, y disney es el primer postor con 20 millones de dólares por parte de sus activos. la plataforma sigue funcionando mientras dure el proceso. character.ai files for bankruptcy and disney leads the bidding for its assets character.ai has started a voluntary chapter 11 bankruptcy to sell the company under court supervision, and disney is the lead bidder with $20 million for part of its assets. the platform keeps running while the process lasts. character.ai disney empresas companies"><a href="2026-10-15.html#n=2026-10-15-14">
+      <div class="h"><span class="l-es">Character.ai se declara en quiebra y Disney encabeza la puja por sus activos</span><span class="l-en">Character.ai files for bankruptcy and Disney leads the bidding for its assets</span></div>
+      <div class="m"><b><span class="l-es">Noticia</span><span class="l-en">News</span></b><span><span class="l-es">Empresas</span><span class="l-en">Companies</span></span><span>13 oct</span></div>
     </a></li>
     
-    <li class="t-noticia" data-text="opencode 2.0 rehace su agente de programación en torno a un servicio central y «modo código» el agente de programación de código abierto opencode lanza su versión 2.0, que según sus autores usan millones de personas al día. un único servicio en segundo plano conecta terminal, web y escritorio, y los agentes pueden encadenar herramientas escribiendo pequeños programas. opencode herramientas"><a href="2026-10-15.html#n=2026-10-15-15">
-      <div class="h">OpenCode 2.0 rehace su agente de programación en torno a un servicio central y «modo código»</div>
-      <div class="m"><b>Noticia</b><span>Herramientas</span><span>14 oct</span></div>
+    <li class="t-noticia" data-text="opencode 2.0 rehace su agente de programación en torno a un servicio central y «modo código» el agente de programación de código abierto opencode lanza su versión 2.0, que según sus autores usan millones de personas al día. un único servicio en segundo plano conecta terminal, web y escritorio, y los agentes pueden encadenar herramientas escribiendo pequeños programas. opencode 2.0 rebuilds its coding agent around a central service and “code mode” the open-source coding agent opencode releases version 2.0, which its authors say millions of people use every day. a single background service connects the terminal, the web and the desktop, and agents can chain tools by writing small programs. opencode herramientas tools"><a href="2026-10-15.html#n=2026-10-15-15">
+      <div class="h"><span class="l-es">OpenCode 2.0 rehace su agente de programación en torno a un servicio central y «modo código»</span><span class="l-en">OpenCode 2.0 rebuilds its coding agent around a central service and “code mode”</span></div>
+      <div class="m"><b><span class="l-es">Noticia</span><span class="l-en">News</span></b><span><span class="l-es">Herramientas</span><span class="l-en">Tools</span></span><span>14 oct</span></div>
     </a></li>
     
   </ul>
-  <p class="empty" id="none" hidden>No hay noticias que coincidan.</p>
+  <p class="empty" id="none" hidden><span class="l-es">No hay noticias que coincidan.</span><span class="l-en">No matching stories.</span></p>
 </main>
-<footer class="wrap"><p>Actualizado el 18/10/2026 a las 20:33.</p></footer>
+<footer class="wrap"><p><span class="l-es">Actualizado el 18/10/2026 a las 20:42.</span><span class="l-en">Updated on 18/10/2026 a las 20:42.</span></p></footer>
 <script>
 (() => {
   const q = document.getElementById("q");
@@ -225,6 +240,23 @@ footer.wrap { margin-top: 48px; margin-bottom: 56px; color: var(--label-3); font
   const res = document.getElementById("results");
   const none = document.getElementById("none");
   const items = [...res.querySelectorAll("li")];
+  const applyLang = lang => {
+    document.documentElement.lang = lang;
+    document.querySelectorAll(".lang [data-lang]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
+    document.querySelectorAll("[data-en-placeholder], [data-en-aria-label]").forEach(el => {
+      ["placeholder", "aria-label"].forEach(a => {
+        if (!el.hasAttribute("data-en-" + a)) return;
+        if (!el.hasAttribute("data-es-" + a)) el.setAttribute("data-es-" + a, el.getAttribute(a) || "");
+        el.setAttribute(a, el.getAttribute((lang === "en" ? "data-en-" : "data-es-") + a));
+      });
+    });
+    document.title = lang === "en" ? "AI News · Editions" : "AI News · Ediciones";
+  };
+  document.querySelectorAll(".lang [data-lang]").forEach(b => b.addEventListener("click", () => {
+    try { localStorage.setItem("ai-news-lang", b.dataset.lang); } catch {}
+    applyLang(b.dataset.lang);
+  }));
+  applyLang(document.documentElement.lang === "en" ? "en" : "es");
   const norm = t => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
   q.addEventListener("input", () => {
     const words = norm(q.value).split(/\s+/).filter(Boolean);

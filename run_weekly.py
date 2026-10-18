@@ -146,6 +146,8 @@ def build_story(day: str, n: int, c: Cluster, score: float, s: Summary) -> Story
         partial=all(it.kind == "youtube" and it.partial for it in c.items),
         reading_minutes=max(1, round(words / 200)),
         unconfirmed_claims=s.unverified_claims,
+        en=({"headline": s.en.headline, "summary_short": s.en.summary_short, "summary_long": s.en.summary_long,
+             "unconfirmed_claims": s.en.unverified_claims} if s.en else {}),
         first_seen=min(it.published for it in c.items).astimezone(MADRID).date().isoformat(),
     )
 

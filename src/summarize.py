@@ -26,6 +26,13 @@ WINDOW_BEFORE_S = 30
 WINDOW_AFTER_S = 300
 
 
+class SummaryEN(BaseModel):
+    headline: str
+    summary_short: str
+    summary_long: str
+    unverified_claims: list[str] = []
+
+
 class Summary(BaseModel):
     headline: str
     summary_short: str
@@ -33,6 +40,7 @@ class Summary(BaseModel):
     type: Literal["avance", "debate", "polemica", "noticia"]
     category: Literal["modelos", "empresas", "investigacion", "regulacion", "herramientas"]
     unverified_claims: list[str] = []
+    en: SummaryEN | None = None  # traducción al inglés para el selector de idioma de la página
 
 
 class Summaries(BaseModel):

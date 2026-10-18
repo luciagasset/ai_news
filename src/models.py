@@ -22,6 +22,10 @@ TYPE_LABELS = {
     "noticia": "Noticias",
 }
 TYPE_SINGULAR = {"avance": "Avance", "debate": "Debate", "polemica": "Polémica", "noticia": "Noticia"}
+TYPE_LABELS_EN = {"avance": "Frontier models", "debate": "Debates", "polemica": "Controversies", "noticia": "News"}
+TYPE_SINGULAR_EN = {"avance": "Release", "debate": "Debate", "polemica": "Controversy", "noticia": "News"}
+CATEGORY_LABELS_EN = {"modelos": "Models", "empresas": "Companies", "investigacion": "Research",
+                      "regulacion": "Regulation", "herramientas": "Tools"}
 CATEGORY_LABELS = {
     "modelos": "Modelos",
     "empresas": "Empresas",
@@ -101,6 +105,8 @@ class Story:
     partial: bool
     reading_minutes: int
     unconfirmed_claims: list[str] = field(default_factory=list)
+    # Versión en inglés (headline, summary_short, summary_long, unconfirmed_claims); vacía si no hay traducción
+    en: dict = field(default_factory=dict)
     first_seen: str = ""        # fecha (AAAA-MM-DD) de la primera fuente: sitúa la noticia en la semana
     embedding: list[float] = field(default_factory=list)
     # Fase 2: [{story_id, date, headline, relation: seguimiento|relacionada|contradiccion}]

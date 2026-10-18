@@ -14,6 +14,9 @@ La edición se abre en la semana:
   todo el histórico.
 - **Día a día**: un selector y unas flechas recorren los 7 días; cada día ordena sus noticias por tipo.
 
+La página está en español e inglés, con un selector ES/EN arriba a la derecha (recuerda la elección y, la
+primera vez, usa el idioma del navegador).
+
 Cada edición genera además dos piezas para compartir en LinkedIn: una **imagen de vista previa**
 (`output/og/<fecha>.png`, con etiquetas Open Graph) y un **carrusel PDF** de 1080×1350
 (`output/carrusel/<fecha>.pdf`).

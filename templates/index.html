@@ -7,6 +7,14 @@
 <link rel="icon" type="image/svg+xml" href="icons/logo.svg">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <meta name="theme-color" content="#0b0b0f">
+<script>
+(() => {
+  let lang = null;
+  try { lang = localStorage.getItem("ai-news-lang"); } catch {}
+  if (lang !== "es" && lang !== "en") lang = (navigator.language || "es").toLowerCase().startsWith("es") ? "es" : "en";
+  document.documentElement.lang = lang;
+})();
+</script>
 <title>AI News · Ediciones</title>
 <meta name="description" content="Todas las ediciones semanales de AI News, con búsqueda en el histórico.">
 {%- if og_image %}
@@ -31,6 +39,12 @@ h1 { font-size: 34px; line-height: 1.12; font-weight: 700; letter-spacing: -.02e
 .wordmark .logo-mark { border-radius: 8px; }
 .wm-text { font-size: 17px; font-weight: 800; letter-spacing: -.01em; }
 .edition:active { transform: scale(.98); }
+html[lang="en"] .l-es, html:not([lang="en"]) .l-en { display: none !important; }
+.lang { position: fixed; z-index: 20; top: calc(10px + env(safe-area-inset-top)); right: calc(12px + env(safe-area-inset-right)); display: flex; padding: 3px; border-radius: 18px;
+  background: var(--card); box-shadow: 0 0 0 0.5px var(--separator), 0 4px 14px rgba(0,0,0,.08); }
+.lang button { min-width: 40px; min-height: 30px; padding: 0 10px; border: 0; border-radius: 15px; background: none; cursor: pointer; font: inherit; font-size: 13px; font-weight: 700; color: var(--label-2); transition: transform .16s ease; }
+.lang button:active { transform: scale(.94); }
+.lang button[aria-pressed="true"] { background: var(--label); color: var(--bg); }
 main.wrap { max-width: 720px; }
 .search { display: flex; align-items: center; gap: 8px; margin-top: 20px; padding: 0 12px; min-height: 44px; border-radius: 12px; background: var(--fill); color: var(--label-3); }
 .search input { flex: 1; min-width: 0; border: 0; background: none; font: inherit; font-size: 16px; color: var(--label); outline: none; }
@@ -59,44 +73,47 @@ footer.wrap { margin-top: 48px; margin-bottom: 56px; color: var(--label-3); font
 </head>
 <body>
 {%- from "partials/logo.html" import wordmark %}
+{%- macro t(es, en_text) -%}<span class="l-es">{{ es }}</span><span class="l-en">{{ en_text or es }}</span>{%- endmacro -%}
+<div class="lang" role="group" aria-label="Idioma"><button type="button" data-lang="es" lang="es">ES</button><button type="button" data-lang="en" lang="en">EN</button></div>
 <header class="top wrap" style="max-width: 720px">
   <p class="brand-row">{{ wordmark(28) }}</p>
-  <h1>Todas las ediciones</h1>
-  <p class="meta">{{ editions|length }} {{ "edición" if editions|length == 1 else "ediciones" }} · {{ editions | map(attribute='stories') | map('length') | sum }} noticias</p>
+  <h1>{{ t('Todas las ediciones', 'All editions') }}</h1>
+  {% set total = editions | map(attribute='stories') | map('length') | sum %}
+  <p class="meta">{{ editions|length }} {{ t("edición" if editions|length == 1 else "ediciones", "edition" if editions|length == 1 else "editions") }} · {{ total }} {{ t("noticias", "stories") }}</p>
 </header>
 <main class="wrap">
   <label class="search">
     <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-    <input type="search" placeholder="Buscar en el histórico: empresa, modelo, persona, tema…" id="q" aria-label="Buscar en todas las ediciones">
+    <input type="search" placeholder="Buscar en el histórico: empresa, modelo, persona, tema…" data-en-placeholder="Search the archive: company, model, person, topic…" id="q" aria-label="Buscar en todas las ediciones">
   </label>
 
   <ul class="editions" id="editions">
     {% for e in editions %}
     <li><a class="edition" href="{{ e.date }}.html">
-      <h2>{{ e.label }}</h2>
-      <p class="sub">{{ e.stories|length }} noticias</p>
-      <ul class="top3">{% for s in e.stories[:3] %}<li class="t-{{ s.type }}">{{ s.headline }}</li>{% endfor %}</ul>
+      <h2>{{ t(e.label, e.label_en) }}</h2>
+      <p class="sub">{{ e.stories|length }} {{ t('noticias', 'stories') }}</p>
+      <ul class="top3">{% for s in e.stories[:3] %}<li class="t-{{ s.type }}">{{ t(s.headline, en(s, "headline")) }}</li>{% endfor %}</ul>
       {% set mx = e.days | map(attribute='stories') | map('length') | max %}
-      <div class="week-bars" aria-label="Noticias por día">
+      <div class="week-bars" aria-label="Noticias por día" data-en-aria-label="Stories per day">
         {% for d in e.days %}<span><i{% if not d.stories %} class="zero"{% endif %} style="--h: {{ (d.stories|length / (mx or 1)) | round(2) }}"></i>{{ d.initial }}</span>{% endfor %}
       </div>
     </a></li>
     {% else %}
-    <li class="empty">Todavía no hay ediciones.</li>
+    <li class="empty">{{ t('Todavía no hay ediciones.', 'No editions yet.') }}</li>
     {% endfor %}
   </ul>
 
   <ul class="results" id="results" hidden>
     {% for e in editions %}{% for s in e.stories %}
     <li class="t-{{ s.type }}" data-text="{{ s | search_text }}"><a href="{{ e.date }}.html#n={{ s.id }}">
-      <div class="h">{{ s.headline }}</div>
-      <div class="m"><b>{{ type_singular[s.type] }}</b><span>{{ category_labels[s.category] }}</span><span>{{ s.first_seen | short_date }}</span></div>
+      <div class="h">{{ t(s.headline, en(s, "headline")) }}</div>
+      <div class="m"><b>{{ t(type_singular[s.type], type_singular_en[s.type]) }}</b><span>{{ t(category_labels[s.category], category_labels_en[s.category]) }}</span><span>{{ s.first_seen | short_date }}</span></div>
     </a></li>
     {% endfor %}{% endfor %}
   </ul>
-  <p class="empty" id="none" hidden>No hay noticias que coincidan.</p>
+  <p class="empty" id="none" hidden>{{ t("No hay noticias que coincidan.", "No matching stories.") }}</p>
 </main>
-<footer class="wrap"><p>Actualizado el {{ generated }}.</p></footer>
+<footer class="wrap"><p>{{ t("Actualizado el " ~ generated ~ ".", "Updated on " ~ generated ~ ".") }}</p></footer>
 <script>
 (() => {
   const q = document.getElementById("q");
@@ -104,6 +121,23 @@ footer.wrap { margin-top: 48px; margin-bottom: 56px; color: var(--label-3); font
   const res = document.getElementById("results");
   const none = document.getElementById("none");
   const items = [...res.querySelectorAll("li")];
+  const applyLang = lang => {
+    document.documentElement.lang = lang;
+    document.querySelectorAll(".lang [data-lang]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
+    document.querySelectorAll("[data-en-placeholder], [data-en-aria-label]").forEach(el => {
+      ["placeholder", "aria-label"].forEach(a => {
+        if (!el.hasAttribute("data-en-" + a)) return;
+        if (!el.hasAttribute("data-es-" + a)) el.setAttribute("data-es-" + a, el.getAttribute(a) || "");
+        el.setAttribute(a, el.getAttribute((lang === "en" ? "data-en-" : "data-es-") + a));
+      });
+    });
+    document.title = lang === "en" ? "AI News · Editions" : "AI News · Ediciones";
+  };
+  document.querySelectorAll(".lang [data-lang]").forEach(b => b.addEventListener("click", () => {
+    try { localStorage.setItem("ai-news-lang", b.dataset.lang); } catch {}
+    applyLang(b.dataset.lang);
+  }));
+  applyLang(document.documentElement.lang === "en" ? "en" : "es");
   const norm = t => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
   q.addEventListener("input", () => {
     const words = norm(q.value).split(/\s+/).filter(Boolean);

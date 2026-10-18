@@ -22,6 +22,14 @@
 <meta name="theme-color" content="#0b0b0f">
 <script>
 document.documentElement.classList.add("js");
+// Idioma: el elegido antes (si se guardó) o el del navegador
+(() => {
+  let lang = null;
+  try { lang = localStorage.getItem("ai-news-lang"); } catch {}
+  if (lang !== "es" && lang !== "en") lang = (navigator.language || "es").toLowerCase().startsWith("es") ? "es" : "en";
+  document.documentElement.lang = lang;
+})();
+const L = (es, en) => (document.documentElement.lang === "en" ? en : es);
 // La entrada se muestra al abrir la edición, una vez por visita, y nunca si se llega con un enlace a una noticia
 (() => {
   let seen = false;
@@ -169,7 +177,7 @@ dialog.sheet.closing::backdrop { animation: fade-out .22s ease-in forwards; }
 .day-label b { display: block; font-size: 14px; font-weight: 600; color: var(--label-2); }
 .day.quiet .day-label b { color: var(--label-3); font-weight: 500; }
 .pulse-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 12px 0 0; font-size: 12px; color: var(--label-2); }
-.pulse-legend span::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--tc); margin-right: 5px; }
+.pulse-legend > span::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--tc); margin-right: 5px; }
 .js .pulse .dot::before { animation: pop .55s cubic-bezier(.3,1.5,.5,1) both; animation-delay: var(--d, 0s); }
 @keyframes pop { from { transform: scale(0); } }
 
@@ -315,6 +323,21 @@ h2.sec .count { color: var(--label-3); font-weight: 600; }
 .home-actions .all-btn { margin-top: 0; font-size: 16px; }
 .view > .day-head { padding-top: 20px; }
 
+/* ---------- Idioma ---------- */
+html[lang="en"] .l-es, html:not([lang="en"]) .l-en { display: none !important; }
+.lang { position: fixed; z-index: 120; top: calc(10px + env(safe-area-inset-top)); right: calc(12px + env(safe-area-inset-right));
+  display: flex; padding: 3px; border-radius: 18px; background: var(--bar);
+  -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px);
+  box-shadow: 0 0 0 0.5px var(--separator), 0 4px 14px rgba(0,0,0,.08); }
+.lang button { min-width: 40px; min-height: 30px; padding: 0 10px; border: 0; border-radius: 15px; background: none; cursor: pointer;
+  font-size: 13px; font-weight: 700; letter-spacing: .03em; color: var(--label-2); position: relative; }
+.lang button::after { content: ""; position: absolute; inset: -7px -2px; } /* área táctil ≥ 44 pt */
+.lang button[aria-pressed="true"] { background: var(--label); color: var(--bg); }
+.lang button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+/* La cabecera deja sitio al selector */
+header.top .brand-row, .title-row { padding-right: 104px; }
+.bar .row { padding-right: 104px; }
+
 /* ---------- Marca ---------- */
 .wordmark { display: inline-flex; align-items: center; gap: 8px; }
 .wordmark .logo-mark { border-radius: 8px; flex: none; }
@@ -344,7 +367,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 .intro-count { font-size: 17px; color: var(--label-2); margin: 22px 0 0; }
 .intro-count b { display: block; font-size: 64px; line-height: 1; font-weight: 800; letter-spacing: -.04em; color: var(--label); font-variant-numeric: tabular-nums; margin-bottom: 6px; }
 .intro-top { margin: 22px 0 0; font-size: 17px; line-height: 1.35; font-weight: 600; max-width: 400px; }
-.intro-top span { display: block; font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+.intro-top .k { display: block; font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
 .intro-go { margin-top: 28px; min-height: 52px; padding: 0 26px; border: 0; border-radius: 26px; background: var(--label); color: var(--bg);
   font-size: 17px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; position: relative; }
 .intro-go .icon { font-size: 18px; stroke-width: 2.4; }
@@ -379,6 +402,9 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 <body>
 {%- from "partials/logo.html" import logo_mark, wordmark %}
 {%- set ni = namespace(i=0) %}
+{#- Texto en los dos idiomas: el CSS muestra solo el activo (html[lang]) -#}
+{%- macro t(es, en_text) -%}<span class="l-es">{{ es }}</span><span class="l-en">{{ en_text or es }}</span>{%- endmacro -%}
+{%- macro plural(n, es1, esn, en1, enn) -%}{{ t(es1 if n == 1 else esn, en1 if n == 1 else enn) }}{%- endmacro -%}
 {%- macro icon(t) -%}
 <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
 {%- if t == "avance" -%}<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>
@@ -393,6 +419,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 {%- elif t == "search" -%}<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>
 {%- elif t == "week" -%}<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M7 14h2M11 14h2M15 14h2M7 17h2M11 17h2"/>
 {%- elif t == "archive" -%}<rect x="3" y="4" width="18" height="5" rx="1.5"/><path d="M5 9v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9"/><path d="M10 13h4"/>
+{%- elif t == "grid" -%}<path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/>
 {%- else -%}<path d="M4 4h13v16H6a2 2 0 0 1-2-2z"/><path d="M17 8h3v10a2 2 0 0 1-2 2"/><path d="M8 8h5M8 12h5M8 16h3"/>
 {%- endif -%}
 </svg>
@@ -402,73 +429,79 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 <button class="tile t-{{ s.type }} reveal" type="button" data-open="{{ s.id }}" data-type="{{ s.type }}" data-day="{{ s.first_seen }}"
   data-cat="{{ s.category }}" data-text="{{ s | search_text }}" aria-haspopup="dialog">
   <span class="tags">
-    <span class="tag">{{ icon(s.type) }}{{ type_singular[s.type] }}</span>
-    {% if s.official %}<span class="tag official">Oficial</span>{% endif %}
-    {% if s.unconfirmed %}<span class="tag unconfirmed">Sin confirmar</span>{% endif %}
-    <span class="tag done">{{ icon("check") }}Leída</span>
+    <span class="tag">{{ icon(s.type) }}{{ t(type_singular[s.type], type_singular_en[s.type]) }}</span>
+    {% if s.official %}<span class="tag official">{{ t("Oficial", "Official") }}</span>{% endif %}
+    {% if s.unconfirmed %}<span class="tag unconfirmed">{{ t("Sin confirmar", "Unconfirmed") }}</span>{% endif %}
+    <span class="tag done">{{ icon("check") }}{{ t("Leída", "Read") }}</span>
   </span>
-  <h3>{{ s.headline }}</h3>
+  <h3>{{ t(s.headline, en(s, "headline")) }}</h3>
   {% set names = s.sources | source_names %}
   <span class="src">{{ names[:2] | join(", ") }}{% if names|length > 2 %} +{{ names|length - 2 }}{% endif %}</span>
   <span class="stats">
-    {% if s.comments %}<span class="meter" aria-label="Intensidad del debate: {{ s.comments | heat_level }} de 5">{% for i in range(5) %}<i{% if i < (s.comments | heat_level) %} class="on"{% endif %}></i>{% endfor %}</span>{% endif %}
+    {% if s.comments %}{% set lv = s.comments | heat_level %}<span class="meter" aria-label="Intensidad del debate: {{ lv }} de 5" data-en-aria-label="Debate intensity: {{ lv }} of 5">{% for i in range(5) %}<i{% if i < lv %} class="on"{% endif %}></i>{% endfor %}</span>{% endif %}
     <span>{{ s.reading_minutes }} min</span>
   </span>
 </button>
 {%- endmacro -%}
 
-<div class="intro" id="intro" role="dialog" aria-modal="true" aria-label="Bienvenida a AI News">
+{# Selector de idioma, fijo arriba a la derecha en todas las pantallas #}
+<div class="lang" role="group" aria-label="Idioma" data-en-aria-label="Language">
+  <button type="button" data-lang="es" aria-pressed="true" lang="es">ES</button>
+  <button type="button" data-lang="en" aria-pressed="false" lang="en">EN</button>
+</div>
+
+<div class="intro" id="intro" role="dialog" aria-modal="true" aria-label="Bienvenida a AI News" data-en-aria-label="Welcome to AI News">
   <div class="intro-inner">
     {{ logo_mark(84, "intro-logo", true) }}
     <p class="intro-brand">AI News</p>
-    <p class="intro-week">{{ week_label }}</p>
+    <p class="intro-week">{{ t(week_label, week_label_en) }}</p>
     <div class="intro-pulse" style="--n: {{ days|length }}" aria-hidden="true">
       {%- for d in days %}
       <div class="intro-day">
         <div class="intro-dots">{% for s in d.stories %}{% set ni.i = ni.i + 1 %}<i class="intro-dot t-{{ s.type }}" style="--s: {{ 12 + 3 * (s.comments | heat_level) }}px; --d: {{ (0.8 + ni.i * 0.07) | round(2) }}s"></i>{% endfor %}</div>
-        <b>{{ d.initial }}</b>
+        <b>{{ t(d.initial, d.initial_en) }}</b>
       </div>
       {%- endfor %}
     </div>
-    <p class="intro-count"><b id="intro-n" data-to="{{ n_stories }}">{{ n_stories }}</b>noticias de IA que generaron conversación</p>
-    {% if ranked %}<p class="intro-top" style="--t: {{ (1.1 + ni.i * 0.07) | round(2) }}s"><span>Lo más destacado</span>{{ ranked[0].headline }}</p>{% endif %}
-    <button class="intro-go" id="intro-go" type="button" style="--t: {{ (1.1 + ni.i * 0.07) | round(2) }}s">Ver la semana{{ icon("next") }}</button>
-    <p class="intro-skip" style="--t: {{ (1.1 + ni.i * 0.07) | round(2) }}s">o toca en cualquier parte</p>
+    <p class="intro-count"><b id="intro-n" data-to="{{ n_stories }}">{{ n_stories }}</b>{{ t("noticias de IA que generaron conversación", "AI stories that got people talking") }}</p>
+    {% if ranked %}<p class="intro-top" style="--t: {{ (1.1 + ni.i * 0.07) | round(2) }}s"><span class="k">{{ t("Lo más destacado", "Top story") }}</span>{{ t(ranked[0].headline, en(ranked[0], "headline")) }}</p>{% endif %}
+    <button class="intro-go" id="intro-go" type="button" style="--t: {{ (1.1 + ni.i * 0.07) | round(2) }}s">{{ t("Ver la semana", "See the week") }}{{ icon("next") }}</button>
+    <p class="intro-skip" style="--t: {{ (1.1 + ni.i * 0.07) | round(2) }}s">{{ t("o toca en cualquier parte", "or tap anywhere") }}</p>
   </div>
 </div>
 
 {# ================= Pantalla principal: la semana ================= #}
 <div id="view-home" class="view">
   <header class="top wrap">
-    <p class="brand-row">{{ wordmark(28) }}<span class="sub">Resumen semanal</span></p>
-    <h1>{{ week_label }}</h1>
-    <p class="meta">{{ n_stories }} {{ "noticia" if n_stories == 1 else "noticias" }} · {{ total_minutes }} min de lectura</p>
+    <p class="brand-row">{{ wordmark(28) }}<span class="sub">{{ t("Resumen semanal", "Weekly digest") }}</span></p>
+    <h1>{{ t(week_label, week_label_en) }}</h1>
+    <p class="meta">{{ n_stories }} {{ plural(n_stories, "noticia", "noticias", "story", "stories") }} · {{ total_minutes }} {{ t("min de lectura", "min read") }}</p>
     <div class="head-row">
-      {% if n_stories %}<div class="progress-read"><span class="track"><span class="fill" data-read-fill></span></span><span data-read-count>Aún no has abierto ninguna</span></div>{% endif %}
-      <button class="help-btn" type="button" data-help>{{ icon("info") }} Cómo leer esta página</button>
+      {% if n_stories %}<div class="progress-read"><span class="track"><span class="fill" data-read-fill></span></span><span data-read-count></span></div>{% endif %}
+      <button class="help-btn" type="button" data-help>{{ icon("info") }} {{ t("Cómo leer esta página", "How to read this page") }}</button>
     </div>
   </header>
 
   <main class="wrap">
-    <nav class="types" aria-label="Tipos de noticia">
-      {% for t, label, desc, items in types %}
-      <button class="type-btn t-{{ t }}" type="button" data-view="{{ t }}"{% if not items %} disabled{% endif %}>
-        <span class="badge">{{ icon(t) }}</span>
-        <span class="name">{{ label }}</span>
-        <span class="desc">{{ desc }}</span>
-        <span class="count">{% if items %}{{ items|length }} {{ "noticia" if items|length == 1 else "noticias" }}<span class="rd" data-type-read="{{ items | map(attribute='id') | join(' ') }}"></span>{% else %}Nada esta semana{% endif %}</span>
+    <nav class="types" aria-label="Tipos de noticia" data-en-aria-label="Story types">
+      {% for tp, label, desc, items in types %}
+      <button class="type-btn t-{{ tp }}" type="button" data-view="{{ tp }}"{% if not items %} disabled{% endif %}>
+        <span class="badge">{{ icon(tp) }}</span>
+        <span class="name">{{ t(label, type_labels_en[tp]) }}</span>
+        <span class="desc">{{ t(desc, type_desc_en[tp]) }}</span>
+        <span class="count">{% if items %}{{ items|length }} {{ plural(items|length, "noticia", "noticias", "story", "stories") }}<span class="rd" data-type-read="{{ items | map(attribute='id') | join(' ') }}"></span>{% else %}{{ t("Nada esta semana", "Nothing this week") }}{% endif %}</span>
       </button>
       {% endfor %}
     </nav>
     {% if n_stories %}
     <div class="home-actions">
-      <button class="all-btn" type="button" data-view="todas">{{ icon("grid") }} Todas las noticias</button>
-      <button class="all-btn" type="button" data-view="day">{{ icon("week") }} Día a día</button>
+      <button class="all-btn" type="button" data-view="todas">{{ icon("grid") }} {{ t("Todas las noticias", "All stories") }}</button>
+      <button class="all-btn" type="button" data-view="day">{{ icon("week") }} {{ t("Día a día", "Day by day") }}</button>
     </div>
 
     <section class="pulse" aria-labelledby="h-pulse">
-      <h2 id="h-pulse">El pulso de la semana</h2>
-      <p class="pulse-readout" id="pulse-readout" aria-live="polite">Cada punto es una noticia, en el día en que surgió; cuanto más grande, más se debatió. Toca un punto para abrirla o un día para verlo entero.</p>
+      <h2 id="h-pulse">{{ t("El pulso de la semana", "The week's pulse") }}</h2>
+      <p class="pulse-readout" id="pulse-readout" aria-live="polite">{{ t("Cada punto es una noticia, en el día en que surgió; cuanto más grande, más se debatió. Toca un punto para abrirla o un día para verlo entero.", "Each dot is a story, on the day it broke; the bigger it is, the more it was debated. Tap a dot to open it, or a day to see it in full.") }}</p>
       <div class="days" style="--n: {{ days|length }}">
         {%- set ns = namespace(i=0) %}
         {%- for d in days %}
@@ -477,47 +510,49 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
             {%- for s in d.stories %}{% set ns.i = ns.i + 1 %}
             <button class="dot t-{{ s.type }}" type="button" data-open="{{ s.id }}" data-ctx="pulse"
               data-label="{{ d.weekday|capitalize }} {{ d.day }} · {{ type_singular[s.type] }}|{{ s.headline }}"
+              data-label-en="{{ d.weekday_en }} {{ d.day }} · {{ type_singular_en[s.type] }}|{{ en(s, 'headline') }}"
               aria-label="{{ d.weekday|capitalize }} {{ d.day }}, {{ type_singular[s.type] }}: {{ s.headline }}"
+              data-en-aria-label="{{ d.weekday_en }} {{ d.day }}, {{ type_singular_en[s.type] }}: {{ en(s, 'headline') }}"
               style="--s: {{ 10 + 3 * (s.comments | heat_level) }}px; --d: {{ 120 + ns.i * 45 }}ms"></button>
             {%- endfor %}
           </div>
-          <button class="day-label" type="button" data-goto-day="{{ d.iso }}" aria-label="Ver {{ d.label }}"><b>{{ d.day }}</b>{{ d.weekday }}</button>
+          <button class="day-label" type="button" data-goto-day="{{ d.iso }}" aria-label="Ver {{ d.label }}" data-en-aria-label="See {{ d.label_en }}"><b>{{ d.day }}</b>{{ t(d.weekday, d.weekday_en) }}</button>
         </div>
         {%- endfor %}
       </div>
-      <p class="pulse-legend" aria-hidden="true">{% for t, label, desc, items in types if items %}<span class="t-{{ t }}">{{ label }}</span>{% endfor %}</p>
+      <p class="pulse-legend" aria-hidden="true">{% for tp, label, desc, items in types if items %}<span class="t-{{ tp }}">{{ t(label, type_labels_en[tp]) }}</span>{% endfor %}</p>
     </section>
 
-    <h2 class="block">Lo más destacado</h2>
+    <h2 class="block">{{ t("Lo más destacado", "Top stories") }}</h2>
     <div class="grid">
       {% for s in ranked[:4] %}{{ tile(s) }}{% endfor %}
     </div>
     {% else %}
-    <p class="empty">No hay noticias esta semana.</p>
+    <p class="empty">{{ t("No hay noticias esta semana.", "No stories this week.") }}</p>
     {% endif %}
 
-    <nav class="editions" aria-label="Otras ediciones">
-      {% if prev_day %}<a class="ed-link" href="{{ prev_day }}.html">{{ icon("back") }} Semana anterior</a>{% endif %}
-      <a class="ed-link" href="ediciones.html">{{ icon("archive") }} Todas las ediciones</a>
-      {% if next_day %}<a class="ed-link" href="{{ next_day }}.html">Semana siguiente {{ icon("next") }}</a>{% endif %}
+    <nav class="editions" aria-label="Otras ediciones" data-en-aria-label="Other editions">
+      {% if prev_day %}<a class="ed-link" href="{{ prev_day }}.html">{{ icon("back") }} {{ t("Semana anterior", "Previous week") }}</a>{% endif %}
+      <a class="ed-link" href="ediciones.html">{{ icon("archive") }} {{ t("Todas las ediciones", "All editions") }}</a>
+      {% if next_day %}<a class="ed-link" href="{{ next_day }}.html">{{ t("Semana siguiente", "Next week") }} {{ icon("next") }}</a>{% endif %}
     </nav>
   </main>
 </div>
 
 {# ================= Un tipo ================= #}
-{% for t, label, desc, items in types if items %}
-<div id="view-{{ t }}" class="view t-{{ t }}" hidden>
+{% for tp, label, desc, items in types if items %}
+<div id="view-{{ tp }}" class="view t-{{ tp }}" hidden>
   <div class="bar"><div class="wrap row">
-    <button class="back" type="button" data-view="home">{{ icon("back") }}Semana</button>
+    <button class="back" type="button" data-view="home">{{ icon("back") }}{{ t("Semana", "Week") }}</button>
   </div></div>
   <main class="wrap">
-    <h2 class="view-title">{{ icon(t) }}{{ label }}</h2>
-    <p class="view-sub">{{ items|length }} {{ "noticia" if items|length == 1 else "noticias" }} · {{ week_label }}</p>
+    <h2 class="view-title">{{ icon(tp) }}{{ t(label, type_labels_en[tp]) }}</h2>
+    <p class="view-sub">{{ items|length }} {{ plural(items|length, "noticia", "noticias", "story", "stories") }} · {{ t(week_label, week_label_en) }}</p>
     {% set cats = items | categories_of %}
     {% if cats|length > 1 %}
-    <nav class="filters" aria-label="Filtrar por categoría" role="group" data-filter="cat">
-      <button class="chip" type="button" data-value="" aria-pressed="true">Todas</button>
-      {% for key, clabel in cats %}<button class="chip" type="button" data-value="{{ key }}" aria-pressed="false">{{ clabel }}</button>{% endfor %}
+    <nav class="filters" aria-label="Filtrar por categoría" data-en-aria-label="Filter by category" role="group" data-filter="cat">
+      <button class="chip" type="button" data-value="" aria-pressed="true">{{ t("Todas", "All") }}</button>
+      {% for key, clabel in cats %}<button class="chip" type="button" data-value="{{ key }}" aria-pressed="false">{{ t(clabel, category_labels_en[key]) }}</button>{% endfor %}
     </nav>
     {% endif %}
     <div class="grid" data-filterable>{% for s in items %}{{ tile(s) }}{% endfor %}</div>
@@ -528,46 +563,47 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 {# ================= Todas, con búsqueda y filtros ================= #}
 <div id="view-todas" class="view" hidden>
   <div class="bar"><div class="wrap row">
-    <button class="back" type="button" data-view="home">{{ icon("back") }}Semana</button>
+    <button class="back" type="button" data-view="home">{{ icon("back") }}{{ t("Semana", "Week") }}</button>
   </div></div>
   <main class="wrap">
-    <h2 class="view-title">Todas las noticias</h2>
-    <p class="view-sub">{{ n_stories }} noticias · {{ week_label }}</p>
-    <label class="search">{{ icon("search") }}<input type="search" placeholder="Buscar: empresa, modelo, tema…" data-search aria-label="Buscar noticias"></label>
-    <nav class="filters" aria-label="Filtrar por tipo" role="group" data-filter="type">
-      <button class="chip" type="button" data-value="" aria-pressed="true">Todos</button>
-      {% for t, label, desc, items in types if items %}<button class="chip t-{{ t }}" type="button" data-value="{{ t }}" aria-pressed="false"><span class="chip-dot"></span>{{ label }} <span class="n">{{ items|length }}</span></button>{% endfor %}
+    <h2 class="view-title">{{ t("Todas las noticias", "All stories") }}</h2>
+    <p class="view-sub">{{ n_stories }} {{ plural(n_stories, "noticia", "noticias", "story", "stories") }} · {{ t(week_label, week_label_en) }}</p>
+    <label class="search">{{ icon("search") }}<input type="search" placeholder="Buscar: empresa, modelo, tema…" data-en-placeholder="Search: company, model, topic…" data-search aria-label="Buscar noticias" data-en-aria-label="Search stories"></label>
+    <nav class="filters" aria-label="Filtrar por tipo" data-en-aria-label="Filter by type" role="group" data-filter="type">
+      <button class="chip" type="button" data-value="" aria-pressed="true">{{ t("Todos", "All") }}</button>
+      {% for tp, label, desc, items in types if items %}<button class="chip t-{{ tp }}" type="button" data-value="{{ tp }}" aria-pressed="false"><span class="chip-dot"></span>{{ t(label, type_labels_en[tp]) }} <span class="n">{{ items|length }}</span></button>{% endfor %}
     </nav>
-    <nav class="filters" aria-label="Filtrar por día" role="group" data-filter="day">
-      <button class="chip" type="button" data-value="" aria-pressed="true">Toda la semana</button>
-      {% for d in days if d.stories %}<button class="chip" type="button" data-value="{{ d.iso }}" aria-pressed="false">{{ d.weekday|capitalize }} {{ d.day }}</button>{% endfor %}
+    <nav class="filters" aria-label="Filtrar por día" data-en-aria-label="Filter by day" role="group" data-filter="day">
+      <button class="chip" type="button" data-value="" aria-pressed="true">{{ t("Toda la semana", "All week") }}</button>
+      {% for d in days if d.stories %}<button class="chip" type="button" data-value="{{ d.iso }}" aria-pressed="false">{{ t(d.weekday|capitalize, d.weekday_en) }} {{ d.day }}</button>{% endfor %}
     </nav>
     <div class="grid" data-filterable>{% for s in ranked %}{{ tile(s) }}{% endfor %}</div>
-    <p class="empty" data-no-results hidden>No hay noticias que coincidan.</p>
+    <p class="empty" data-no-results hidden>{{ t("No hay noticias que coincidan.", "No matching stories.") }}</p>
   </main>
 </div>
 
 {# ================= Día a día ================= #}
 <div id="view-day" class="view" hidden>
   <div class="bar"><div class="wrap row">
-    <button class="back" type="button" data-view="home">{{ icon("back") }}Semana</button>
+    <button class="back" type="button" data-view="home">{{ icon("back") }}{{ t("Semana", "Week") }}</button>
   </div></div>
   <header class="top wrap day-head">
     <div class="title-row">
-      <h1 id="day-title">{% for d in days if d.iso == default_day %}{{ d.label }}{% endfor %}</h1>
+      <h1 id="day-title"></h1>
       <div class="arrows">
-        <button class="arrow" type="button" data-day-step="-1" aria-label="Día anterior">{{ icon("back") }}</button>
-        <button class="arrow" type="button" data-day-step="1" aria-label="Día siguiente">{{ icon("next") }}</button>
+        <button class="arrow" type="button" data-day-step="-1" aria-label="Día anterior" data-en-aria-label="Previous day">{{ icon("back") }}</button>
+        <button class="arrow" type="button" data-day-step="1" aria-label="Día siguiente" data-en-aria-label="Next day">{{ icon("next") }}</button>
       </div>
     </div>
     <p class="meta" id="day-meta" aria-live="polite"></p>
   </header>
-  <nav class="strip-bar" aria-label="Días de la semana">
+  <nav class="strip-bar" aria-label="Días de la semana" data-en-aria-label="Days of the week">
     <div class="wrap strip">
       {% for d in days %}
       <button class="strip-day{% if not d.stories %} empty{% endif %}" type="button" data-day-btn="{{ d.iso }}"
-        aria-label="{{ d.label }}: {{ d.stories|length }} {{ 'noticia' if d.stories|length == 1 else 'noticias' }}">
-        <span class="wd">{{ d.initial }}</span>
+        aria-label="{{ d.label }}: {{ d.stories|length }} {{ 'noticia' if d.stories|length == 1 else 'noticias' }}"
+        data-en-aria-label="{{ d.label_en }}: {{ d.stories|length }} {{ 'story' if d.stories|length == 1 else 'stories' }}">
+        <span class="wd">{{ t(d.initial, d.initial_en) }}</span>
         <span class="num">{{ d.day }}</span>
         <span class="mini" aria-hidden="true">{% for s in d.stories[:4] %}<i class="t-{{ s.type }}"></i>{% endfor %}</span>
       </button>
@@ -576,17 +612,17 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
   </nav>
   <main class="wrap day-main" id="day-main">
     {% for d in days %}
-    <div class="day-pane" data-pane="{{ d.iso }}" data-label="{{ d.label }}" data-n="{{ d.stories|length }}"
+    <div class="day-pane" data-pane="{{ d.iso }}" data-label="{{ d.label }}" data-label-en="{{ d.label_en }}" data-n="{{ d.stories|length }}"
       data-min="{{ d.stories | sum(attribute='reading_minutes') }}"{% if d.iso != default_day %} hidden{% endif %}>
-      {% for t, label, items in d.sections if items %}
-      <section class="t-{{ t }}" aria-label="{{ label }}">
-        <h2 class="sec">{{ icon(t) }}{{ label }}<span class="count">{{ items|length }}</span></h2>
+      {% for tp, label, items in d.sections if items %}
+      <section class="t-{{ tp }}" aria-label="{{ label }}" data-en-aria-label="{{ type_labels_en[tp] }}">
+        <h2 class="sec">{{ icon(tp) }}{{ t(label, type_labels_en[tp]) }}<span class="count">{{ items|length }}</span></h2>
         <div class="grid">{% for s in items %}{{ tile(s) }}{% endfor %}</div>
       </section>
       {% else %}
       <div class="day-empty">
-        <p>Sin noticias destacadas este día.</p>
-        <p class="sub">Puede que lo que pasó no tuviera bastante eco, o que se cuente en otro día de la semana.</p>
+        <p>{{ t("Sin noticias destacadas este día.", "No standout stories this day.") }}</p>
+        <p class="sub">{{ t("Puede que lo que pasó no tuviera bastante eco, o que se cuente en otro día de la semana.", "What happened may not have drawn enough attention, or it is covered on another day of the week.") }}</p>
       </div>
       {% endfor %}
     </div>
@@ -595,34 +631,36 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 </div>
 
 <footer class="wrap">
-  {% if failed_sources %}<p class="warn">Fuentes no disponibles: {{ failed_sources | join(", ") }}.</p>{% endif %}
-  <p>Cobertura de X parcial: el debate en X llega a través de vídeos de YouTube, Hacker News y medios.</p>
-  <p>Resúmenes generados con IA a partir de {{ stats.get("items", 0) }} fuentes; pueden contener errores. Cada noticia enlaza a su fuente original.</p>
-  <p>Generado el {{ generated }}.</p>
+  {% if failed_sources %}<p class="warn">{{ t("Fuentes no disponibles:", "Sources unavailable:") }} {{ failed_sources | join(", ") }}.</p>{% endif %}
+  <p>{{ t("Cobertura de X parcial: el debate en X llega a través de vídeos de YouTube, Hacker News y medios.", "Partial coverage of X: the debate on X arrives through YouTube videos, Hacker News and the press.") }}</p>
+  <p>{{ t("Resúmenes generados con IA a partir de " ~ stats.get("items", 0) ~ " fuentes; pueden contener errores. Cada noticia enlaza a su fuente original.", "Summaries written with AI from " ~ stats.get("items", 0) ~ " sources; they may contain errors. Every story links to its original sources.") }}</p>
+  <p>{{ t("Generado el " ~ generated ~ ".", "Generated on " ~ generated ~ ".") }}</p>
 </footer>
 
 {# Guía: qué significa cada etiqueta #}
 <template id="d-help">
   <div class="help">
-    <h2 id="sheet-title">Cómo leer esta página</h2>
-    <p class="lead">Cada semana se eligen entre 12 y 15 noticias de IA según cuánta conversación real generan, no según lo que sale primero en un buscador. La vista diaria las muestra el día en que surgieron.</p>
-    <h4>Tipos</h4>
+    <h2 id="sheet-title">{{ t("Cómo leer esta página", "How to read this page") }}</h2>
+    <p class="lead">{{ t("Cada semana se eligen entre 12 y 15 noticias de IA según cuánta conversación real generan, no según lo que sale primero en un buscador. La vista día a día las muestra el día en que surgieron.", "Every week, 12 to 15 AI stories are picked by how much real conversation they generate, not by what ranks first on a search engine. The day-by-day view shows them on the day they broke.") }}</p>
+    <h4>{{ t("Tipos", "Types") }}</h4>
     <dl>
-      {% for t, label, desc, items in types %}<dt class="t-{{ t }}"><span class="tag">{{ icon(t) }}{{ type_singular[t] }}</span></dt><dd>{{ desc }}.</dd>{% endfor %}
+      {% for tp, label, desc, items in types %}<dt class="t-{{ tp }}"><span class="tag">{{ icon(tp) }}{{ t(type_singular[tp], type_singular_en[tp]) }}</span></dt><dd>{{ t(desc, type_desc_en[tp]) }}.</dd>{% endfor %}
     </dl>
-    <h4>Etiquetas</h4>
+    <h4>{{ t("Etiquetas", "Labels") }}</h4>
     <dl>
-      <dt><span class="tag official">Fuente oficial</span></dt><dd>El anuncio viene de la propia empresa o laboratorio.</dd>
-      <dt><span class="tag unconfirmed">Sin confirmar</span></dt><dd>Polémica con una sola fuente no oficial: tómala con cautela. Dentro de cada noticia, el apartado «Sin confirmar» lista las afirmaciones concretas que no están verificadas.</dd>
-      <dt><span class="tag partial">Resumen parcial</span></dt><dd>El vídeo no tenía subtítulos y el resumen se basa solo en su título y descripción.</dd>
+      <dt><span class="tag official">{{ t("Fuente oficial", "Official source") }}</span></dt><dd>{{ t("El anuncio viene de la propia empresa o laboratorio.", "The announcement comes from the company or lab itself.") }}</dd>
+      <dt><span class="tag unconfirmed">{{ t("Sin confirmar", "Unconfirmed") }}</span></dt><dd>{{ t("Polémica con una sola fuente no oficial: tómala con cautela. Dentro de cada noticia, el apartado «Sin confirmar» lista las afirmaciones concretas que no están verificadas.", "A controversy backed by a single unofficial source: treat it with caution. Inside each story, the “Unconfirmed” section lists the specific claims that have not been verified.") }}</dd>
+      <dt><span class="tag partial">{{ t("Resumen parcial", "Partial summary") }}</span></dt><dd>{{ t("El vídeo no tenía subtítulos y el resumen se basa solo en su título y descripción.", "The video had no captions, so the summary relies only on its title and description.") }}</dd>
     </dl>
-    <h4>Intensidad del debate</h4>
+    <h4>{{ t("Intensidad del debate", "Debate intensity") }}</h4>
     <dl>
       <dt><span class="meter" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span></dt>
-      <dd>Las barras resumen los comentarios en Hacker News y YouTube: una a partir de 20, dos desde 80, tres desde 200, cuatro desde 500 y cinco desde 1.000. En «El pulso de la semana», el tamaño del punto dice lo mismo.</dd>
+      <dd>{{ t("Las barras resumen los comentarios en Hacker News y YouTube: una a partir de 20, dos desde 80, tres desde 200, cuatro desde 500 y cinco desde 1.000. En «El pulso de la semana», el tamaño del punto dice lo mismo.", "The bars summarise comments on Hacker News and YouTube: one from 20, two from 80, three from 200, four from 500 and five from 1,000. In “The week's pulse”, the size of each dot says the same.") }}</dd>
     </dl>
-    <h4>Cómo se eligen</h4>
-    <p class="note">Se puntúa cuántas fuentes distintas cuentan la noticia, cuánto se discute, lo reciente que es y su tipo (los avances y las polémicas pesan algo más). Se reparten entre los días y los tipos cuando la semana da para ello, y nunca se rellena con temas flojos. Los resúmenes salen solo de las fuentes enlazadas.</p>
+    <h4>{{ t("Cómo se eligen", "How they are chosen") }}</h4>
+    <p class="note">{{ t("Se puntúa cuántas fuentes distintas cuentan la noticia, cuánto se discute, lo reciente que es y su tipo (los avances y las polémicas pesan algo más). Se reparten entre los días y los tipos cuando la semana da para ello, y nunca se rellena con temas flojos. Los resúmenes salen solo de las fuentes enlazadas.", "Each story is scored on how many different sources cover it, how much it is discussed, how recent it is and its type (releases and controversies weigh a little more). Stories are spread across days and types when the week allows it, and gaps are never filled with weak topics. Summaries are based only on the linked sources.") }}</p>
+    <h4>{{ t("Idioma", "Language") }}</h4>
+    <p class="note">{{ t("Los resúmenes se escriben en español y se traducen al inglés; las fuentes enlazadas están en su idioma original.", "Summaries are written in Spanish and translated into English; linked sources are in their original language.") }}</p>
   </div>
 </template>
 
@@ -630,33 +668,36 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 {% for s in ranked %}
 <template id="d-{{ s.id }}">
   <div class="tags">
-    <span class="tag t-{{ s.type }}">{{ icon(s.type) }}{{ type_singular[s.type] }}</span>
-    <span class="tag t-noticia">{{ category_labels[s.category] }}</span>
-    {% if s.official %}<span class="tag official">Fuente oficial</span>{% endif %}
-    {% if s.unconfirmed %}<span class="tag unconfirmed">Sin confirmar</span>{% endif %}
-    {% if s.partial %}<span class="tag partial">Resumen parcial</span>{% endif %}
+    <span class="tag t-{{ s.type }}">{{ icon(s.type) }}{{ t(type_singular[s.type], type_singular_en[s.type]) }}</span>
+    <span class="tag t-noticia">{{ t(category_labels[s.category], category_labels_en[s.category]) }}</span>
+    {% if s.official %}<span class="tag official">{{ t("Fuente oficial", "Official source") }}</span>{% endif %}
+    {% if s.unconfirmed %}<span class="tag unconfirmed">{{ t("Sin confirmar", "Unconfirmed") }}</span>{% endif %}
+    {% if s.partial %}<span class="tag partial">{{ t("Resumen parcial", "Partial summary") }}</span>{% endif %}
   </div>
-  <h2 id="sheet-title">{{ s.headline }}</h2>
-  <p class="lead">{{ s.summary_short }}</p>
+  <h2 id="sheet-title">{{ t(s.headline, en(s, "headline")) }}</h2>
+  <p class="lead">{{ t(s.summary_short, en(s, "summary_short")) }}</p>
   <div class="info">
-    {% if s.comments %}<span>{% set h = s.comments | heat %}{% if h %}<span class="heat">{{ h }}</span> · {% endif %}{{ s.comments }} comentarios</span>{% endif %}
-    <span>{{ s.sources|length }} {{ "fuente" if s.sources|length == 1 else "fuentes" }}</span>
-    <span>{{ s.reading_minutes }} min de lectura</span>
+    {% if s.comments %}{% set h = s.comments | heat %}<span>{% if h %}<span class="heat">{{ t(h, {"Muy debatido": "Hotly debated", "Debatido": "Debated"}[h]) }}</span> · {% endif %}{{ s.comments }} {{ t("comentarios", "comments") }}</span>{% endif %}
+    <span>{{ s.sources|length }} {{ plural(s.sources|length, "fuente", "fuentes", "source", "sources") }}</span>
+    <span>{{ s.reading_minutes }} {{ t("min de lectura", "min read") }}</span>
   </div>
-  <div class="long">{% for para in s.summary_long.split("\n\n") if para.strip() %}<p>{{ para.strip() }}</p>{% endfor %}</div>
+  <div class="long l-es">{% for para in s.summary_long.split("\n\n") if para.strip() %}<p>{{ para.strip() }}</p>{% endfor %}</div>
+  <div class="long l-en">{% for para in en(s, "summary_long").split("\n\n") if para.strip() %}<p>{{ para.strip() }}</p>{% endfor %}</div>
   {% if s.unconfirmed_claims %}
-  <h4>Sin confirmar</h4>
-  <ul class="claims">{% for c in s.unconfirmed_claims %}<li>{{ c }}</li>{% endfor %}</ul>
+  <h4>{{ t("Sin confirmar", "Unconfirmed") }}</h4>
+  <ul class="claims l-es">{% for c in s.unconfirmed_claims %}<li>{{ c }}</li>{% endfor %}</ul>
+  <ul class="claims l-en">{% for c in (en(s, "unconfirmed_claims")) %}<li>{{ c }}</li>{% endfor %}</ul>
   {% endif %}
-  <h4>Fuentes</h4>
+  <h4>{{ t("Fuentes", "Sources") }}</h4>
   <ul>
     {% for src in s.sources %}
-    <li><span class="kind">{{ {"youtube": "Vídeo", "rss": "Artículo", "lab": "Oficial", "hackernews": "HN"}[src.kind] }}</span>
-      <span><a href="{{ src | source_link }}" target="_blank" rel="noopener">{{ src.name }}</a>{% if src.timestamp %} · min {{ src.timestamp | mmss }}{% endif %}{% if src.partial %} · sin transcripción{% endif %}</span></li>
+    {% set kinds = {"youtube": ("Vídeo", "Video"), "rss": ("Artículo", "Article"), "lab": ("Oficial", "Official"), "hackernews": ("HN", "HN")} %}
+    <li><span class="kind">{{ t(kinds[src.kind][0], kinds[src.kind][1]) }}</span>
+      <span><a href="{{ src | source_link }}" target="_blank" rel="noopener">{{ src.name }}</a>{% if src.timestamp %} · min {{ src.timestamp | mmss }}{% endif %}{% if src.partial %} · {{ t("sin transcripción", "no transcript") }}{% endif %}</span></li>
     {% endfor %}
   </ul>
   {% if s.related %}
-  <h4>Ver historia</h4>
+  <h4>{{ t("Ver historia", "See the story so far") }}</h4>
   <ul class="related">
     {% for r in s.related %}
     <li><span class="rel" style="--rc: var(--r-{{ r.relation }})">{{ r.relation | capitalize }}</span>
@@ -670,14 +711,14 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 <dialog class="sheet" id="sheet" aria-labelledby="sheet-title">
   <div class="sheet-head">
     <div class="grabber" aria-hidden="true"></div>
-    <button class="share" type="button" aria-label="Compartir esta noticia"><span>{{ icon("share") }}</span></button>
-    <button class="close" type="button" aria-label="Cerrar"><span>{{ icon("close") }}</span></button>
+    <button class="share" type="button" aria-label="Compartir esta noticia" data-en-aria-label="Share this story"><span>{{ icon("share") }}</span></button>
+    <button class="close" type="button" aria-label="Cerrar" data-en-aria-label="Close"><span>{{ icon("close") }}</span></button>
   </div>
   <div class="sheet-body" id="sheet-body" tabindex="-1" autofocus></div>
-  <nav class="sheet-nav" id="sheet-nav" aria-label="Otras noticias">
-    <button class="nav-btn" type="button" data-step="-1">{{ icon("back") }}Anterior</button>
+  <nav class="sheet-nav" id="sheet-nav" aria-label="Otras noticias" data-en-aria-label="Other stories">
+    <button class="nav-btn" type="button" data-step="-1">{{ icon("back") }}{{ t("Anterior", "Previous") }}</button>
     <span class="nav-count" id="nav-count" aria-live="polite"></span>
-    <button class="nav-btn" type="button" data-step="1">Siguiente{{ icon("next") }}</button>
+    <button class="nav-btn" type="button" data-step="1">{{ t("Siguiente", "Next") }}{{ icon("next") }}</button>
   </nav>
 </dialog>
 <div class="toast" id="toast" role="status"></div>
@@ -796,9 +837,11 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
       if (!on) return;
       p.classList.remove("from-right", "from-left");
       if (dir && !reduce) { void p.offsetWidth; p.classList.add(dir > 0 ? "from-right" : "from-left"); }
-      title.textContent = p.dataset.label;
+      title.textContent = L(p.dataset.label, p.dataset.labelEn);
       const n = +p.dataset.n;
-      meta.textContent = n ? `${n} ${n === 1 ? "noticia" : "noticias"} · ${p.dataset.min} min de lectura` : "Un día tranquilo";
+      meta.textContent = n
+        ? L(`${n} ${n === 1 ? "noticia" : "noticias"} · ${p.dataset.min} min de lectura`, `${n} ${n === 1 ? "story" : "stories"} · ${p.dataset.min} min read`)
+        : L("Un día tranquilo", "A quiet day");
       $$(".reveal", p).forEach(el => el.classList.add("in"));
     });
     dayBtns.forEach(b => b.setAttribute("aria-pressed", String(b.dataset.dayBtn === iso)));
@@ -834,12 +877,14 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     $$("[data-open]").forEach(el => el.classList.toggle("read", read.has(el.dataset.open)));
     const n = ALL.filter(id => read.has(id)).length;
     $$("[data-read-count]").forEach(el => {
-      el.textContent = n === 0 ? "Aún no has abierto ninguna" : n === ALL.length ? "Has leído toda la semana" : `${n} de ${ALL.length} leídas`;
+      el.textContent = n === 0 ? L("Aún no has abierto ninguna", "You haven't opened any yet")
+        : n === ALL.length ? L("Has leído toda la semana", "You've read the whole week")
+        : L(`${n} de ${ALL.length} leídas`, `${n} of ${ALL.length} read`);
     });
     $$("[data-read-fill]").forEach(el => el.style.setProperty("--r", ALL.length ? n / ALL.length : 0));
     $$("[data-type-read]").forEach(el => {
       const k = el.dataset.typeRead.split(" ").filter(id => read.has(id)).length;
-      el.textContent = k ? ` · ${k} ${k === 1 ? "leída" : "leídas"}` : "";
+      el.textContent = k ? ` · ${k} ${L(k === 1 ? "leída" : "leídas", "read")}` : "";
     });
     dayBtns.forEach(b => {
       const ids = $$(".tile", document.querySelector(`[data-pane="${b.dataset.dayBtn}"]`)).map(t => t.dataset.open);
@@ -887,8 +932,8 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
   if (readout) {
     const readoutDefault = readout.innerHTML;
     $$(".pulse .dot").forEach(dot => {
-      const [when, text] = dot.dataset.label.split("|");
       const label = () => {
+        const [when, text] = L(dot.dataset.label, dot.dataset.labelEn).split("|");
         readout.style.setProperty("--tc", getComputedStyle(dot).getPropertyValue("--tc"));
         readout.replaceChildren(Object.assign(document.createElement("b"), { textContent: when + " · " }), text);
       };
@@ -920,7 +965,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     nav.hidden = single;
     shareBtn.hidden = id === "help";
     if (!single) {
-      count.textContent = `${idx + 1} de ${list.length}`;
+      count.textContent = L(`${idx + 1} de ${list.length}`, `${idx + 1} of ${list.length}`);
       prevBtn.disabled = idx <= 0;
       nextBtn.disabled = idx >= list.length - 1;
     }
@@ -1004,9 +1049,9 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     try {
       if (navigator.share) { await navigator.share({ title: heading, text, url }); return; }
       await navigator.clipboard.writeText(`${heading}\n${url}`);
-      say("Enlace copiado");
+      say(L("Enlace copiado", "Link copied"));
     } catch (err) {
-      if (err && err.name !== "AbortError") say("No se pudo compartir");
+      if (err && err.name !== "AbortError") say(L("No se pudo compartir", "Couldn't share"));
     }
   });
 
@@ -1037,6 +1082,28 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     const dx = e.clientX - sx, dy = e.clientY - sy; sx = sy = null;
     if (Math.abs(dx) > 70 && Math.abs(dx) > 2 * Math.abs(dy)) step(dx < 0 ? 1 : -1);
   });
+
+  // ---------- Idioma ----------
+  const TITLE = { es: document.title, en: "AI News · Week {{ week_label_en }}" };
+  const ATTRS = ["aria-label", "placeholder"];
+  const applyLang = lang => {
+    document.documentElement.lang = lang;
+    $$(".lang [data-lang]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
+    ATTRS.forEach(attr => $$(`[data-en-${attr}]`).forEach(el => {
+      if (!el.hasAttribute(`data-es-${attr}`)) el.setAttribute(`data-es-${attr}`, el.getAttribute(attr) || "");
+      el.setAttribute(attr, el.getAttribute(lang === "en" ? `data-en-${attr}` : `data-es-${attr}`));
+    }));
+    document.title = TITLE[lang];
+    paintRead();
+    showDay(day);
+    if (sheet.open && currentId) renderStory(currentId);
+  };
+  $$(".lang [data-lang]").forEach(b => b.addEventListener("click", e => {
+    e.stopPropagation(); // no cierra la entrada
+    try { localStorage.setItem("ai-news-lang", b.dataset.lang); } catch {}
+    applyLang(b.dataset.lang);
+  }));
+  applyLang(document.documentElement.lang === "en" ? "en" : "es");
 
   // ---------- Estado inicial y botón atrás ----------
   const route = () => {
