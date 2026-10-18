@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>IA News · Ediciones</title>
+<meta name="description" content="Todas las ediciones semanales de IA News, con búsqueda en el histórico.">
+{%- if og_image %}
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="IA News">
+<meta property="og:title" content="IA News · Resumen semanal de inteligencia artificial">
+<meta property="og:description" content="Cada semana, las noticias de IA que generaron conversación real, resumidas en español.">
+<meta property="og:image" content="{{ og_image }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="{{ site_url }}">
+<meta name="twitter:card" content="summary_large_image">
+{%- endif %}
+<style>
+{% include "partials/base.css" %}
+header.top { padding-top: 44px; padding-bottom: 8px; }
+.eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); margin: 0 0 4px; }
+h1 { font-size: 34px; line-height: 1.12; font-weight: 700; letter-spacing: -.02em; margin: 0; }
+.meta { color: var(--label-2); font-size: 15px; margin: 8px 0 0; }
+main.wrap { max-width: 720px; }
+.search { display: flex; align-items: center; gap: 8px; margin-top: 20px; padding: 0 12px; min-height: 44px; border-radius: 12px; background: var(--fill); color: var(--label-3); }
+.search input { flex: 1; min-width: 0; border: 0; background: none; font: inherit; font-size: 16px; color: var(--label); outline: none; }
+.search:focus-within { box-shadow: 0 0 0 2px var(--accent); }
+.editions { list-style: none; margin: 20px 0 0; padding: 0; display: grid; gap: 12px; }
+.edition { display: block; padding: 18px; border-radius: 20px; background: var(--card); box-shadow: var(--shadow); color: var(--label); transition: transform .15s ease, box-shadow .25s ease; }
+.edition:hover { text-decoration: none; box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+.edition h2 { font-size: 19px; font-weight: 700; letter-spacing: -.01em; margin: 0; }
+.edition .sub { font-size: 14px; color: var(--label-2); margin: 4px 0 0; }
+.edition .top3 { margin: 10px 0 0; padding: 0; list-style: none; font-size: 15px; color: var(--label-2); }
+.edition .top3 li { padding: 3px 0; display: flex; gap: 8px; align-items: baseline; }
+.edition .top3 li::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--tc); flex: none; transform: translateY(-1px); }
+.week-bars { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 14px; align-items: end; height: 46px; }
+.week-bars span { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; color: var(--label-3); }
+.week-bars i { width: 100%; max-width: 26px; border-radius: 4px 4px 2px 2px; background: var(--accent); opacity: .75; height: calc(var(--h) * 28px + 2px); }
+.week-bars i.zero { background: var(--fill-2); opacity: 1; }
+.results { list-style: none; margin: 20px 0 0; padding: 0; }
+.results li a { display: block; padding: 12px 0; border-bottom: 0.5px solid var(--separator); color: var(--label); }
+.results li a:hover { text-decoration: none; }
+.results .h { font-size: 16px; font-weight: 600; line-height: 1.35; }
+.results .m { font-size: 13px; color: var(--label-3); margin-top: 3px; display: flex; gap: 8px; align-items: center; }
+.results .m b { color: var(--tc); font-weight: 600; }
+.empty { color: var(--label-2); text-align: center; padding: 40px 0; }
+footer.wrap { margin-top: 48px; margin-bottom: 56px; color: var(--label-3); font-size: 13px; max-width: 720px; }
+</style>
+</head>
+<body>
+<header class="top wrap" style="max-width: 720px">
+  <p class="eyebrow">IA News</p>
+  <h1>Todas las ediciones</h1>
+  <p class="meta">{{ editions|length }} {{ "edición" if editions|length == 1 else "ediciones" }} · {{ editions | map(attribute='stories') | map('length') | sum }} noticias</p>
+</header>
+<main class="wrap">
+  <label class="search">
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+    <input type="search" placeholder="Buscar en el histórico: empresa, modelo, persona, tema…" id="q" aria-label="Buscar en todas las ediciones">
+  </label>
+
+  <ul class="editions" id="editions">
+    {% for e in editions %}
+    <li><a class="edition" href="{{ e.date }}.html">
+      <h2>{{ e.label }}</h2>
+      <p class="sub">{{ e.stories|length }} noticias</p>
+      <ul class="top3">{% for s in e.stories[:3] %}<li class="t-{{ s.type }}">{{ s.headline }}</li>{% endfor %}</ul>
+      {% set mx = e.days | map(attribute='stories') | map('length') | max %}
+      <div class="week-bars" aria-label="Noticias por día">
+        {% for d in e.days %}<span><i{% if not d.stories %} class="zero"{% endif %} style="--h: {{ (d.stories|length / (mx or 1)) | round(2) }}"></i>{{ d.initial }}</span>{% endfor %}
+      </div>
+    </a></li>
+    {% else %}
+    <li class="empty">Todavía no hay ediciones.</li>
+    {% endfor %}
+  </ul>
+
+  <ul class="results" id="results" hidden>
+    {% for e in editions %}{% for s in e.stories %}
+    <li class="t-{{ s.type }}" data-text="{{ s | search_text }}"><a href="{{ e.date }}.html#n={{ s.id }}">
+      <div class="h">{{ s.headline }}</div>
+      <div class="m"><b>{{ type_singular[s.type] }}</b><span>{{ category_labels[s.category] }}</span><span>{{ s.first_seen | short_date }}</span></div>
+    </a></li>
+    {% endfor %}{% endfor %}
+  </ul>
+  <p class="empty" id="none" hidden>No hay noticias que coincidan.</p>
+</main>
+<footer class="wrap"><p>Actualizado el {{ generated }}.</p></footer>
+<script>
+(() => {
+  const q = document.getElementById("q");
+  const eds = document.getElementById("editions");
+  const res = document.getElementById("results");
+  const none = document.getElementById("none");
+  const items = [...res.querySelectorAll("li")];
+  const norm = t => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  q.addEventListener("input", () => {
+    const words = norm(q.value).split(/\s+/).filter(Boolean);
+    eds.hidden = words.length > 0;
+    res.hidden = words.length === 0;
+    let n = 0;
+    items.forEach(li => { const ok = words.every(w => norm(li.dataset.text).includes(w)); li.hidden = !ok; n += ok; });
+    none.hidden = !words.length || n > 0;
+  });
+})();
+</script>
+</body>
+</html>

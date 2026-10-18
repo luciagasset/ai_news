@@ -1,0 +1,49 @@
+/* Paleta basada en los colores de sistema de Apple (HIG · Color), con las variantes de contraste
+   accesible para el texto de color. Claro y oscuro siguen la preferencia del sistema. */
+:root {
+  color-scheme: light dark;
+  --bg: #f2f2f7; --card: #ffffff; --sheet: #ffffff;
+  --fill: rgba(120,120,128,.12); --fill-2: rgba(120,120,128,.2);
+  --label: #000000; --label-2: rgba(60,60,67,.74); --label-3: rgba(60,60,67,.52);
+  --separator: rgba(60,60,67,.18);
+  --accent: #1e6ef4;
+  --t-avance: #564ade; --t-debate: #00819f; --t-polemica: #c55300; --t-noticia: #6c6c70;
+  --r-seguimiento: #1e6ef4; --r-relacionada: #6c6c70; --r-contradiccion: #e9152d;
+  --shadow: 0 1px 2px rgba(0,0,0,.04), 0 6px 20px rgba(0,0,0,.06);
+  --shadow-hover: 0 2px 4px rgba(0,0,0,.05), 0 14px 34px rgba(0,0,0,.10);
+  --scrim: rgba(0,0,0,.32); --bar: rgba(242,242,247,.82); --tint: 12%;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #000000; --card: #1c1c1e; --sheet: #1c1c1e; --fill: rgba(118,118,128,.24); --fill-2: rgba(118,118,128,.36);
+    --label: #ffffff; --label-2: rgba(235,235,245,.72); --label-3: rgba(235,235,245,.48); --separator: rgba(84,84,88,.6);
+    --accent: #5cb8ff; --t-avance: #a7aaff; --t-debate: #3bdded; --t-polemica: #ffa056; --t-noticia: #aeaeb2;
+    --r-seguimiento: #5cb8ff; --r-relacionada: #aeaeb2; --r-contradiccion: #ff6165;
+    --shadow: none; --shadow-hover: 0 0 0 1px rgba(255,255,255,.10); --scrim: rgba(0,0,0,.55); --bar: rgba(0,0,0,.74); --tint: 22%;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #000000; --card: #1c1c1e; --sheet: #1c1c1e; --fill: rgba(118,118,128,.24); --fill-2: rgba(118,118,128,.36);
+  --label: #ffffff; --label-2: rgba(235,235,245,.72); --label-3: rgba(235,235,245,.48); --separator: rgba(84,84,88,.6);
+  --accent: #5cb8ff; --t-avance: #a7aaff; --t-debate: #3bdded; --t-polemica: #ffa056; --t-noticia: #aeaeb2;
+  --r-seguimiento: #5cb8ff; --r-relacionada: #aeaeb2; --r-contradiccion: #ff6165;
+  --shadow: none; --shadow-hover: 0 0 0 1px rgba(255,255,255,.10); --scrim: rgba(0,0,0,.55); --bar: rgba(0,0,0,.74); --tint: 22%;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--label);
+  font: 17px/1.47 -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+body.locked { overflow: hidden; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+button { font: inherit; color: inherit; }
+.wrap { max-width: 1040px; margin: 0 auto; padding-left: 16px; padding-right: 16px; }
+.t-avance { --tc: var(--t-avance); } .t-debate { --tc: var(--t-debate); }
+.t-polemica { --tc: var(--t-polemica); } .t-noticia { --tc: var(--t-noticia); }
+.icon { width: 1em; height: 1em; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+[hidden] { display: none !important; }

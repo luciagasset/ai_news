@@ -1,0 +1,73 @@
+# Fuentes de IA_NEWS. Edita libremente: `enabled: false` desactiva una fuente sin borrarla.
+# Fase 1: 3 canales de YouTube, 2 feeds RSS, Hacker News y 3 laboratorios frontera. Edición semanal.
+
+youtube:
+  # Se guardan por handle; el channel_id se resuelve la primera vez con la Data API
+  # y se cachea en data/youtube_channels.json.
+  max_videos_per_channel: 10
+  channels:
+    - { name: "AI Explained",        handle: "@aiexplained-official", lang: en, enabled: true }
+    - { name: "Matthew Berman",      handle: "@matthew_berman",       lang: en, enabled: true }
+    - { name: "Dot CSV",             handle: "@DotCSV",               lang: es, enabled: true }
+    - { name: "Wes Roth",            handle: "@WesRoth",              lang: en, enabled: false }
+    - { name: "The AI Daily Brief",  handle: "@AIDailyBrief",         lang: en, enabled: false }
+    - { name: "Two Minute Papers",   handle: "@TwoMinutePapers",      lang: en, enabled: false }
+    - { name: "Yannic Kilcher",      handle: "@YannicKilcher",        lang: en, enabled: false }
+    - { name: "Matt Wolfe",          handle: "@mreflow",              lang: en, enabled: false }
+    - { name: "Sam Witteveen",       handle: "@samwitteveenai",       lang: en, enabled: false }
+    - { name: "Latent Space",        handle: "@LatentSpacePod",       lang: en, enabled: false }
+    - { name: "bycloud",             handle: "@bycloudAI",            lang: en, enabled: false }
+    - { name: "Dwarkesh Patel",      handle: "@DwarkeshPatel",        lang: en, enabled: false }
+    - { name: "Xavier Mitjana",      handle: "@XavierMitjana",        lang: es, enabled: false }
+    - { name: "Jon Hernández",       handle: "@JonHernandezIA",       lang: es, enabled: false }
+    - { name: "Alejavi Rivera",      handle: "@AlejaviRivera",        lang: es, enabled: false }
+
+rss:
+  - { name: "The Verge",              url: "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml", enabled: true }
+  - { name: "MIT Technology Review",  url: "https://www.technologyreview.com/topic/artificial-intelligence/feed", enabled: true }
+  - { name: "Hugging Face",           url: "https://huggingface.co/blog/feed.xml", enabled: false }
+
+# Páginas oficiales de los laboratorios frontera. Lo que venga de aquí se marca como "fuente oficial".
+# kind: rss  -> se lee como feed
+# kind: html -> se extraen los enlaces que empiezan por `link_prefix` y su fecha (<time>)
+labs:
+  - { name: "OpenAI",          kind: rss,  url: "https://openai.com/news/rss.xml", enabled: true }
+  - { name: "Anthropic",       kind: html, url: "https://www.anthropic.com/news", link_prefix: "/news/", enabled: true }
+  - { name: "Google DeepMind", kind: rss,  url: "https://deepmind.google/blog/rss.xml", enabled: true }
+  - { name: "Meta AI",         kind: html, url: "https://ai.meta.com/blog/", link_prefix: "/blog/", enabled: false }
+  - { name: "Mistral",         kind: html, url: "https://mistral.ai/news", link_prefix: "/news/", enabled: false }
+  # xAI devuelve 403 a peticiones automáticas; queda fuera por ahora.
+
+hackernews:
+  enabled: true
+  min_points: 50
+  max_items: 80            # las 80 historias de IA con más puntos de la semana
+  # Historias con mucha tracción cuyo título no dice nada de IA (p. ej. «REA Reverse – Engineer Anything»):
+  # se lee el artículo (o el hilo, si la web no deja leerlo) y entran si habla de IA con frecuencia.
+  check_text_min_points: 150
+  # Una historia entra si su título contiene alguna de estas palabras completas (sin distinguir
+  # mayúsculas). Un * final permite cualquier terminación: "fine-tun*" casa con fine-tuning.
+  keywords: [ "ai", "a.i.", "llm", "gpt", "openai", "anthropic", "claude", "gemini", "deepmind",
+              "llama", "mistral", "grok", "xai", "transformer", "neural", "machine learning",
+              "deep learning", "chatbot", "agent", "diffusion", "benchmark", "hugging face",
+              "copilot", "codex", "inference", "fine-tun*", "rlhf", "model", "agi" ]
+
+# Laboratorios considerados "frontera" (se usan para clasificar avances).
+frontier_labs: [ OpenAI, Anthropic, Google DeepMind, Meta, Mistral, xAI ]
+
+# Temas que suben la puntuación (coincidencia en titular o entidades).
+priority_topics: [ "seguridad de la IA", "agentes", "regulación", "open source", "benchmarks", "razonamiento" ]
+
+selection:
+  max_items: 15            # edición semanal: 12-15 noticias
+  min_per_type: 2          # solo si hay material con peso real; nunca se rellena
+  max_per_type: 5          # ningún tipo acapara la edición
+  min_per_day: 1           # cada día con material de peso tiene al menos una noticia
+  max_per_day: 4           # ningún día acapara la semana
+  window_days: 7
+
+# Publicación. La URL pública se usa para la imagen de vista previa (LinkedIn y otras redes
+# necesitan una dirección absoluta) y para el enlace del carrusel.
+site:
+  url: "https://luciagasset.github.io/ia_news/"
+  author: "Lucía Gasset"

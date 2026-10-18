@@ -1,0 +1,929 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>IA News · Semana {{ date | short_date }}</title>
+<meta name="description" content="Resumen semanal de avances, debates, polémicas y noticias de inteligencia artificial.">
+{%- if og_image %}
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="IA News">
+<meta property="og:title" content="IA News · {{ week_label }}">
+<meta property="og:description" content="{{ n_stories }} noticias de IA que generaron conversación: avances, debates, polémicas y noticias, resumidas en español.">
+<meta property="og:image" content="{{ og_image }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+{% if page_url %}<meta property="og:url" content="{{ page_url }}">{% endif %}
+<meta name="twitter:card" content="summary_large_image">
+{%- endif %}
+<script>document.documentElement.classList.add("js")</script>
+<style>
+{% include "partials/base.css" %}
+
+/* ---------- Inicio ---------- */
+header.top { padding-top: 44px; padding-bottom: 8px; }
+.eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); margin: 0 0 4px; }
+h1 { font-size: 34px; line-height: 1.12; font-weight: 700; letter-spacing: -.02em; margin: 0; }
+.meta { color: var(--label-2); font-size: 15px; margin: 8px 0 0; }
+.daynav { display: flex; gap: 16px; margin-top: 10px; font-size: 15px; }
+
+.tile:focus-visible, .back:focus-visible, .close:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+h2.block { font-size: 22px; font-weight: 700; letter-spacing: -.01em; margin: 36px 0 12px; }
+
+/* ---------- Vista de un tipo ---------- */
+.bar {
+  position: sticky; top: 0; z-index: 5;
+  background: var(--bar); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 0.5px solid var(--separator);
+}
+.bar .row { display: flex; align-items: center; gap: 8px; min-height: 52px; }
+.back { display: inline-flex; align-items: center; gap: 2px; min-height: 44px; padding: 0 8px 0 0; border: 0; background: none; color: var(--accent); font-size: 17px; cursor: pointer; }
+.back .icon { font-size: 22px; stroke-width: 2.4; }
+.view-title { display: flex; align-items: center; gap: 8px; font-size: 28px; font-weight: 700; letter-spacing: -.02em; margin: 20px 0 4px; }
+.view-title .icon { color: var(--tc); }
+.view-sub { color: var(--label-2); font-size: 15px; margin: 0 0 4px; }
+.filters { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 14px 0 2px; }
+.filters::-webkit-scrollbar { display: none; }
+.chip {
+  flex: none; min-height: 36px; padding: 0 14px; border-radius: 18px; border: 0; cursor: pointer; position: relative;
+  background: var(--fill); font-size: 15px; font-weight: 500; transition: background-color .2s ease, color .2s ease, transform .1s ease;
+}
+.chip::after { content: ""; position: absolute; inset: -4px 0; } /* área táctil ≥ 44 pt */
+.chip:active { transform: scale(.96); }
+.chip[aria-pressed="true"] { background: var(--label); color: var(--bg); }
+
+/* ---------- Tarjetas verticales ---------- */
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
+@media (min-width: 640px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 960px) { .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; } }
+.tile {
+  display: flex; flex-direction: column; text-align: left; border: 0; cursor: pointer;
+  min-height: 240px; padding: 14px; border-radius: 20px; /* rectángulo vertical que crece si el texto lo necesita */
+  background: var(--card); box-shadow: var(--shadow);
+  transition: transform .15s ease, box-shadow .25s ease;
+}
+@media (hover: hover) { .tile:hover { box-shadow: var(--shadow-hover); transform: translateY(-3px); } }
+.tile:active { transform: scale(.97); }
+.tags { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; font-size: 11px; font-weight: 600; }
+.tag { color: var(--tc); background: color-mix(in srgb, var(--tc) var(--tint), transparent); padding: 3px 7px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px; }
+.tag .icon { font-size: 12px; }
+.tag.official { --tc: var(--accent); }
+.tag.unconfirmed { --tc: var(--t-polemica); }
+.tag.partial { --tc: var(--t-noticia); }
+.tile h3 {
+  font-size: 17px; line-height: 1.28; font-weight: 600; letter-spacing: -.01em; margin: 12px 0 0;
+  display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden; flex-shrink: 0;
+}
+.tile .src { margin-top: auto; padding-top: 10px; font-size: 12px; color: var(--label-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tile .stats { display: flex; align-items: center; gap: 8px; margin-top: 4px; font-size: 12px; color: var(--label-3); }
+.meter { display: inline-flex; gap: 2px; }
+.meter i { width: 4px; height: 10px; border-radius: 2px; background: var(--fill-2); }
+.meter i.on { background: var(--t-polemica); }
+.heat { color: var(--t-polemica); font-weight: 600; }
+@media (min-width: 640px) { .tile { min-height: 300px; } .tile h3 { font-size: 18px; } }
+
+/* ---------- Hoja de detalle ---------- */
+dialog.sheet {
+  border: 0; padding: 0; margin: auto auto 0; width: 100%; max-width: 680px; max-height: 92vh; max-height: 92dvh;
+  background: var(--sheet); color: var(--label); border-radius: 20px 20px 0 0;
+  box-shadow: 0 -10px 40px rgba(0,0,0,.18); overflow: hidden;
+}
+@media (min-width: 760px) { dialog.sheet { margin: auto; border-radius: 22px; max-height: 86vh; } }
+dialog.sheet::backdrop { background: var(--scrim); }
+dialog.sheet[open] { display: flex; flex-direction: column; animation: sheet-in .34s cubic-bezier(.2,.8,.2,1); }
+dialog.sheet[open]::backdrop { animation: fade-in .3s ease; }
+dialog.sheet.closing { animation: sheet-out .22s ease-in forwards; }
+dialog.sheet.closing::backdrop { animation: fade-out .22s ease-in forwards; }
+@keyframes sheet-in { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes sheet-out { to { transform: translateY(100%); } }
+@media (min-width: 760px) {
+  @keyframes sheet-in { from { transform: translateY(24px) scale(.98); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes sheet-out { to { transform: translateY(16px) scale(.98); opacity: 0; } }
+}
+@keyframes fade-in { from { opacity: 0; } }
+@keyframes fade-out { to { opacity: 0; } }
+.sheet-head { position: relative; padding: 8px 16px 0; flex: none; touch-action: none; }
+.grabber { width: 36px; height: 5px; border-radius: 3px; background: var(--fill-2); margin: 0 auto 6px; }
+@media (min-width: 760px) { .grabber { display: none; } }
+.close {
+  position: absolute; top: 8px; right: 10px; width: 44px; height: 44px; border: 0; border-radius: 50%;
+  background: none; cursor: pointer; display: grid; place-items: center;
+}
+.close span { width: 30px; height: 30px; border-radius: 50%; background: var(--fill); display: grid; place-items: center; color: var(--label-2); }
+.close .icon { font-size: 15px; stroke-width: 2.6; }
+.sheet-body:focus { outline: none; }
+.sheet-body { overflow-y: auto; padding: 14px 22px 32px; overscroll-behavior: contain; }
+.sheet-body .tags { font-size: 12px; padding-right: 44px; }
+.sheet-body h2 { font-size: 26px; line-height: 1.2; font-weight: 700; letter-spacing: -.02em; margin: 12px 0 0; }
+.sheet-body .lead { font-size: 18px; line-height: 1.45; color: var(--label); font-weight: 500; margin: 12px 0 0; }
+.sheet-body .info { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; margin-top: 12px; font-size: 13px; color: var(--label-3); }
+.sheet-body .long p { font-size: 17px; margin: 16px 0 0; color: var(--label); }
+.sheet-body h4 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--label-3); margin: 24px 0 6px; font-weight: 600; }
+.sheet-body ul { margin: 0; padding: 0; list-style: none; }
+.sheet-body li { font-size: 15px; padding: 9px 0; border-bottom: 0.5px solid var(--separator); display: flex; gap: 10px; align-items: baseline; }
+.sheet-body li:last-child { border-bottom: 0; }
+.kind { font-size: 12px; color: var(--label-3); min-width: 60px; flex: none; }
+.claims li { color: var(--label-2); }
+.related .rel { font-size: 12px; font-weight: 600; color: var(--rc); flex: none; }
+.sheet-body > * { animation: rise .4s cubic-bezier(.2,.8,.2,1) both; }
+.sheet-body > *:nth-child(2) { animation-delay: .03s; } .sheet-body > *:nth-child(3) { animation-delay: .06s; }
+.sheet-body > *:nth-child(n+4) { animation-delay: .09s; }
+
+/* ---------- Progreso de lectura y ayuda ---------- */
+.head-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-top: 14px; }
+.progress-read { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--label-2); }
+.progress-read .track { width: 120px; height: 4px; border-radius: 2px; background: var(--fill-2); overflow: hidden; }
+.progress-read .fill { display: block; height: 100%; width: calc(var(--r, 0) * 100%); background: var(--accent); border-radius: 2px; transition: width .5s cubic-bezier(.2,.8,.2,1); }
+.help-btn { display: inline-flex; align-items: center; gap: 5px; min-height: 36px; padding: 0 12px; border: 0; border-radius: 18px; background: var(--fill); color: var(--label-2); font-size: 13px; font-weight: 600; cursor: pointer; }
+.help-btn:active { transform: scale(.96); }
+
+/* ---------- El pulso de la semana ---------- */
+.pulse { margin-top: 12px; padding: 16px 16px 14px; border-radius: 22px; background: var(--card); box-shadow: var(--shadow); }
+.pulse h2 { font-size: 17px; font-weight: 700; letter-spacing: -.01em; margin: 0; }
+.pulse-readout { font-size: 13px; color: var(--label-2); margin: 3px 0 0; min-height: 2.7em; line-height: 1.35;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.pulse-readout b { color: var(--tc, var(--label)); font-weight: 600; }
+.days { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); margin-top: 10px; }
+.day { display: flex; flex-direction: column; align-items: center; min-width: 0; }
+.dots { display: flex; flex-direction: column-reverse; align-items: center; justify-content: flex-start; min-height: 120px; }
+.dot { width: 30px; height: 28px; border: 0; padding: 0; background: none; cursor: pointer; display: grid; place-items: center; flex: none; }
+.dot::before { content: ""; width: var(--s); height: var(--s); border-radius: 50%; background: var(--tc); transition: transform .2s cubic-bezier(.2,.8,.2,1), box-shadow .2s ease; }
+.dot:hover::before, .dot:focus-visible::before, .dot.hot::before { transform: scale(1.35); }
+.dot:focus-visible { outline: none; }
+.dot:focus-visible::before { box-shadow: 0 0 0 3px var(--card), 0 0 0 5px var(--accent); }
+.dot.read::before { background: var(--card); box-shadow: inset 0 0 0 2px var(--tc); }
+.day-label { width: 100%; text-align: center; border-top: 0.5px solid var(--separator); padding-top: 6px; margin-top: 4px; font-size: 11px; color: var(--label-3); line-height: 1.2; }
+.day-label b { display: block; font-size: 14px; font-weight: 600; color: var(--label-2); }
+.day.quiet .day-label b { color: var(--label-3); font-weight: 500; }
+.pulse-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 12px 0 0; font-size: 12px; color: var(--label-2); }
+.pulse-legend span::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--tc); margin-right: 5px; }
+.js .pulse .dot::before { animation: pop .55s cubic-bezier(.3,1.5,.5,1) both; animation-delay: var(--d, 0s); }
+@keyframes pop { from { transform: scale(0); } }
+
+/* ---------- Búsqueda ---------- */
+.search { display: flex; align-items: center; gap: 8px; margin-top: 14px; padding: 0 12px; min-height: 40px; border-radius: 12px; background: var(--fill); color: var(--label-3); }
+.search input { flex: 1; min-width: 0; border: 0; background: none; font: inherit; font-size: 16px; color: var(--label); outline: none; }
+.search:focus-within { box-shadow: 0 0 0 2px var(--accent); }
+
+/* ---------- Leídas ---------- */
+.tile .done { display: none; }
+.tile.read .done { display: inline-flex; }
+.tile.read { opacity: .62; }
+@media (hover: hover) { .tile.read:hover { opacity: 1; } }
+.tag.done { --tc: var(--label-3); }
+
+/* ---------- Navegación dentro de la hoja ---------- */
+.share { position: absolute; top: 8px; left: 10px; width: 44px; height: 44px; border: 0; border-radius: 50%; background: none; cursor: pointer; display: grid; place-items: center; }
+.share span { width: 30px; height: 30px; border-radius: 50%; background: var(--fill); display: grid; place-items: center; color: var(--accent); }
+.share .icon { font-size: 15px; }
+.share:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.sheet-body > .tags { padding-left: 34px; }
+.sheet-nav { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px calc(8px + env(safe-area-inset-bottom)); border-top: 0.5px solid var(--separator); background: var(--sheet); }
+.nav-btn { min-height: 44px; padding: 0 14px; border: 0; border-radius: 12px; background: var(--fill); font-size: 15px; font-weight: 600; color: var(--accent); cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: transform .1s ease; }
+.nav-btn:active:not([disabled]) { transform: scale(.96); }
+.nav-btn[disabled] { color: var(--label-3); background: none; cursor: default; }
+.nav-btn .icon { font-size: 17px; stroke-width: 2.4; }
+.nav-count { font-size: 13px; color: var(--label-3); font-variant-numeric: tabular-nums; }
+.sheet-body.from-right > * { animation: in-right .32s cubic-bezier(.2,.8,.2,1) both; }
+.sheet-body.from-left > * { animation: in-left .32s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes in-right { from { opacity: 0; transform: translateX(28px); } to { opacity: 1; transform: none; } }
+@keyframes in-left { from { opacity: 0; transform: translateX(-28px); } to { opacity: 1; transform: none; } }
+.help h2 { padding-right: 40px; }
+.help dl { margin: 4px 0 0; }
+.help dt { margin-top: 12px; }
+.help dd { margin: 4px 0 0; color: var(--label-2); font-size: 15px; }
+.help .note { font-size: 15px; color: var(--label-2); margin: 4px 0 0; }
+.toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translate(-50%, 20px); opacity: 0;
+  background: var(--label); color: var(--bg); font-size: 15px; font-weight: 600; padding: 10px 16px; border-radius: 22px; z-index: 50;
+  transition: opacity .2s ease, transform .25s cubic-bezier(.2,.8,.2,1); pointer-events: none; }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* ---------- Movimiento ---------- */
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.js .reveal { opacity: 0; transform: translateY(14px); transition: opacity .45s ease, transform .45s cubic-bezier(.2,.8,.2,1); transition-delay: var(--d, 0s); }
+.js .reveal.in { opacity: 1; transform: none; }
+.view.enter-fwd { animation: view-in .32s cubic-bezier(.2,.8,.2,1); }
+.view.enter-back { animation: view-back .32s cubic-bezier(.2,.8,.2,1); }
+@keyframes view-in { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: none; } }
+@keyframes view-back { from { opacity: 0; transform: translateX(-18px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0s !important; animation: none !important; }
+  .js .reveal { opacity: 1; transform: none; }
+}
+
+footer.wrap { margin-top: 48px; margin-bottom: 56px; color: var(--label-3); font-size: 13px; }
+footer p { margin: 6px 0; }
+.warn { color: var(--t-polemica); }
+.empty { color: var(--label-2); text-align: center; padding: 48px 0; }
+
+/* ---------- Pantalla 1: vista diaria ---------- */
+.day-head { padding-bottom: 4px; }
+.title-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.title-row h1 { min-width: 0; }
+.arrows { display: flex; gap: 6px; flex: none; padding-bottom: 2px; }
+.arrow { width: 40px; height: 40px; border: 0; border-radius: 50%; background: var(--fill); color: var(--accent); cursor: pointer; display: grid; place-items: center; position: relative; transition: transform .1s ease; }
+.arrow::after { content: ""; position: absolute; inset: -2px; } /* área táctil ≥ 44 pt */
+.arrow .icon { font-size: 20px; stroke-width: 2.4; }
+.arrow:active:not([disabled]) { transform: scale(.92); }
+.arrow[disabled] { color: var(--label-3); cursor: default; opacity: .5; }
+.arrow:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.strip-bar { position: sticky; top: 0; z-index: 5; margin-top: 12px; background: var(--bar);
+  -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); border-bottom: 0.5px solid var(--separator); }
+.strip { display: grid; grid-template-columns: repeat(7, minmax(44px, 1fr)); gap: 4px; padding-top: 8px; padding-bottom: 8px; }
+@media (min-width: 760px) { .strip { grid-template-columns: repeat(7, minmax(44px, 88px)); } }
+.strip-day { display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 64px; padding: 6px 0 7px; border: 0; border-radius: 14px;
+  background: none; cursor: pointer; transition: background-color .2s ease, transform .1s ease; position: relative; }
+.strip-day .wd { font-size: 11px; font-weight: 600; color: var(--label-3); }
+.strip-day .num { font-size: 19px; font-weight: 600; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.strip-day .mini { display: flex; gap: 2px; height: 6px; }
+.strip-day .mini i { width: 6px; height: 6px; border-radius: 50%; background: var(--tc); }
+.strip-day.empty .num { color: var(--label-3); font-weight: 400; }
+.strip-day:active { transform: scale(.95); }
+.strip-day[aria-pressed="true"] { background: var(--label); }
+.strip-day[aria-pressed="true"] .wd, .strip-day[aria-pressed="true"] .num { color: var(--bg); }
+.strip-day.all-read::after { content: ""; position: absolute; top: 6px; right: 8px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.strip-day:focus-visible { outline: 3px solid var(--accent); outline-offset: 1px; }
+
+.day-main { min-height: 50vh; padding-bottom: 96px; }
+.day-pane section { margin-top: 26px; }
+h2.sec { display: flex; align-items: center; gap: 8px; font-size: 20px; line-height: 1.2; font-weight: 700; letter-spacing: -.01em; margin: 0; }
+h2.sec .icon { color: var(--tc); font-size: 19px; }
+h2.sec .count { color: var(--label-3); font-weight: 600; }
+.day-pane .grid { margin-top: 12px; }
+.day-pane.from-right { animation: in-right .34s cubic-bezier(.2,.8,.2,1); }
+.day-pane.from-left { animation: in-left .34s cubic-bezier(.2,.8,.2,1); }
+.day-empty { margin-top: 32px; padding: 32px 20px; border-radius: 22px; background: var(--card); text-align: center; }
+.day-empty p { margin: 0; font-size: 17px; font-weight: 600; }
+.day-empty .sub { margin-top: 6px; font-size: 15px; font-weight: 400; color: var(--label-2); }
+
+/* ---------- Pantalla 2: resumen semanal ---------- */
+.week-head { padding-top: 20px; }
+.week-head + main .pulse { margin-top: 20px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; }
+.chip .chip-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--tc); }
+.chip .n { color: var(--label-3); font-weight: 500; }
+.chip[aria-pressed="true"] .n { color: inherit; opacity: .7; }
+.filters + .filters { padding-top: 6px; }
+#week-grid { margin-top: 14px; }
+.day-label { border: 0; border-top: 0.5px solid var(--separator); background: none; font: inherit; font-size: 11px; color: var(--label-3); cursor: pointer; border-radius: 0 0 8px 8px; }
+.day-label:hover b { color: var(--accent); }
+.editions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 12px; margin-top: 36px; }
+.ed-link { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 16px; border-radius: 22px; background: var(--card); box-shadow: var(--shadow); font-size: 15px; font-weight: 600; }
+.ed-link:hover { text-decoration: none; }
+.ed-link .icon { font-size: 17px; }
+.types { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 24px; }
+@media (min-width: 760px) { .types { grid-template-columns: repeat(4, 1fr); } }
+.type-btn {
+  display: flex; flex-direction: column; align-items: flex-start; text-align: left; gap: 0;
+  min-height: 168px; padding: 16px; border: 0; border-radius: 22px; cursor: pointer;
+  background: var(--card); box-shadow: var(--shadow);
+  transition: transform .15s ease, box-shadow .25s ease;
+}
+.type-btn .badge {
+  width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center;
+  background: color-mix(in srgb, var(--tc) var(--tint), var(--card)); color: var(--tc); font-size: 24px;
+}
+.type-btn .name { font-size: 19px; font-weight: 700; letter-spacing: -.01em; margin-top: auto; padding-top: 18px; line-height: 1.2; }
+.type-btn .desc { font-size: 13px; color: var(--label-2); margin-top: 3px; line-height: 1.35; }
+.type-btn .count { font-size: 13px; font-weight: 600; color: var(--tc); margin-top: 8px; }
+.type-btn[disabled] { cursor: default; opacity: .55; box-shadow: none; }
+@media (hover: hover) { .type-btn:not([disabled]):hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); } }
+.type-btn:not([disabled]):active { transform: scale(.97); }
+.type-btn:focus-visible, .tile:focus-visible, .back:focus-visible, .all-btn:focus-visible, .close:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.all-btn {
+  width: 100%; margin-top: 12px; min-height: 52px; border: 0; border-radius: 16px; cursor: pointer;
+  background: var(--card); box-shadow: var(--shadow); font-size: 17px; font-weight: 600; color: var(--accent);
+  display: flex; align-items: center; justify-content: center; gap: 6px; transition: transform .15s ease;
+}
+.all-btn:active { transform: scale(.98); }
+.type-btn .rd { color: var(--label-3); font-weight: 500; }
+.home-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+.home-actions .all-btn { margin-top: 0; font-size: 16px; }
+.view > .day-head { padding-top: 20px; }
+</style>
+</head>
+<body>
+{%- macro icon(t) -%}
+<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+{%- if t == "avance" -%}<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>
+{%- elif t == "debate" -%}<path d="M4 5h11a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M17 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-4-3h-3"/>
+{%- elif t == "polemica" -%}<path d="M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>
+{%- elif t == "back" -%}<path d="M15 5l-7 7 7 7"/>
+{%- elif t == "next" -%}<path d="M9 5l7 7-7 7"/>
+{%- elif t == "close" -%}<path d="M6 6l12 12M18 6L6 18"/>
+{%- elif t == "share" -%}<path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>
+{%- elif t == "check" -%}<path d="M5 12.5l4.5 4.5L19 7.5"/>
+{%- elif t == "info" -%}<circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/>
+{%- elif t == "search" -%}<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>
+{%- elif t == "week" -%}<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M7 14h2M11 14h2M15 14h2M7 17h2M11 17h2"/>
+{%- elif t == "archive" -%}<rect x="3" y="4" width="18" height="5" rx="1.5"/><path d="M5 9v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9"/><path d="M10 13h4"/>
+{%- else -%}<path d="M4 4h13v16H6a2 2 0 0 1-2-2z"/><path d="M17 8h3v10a2 2 0 0 1-2 2"/><path d="M8 8h5M8 12h5M8 16h3"/>
+{%- endif -%}
+</svg>
+{%- endmacro -%}
+
+{%- macro tile(s) -%}
+<button class="tile t-{{ s.type }} reveal" type="button" data-open="{{ s.id }}" data-type="{{ s.type }}" data-day="{{ s.first_seen }}"
+  data-cat="{{ s.category }}" data-text="{{ s | search_text }}" aria-haspopup="dialog">
+  <span class="tags">
+    <span class="tag">{{ icon(s.type) }}{{ type_singular[s.type] }}</span>
+    {% if s.official %}<span class="tag official">Oficial</span>{% endif %}
+    {% if s.unconfirmed %}<span class="tag unconfirmed">Sin confirmar</span>{% endif %}
+    <span class="tag done">{{ icon("check") }}Leída</span>
+  </span>
+  <h3>{{ s.headline }}</h3>
+  {% set names = s.sources | source_names %}
+  <span class="src">{{ names[:2] | join(", ") }}{% if names|length > 2 %} +{{ names|length - 2 }}{% endif %}</span>
+  <span class="stats">
+    {% if s.comments %}<span class="meter" aria-label="Intensidad del debate: {{ s.comments | heat_level }} de 5">{% for i in range(5) %}<i{% if i < (s.comments | heat_level) %} class="on"{% endif %}></i>{% endfor %}</span>{% endif %}
+    <span>{{ s.reading_minutes }} min</span>
+  </span>
+</button>
+{%- endmacro -%}
+
+{# ================= Pantalla principal: la semana ================= #}
+<div id="view-home" class="view">
+  <header class="top wrap">
+    <p class="eyebrow">IA News · Resumen semanal</p>
+    <h1>{{ week_label }}</h1>
+    <p class="meta">{{ n_stories }} {{ "noticia" if n_stories == 1 else "noticias" }} · {{ total_minutes }} min de lectura</p>
+    <div class="head-row">
+      {% if n_stories %}<div class="progress-read"><span class="track"><span class="fill" data-read-fill></span></span><span data-read-count>Aún no has abierto ninguna</span></div>{% endif %}
+      <button class="help-btn" type="button" data-help>{{ icon("info") }} Cómo leer esta página</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <nav class="types" aria-label="Tipos de noticia">
+      {% for t, label, desc, items in types %}
+      <button class="type-btn t-{{ t }}" type="button" data-view="{{ t }}"{% if not items %} disabled{% endif %}>
+        <span class="badge">{{ icon(t) }}</span>
+        <span class="name">{{ label }}</span>
+        <span class="desc">{{ desc }}</span>
+        <span class="count">{% if items %}{{ items|length }} {{ "noticia" if items|length == 1 else "noticias" }}<span class="rd" data-type-read="{{ items | map(attribute='id') | join(' ') }}"></span>{% else %}Nada esta semana{% endif %}</span>
+      </button>
+      {% endfor %}
+    </nav>
+    {% if n_stories %}
+    <div class="home-actions">
+      <button class="all-btn" type="button" data-view="todas">{{ icon("grid") }} Todas las noticias</button>
+      <button class="all-btn" type="button" data-view="day">{{ icon("week") }} Día a día</button>
+    </div>
+
+    <section class="pulse" aria-labelledby="h-pulse">
+      <h2 id="h-pulse">El pulso de la semana</h2>
+      <p class="pulse-readout" id="pulse-readout" aria-live="polite">Cada punto es una noticia, en el día en que surgió; cuanto más grande, más se debatió. Toca un punto para abrirla o un día para verlo entero.</p>
+      <div class="days" style="--n: {{ days|length }}">
+        {%- set ns = namespace(i=0) %}
+        {%- for d in days %}
+        <div class="day{% if not d.stories %} quiet{% endif %}">
+          <div class="dots">
+            {%- for s in d.stories %}{% set ns.i = ns.i + 1 %}
+            <button class="dot t-{{ s.type }}" type="button" data-open="{{ s.id }}" data-ctx="pulse"
+              data-label="{{ d.weekday|capitalize }} {{ d.day }} · {{ type_singular[s.type] }}|{{ s.headline }}"
+              aria-label="{{ d.weekday|capitalize }} {{ d.day }}, {{ type_singular[s.type] }}: {{ s.headline }}"
+              style="--s: {{ 10 + 3 * (s.comments | heat_level) }}px; --d: {{ 120 + ns.i * 45 }}ms"></button>
+            {%- endfor %}
+          </div>
+          <button class="day-label" type="button" data-goto-day="{{ d.iso }}" aria-label="Ver {{ d.label }}"><b>{{ d.day }}</b>{{ d.weekday }}</button>
+        </div>
+        {%- endfor %}
+      </div>
+      <p class="pulse-legend" aria-hidden="true">{% for t, label, desc, items in types if items %}<span class="t-{{ t }}">{{ label }}</span>{% endfor %}</p>
+    </section>
+
+    <h2 class="block">Lo más destacado</h2>
+    <div class="grid">
+      {% for s in ranked[:4] %}{{ tile(s) }}{% endfor %}
+    </div>
+    {% else %}
+    <p class="empty">No hay noticias esta semana.</p>
+    {% endif %}
+
+    <nav class="editions" aria-label="Otras ediciones">
+      {% if prev_day %}<a class="ed-link" href="{{ prev_day }}.html">{{ icon("back") }} Semana anterior</a>{% endif %}
+      <a class="ed-link" href="ediciones.html">{{ icon("archive") }} Todas las ediciones</a>
+      {% if next_day %}<a class="ed-link" href="{{ next_day }}.html">Semana siguiente {{ icon("next") }}</a>{% endif %}
+    </nav>
+  </main>
+</div>
+
+{# ================= Un tipo ================= #}
+{% for t, label, desc, items in types if items %}
+<div id="view-{{ t }}" class="view t-{{ t }}" hidden>
+  <div class="bar"><div class="wrap row">
+    <button class="back" type="button" data-view="home">{{ icon("back") }}Semana</button>
+  </div></div>
+  <main class="wrap">
+    <h2 class="view-title">{{ icon(t) }}{{ label }}</h2>
+    <p class="view-sub">{{ items|length }} {{ "noticia" if items|length == 1 else "noticias" }} · {{ week_label }}</p>
+    {% set cats = items | categories_of %}
+    {% if cats|length > 1 %}
+    <nav class="filters" aria-label="Filtrar por categoría" role="group" data-filter="cat">
+      <button class="chip" type="button" data-value="" aria-pressed="true">Todas</button>
+      {% for key, clabel in cats %}<button class="chip" type="button" data-value="{{ key }}" aria-pressed="false">{{ clabel }}</button>{% endfor %}
+    </nav>
+    {% endif %}
+    <div class="grid" data-filterable>{% for s in items %}{{ tile(s) }}{% endfor %}</div>
+  </main>
+</div>
+{% endfor %}
+
+{# ================= Todas, con búsqueda y filtros ================= #}
+<div id="view-todas" class="view" hidden>
+  <div class="bar"><div class="wrap row">
+    <button class="back" type="button" data-view="home">{{ icon("back") }}Semana</button>
+  </div></div>
+  <main class="wrap">
+    <h2 class="view-title">Todas las noticias</h2>
+    <p class="view-sub">{{ n_stories }} noticias · {{ week_label }}</p>
+    <label class="search">{{ icon("search") }}<input type="search" placeholder="Buscar: empresa, modelo, tema…" data-search aria-label="Buscar noticias"></label>
+    <nav class="filters" aria-label="Filtrar por tipo" role="group" data-filter="type">
+      <button class="chip" type="button" data-value="" aria-pressed="true">Todos</button>
+      {% for t, label, desc, items in types if items %}<button class="chip t-{{ t }}" type="button" data-value="{{ t }}" aria-pressed="false"><span class="chip-dot"></span>{{ label }} <span class="n">{{ items|length }}</span></button>{% endfor %}
+    </nav>
+    <nav class="filters" aria-label="Filtrar por día" role="group" data-filter="day">
+      <button class="chip" type="button" data-value="" aria-pressed="true">Toda la semana</button>
+      {% for d in days if d.stories %}<button class="chip" type="button" data-value="{{ d.iso }}" aria-pressed="false">{{ d.weekday|capitalize }} {{ d.day }}</button>{% endfor %}
+    </nav>
+    <div class="grid" data-filterable>{% for s in ranked %}{{ tile(s) }}{% endfor %}</div>
+    <p class="empty" data-no-results hidden>No hay noticias que coincidan.</p>
+  </main>
+</div>
+
+{# ================= Día a día ================= #}
+<div id="view-day" class="view" hidden>
+  <div class="bar"><div class="wrap row">
+    <button class="back" type="button" data-view="home">{{ icon("back") }}Semana</button>
+  </div></div>
+  <header class="top wrap day-head">
+    <div class="title-row">
+      <h1 id="day-title">{% for d in days if d.iso == default_day %}{{ d.label }}{% endfor %}</h1>
+      <div class="arrows">
+        <button class="arrow" type="button" data-day-step="-1" aria-label="Día anterior">{{ icon("back") }}</button>
+        <button class="arrow" type="button" data-day-step="1" aria-label="Día siguiente">{{ icon("next") }}</button>
+      </div>
+    </div>
+    <p class="meta" id="day-meta" aria-live="polite"></p>
+  </header>
+  <nav class="strip-bar" aria-label="Días de la semana">
+    <div class="wrap strip">
+      {% for d in days %}
+      <button class="strip-day{% if not d.stories %} empty{% endif %}" type="button" data-day-btn="{{ d.iso }}"
+        aria-label="{{ d.label }}: {{ d.stories|length }} {{ 'noticia' if d.stories|length == 1 else 'noticias' }}">
+        <span class="wd">{{ d.initial }}</span>
+        <span class="num">{{ d.day }}</span>
+        <span class="mini" aria-hidden="true">{% for s in d.stories[:4] %}<i class="t-{{ s.type }}"></i>{% endfor %}</span>
+      </button>
+      {% endfor %}
+    </div>
+  </nav>
+  <main class="wrap day-main" id="day-main">
+    {% for d in days %}
+    <div class="day-pane" data-pane="{{ d.iso }}" data-label="{{ d.label }}" data-n="{{ d.stories|length }}"
+      data-min="{{ d.stories | sum(attribute='reading_minutes') }}"{% if d.iso != default_day %} hidden{% endif %}>
+      {% for t, label, items in d.sections if items %}
+      <section class="t-{{ t }}" aria-label="{{ label }}">
+        <h2 class="sec">{{ icon(t) }}{{ label }}<span class="count">{{ items|length }}</span></h2>
+        <div class="grid">{% for s in items %}{{ tile(s) }}{% endfor %}</div>
+      </section>
+      {% else %}
+      <div class="day-empty">
+        <p>Sin noticias destacadas este día.</p>
+        <p class="sub">Puede que lo que pasó no tuviera bastante eco, o que se cuente en otro día de la semana.</p>
+      </div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </main>
+</div>
+
+<footer class="wrap">
+  {% if failed_sources %}<p class="warn">Fuentes no disponibles: {{ failed_sources | join(", ") }}.</p>{% endif %}
+  <p>Cobertura de X parcial: el debate en X llega a través de vídeos de YouTube, Hacker News y medios.</p>
+  <p>Resúmenes generados con IA a partir de {{ stats.get("items", 0) }} fuentes; pueden contener errores. Cada noticia enlaza a su fuente original.</p>
+  <p>Generado el {{ generated }}.</p>
+</footer>
+
+{# Guía: qué significa cada etiqueta #}
+<template id="d-help">
+  <div class="help">
+    <h2 id="sheet-title">Cómo leer esta página</h2>
+    <p class="lead">Cada semana se eligen entre 12 y 15 noticias de IA según cuánta conversación real generan, no según lo que sale primero en un buscador. La vista diaria las muestra el día en que surgieron.</p>
+    <h4>Tipos</h4>
+    <dl>
+      {% for t, label, desc, items in types %}<dt class="t-{{ t }}"><span class="tag">{{ icon(t) }}{{ type_singular[t] }}</span></dt><dd>{{ desc }}.</dd>{% endfor %}
+    </dl>
+    <h4>Etiquetas</h4>
+    <dl>
+      <dt><span class="tag official">Fuente oficial</span></dt><dd>El anuncio viene de la propia empresa o laboratorio.</dd>
+      <dt><span class="tag unconfirmed">Sin confirmar</span></dt><dd>Polémica con una sola fuente no oficial: tómala con cautela. Dentro de cada noticia, el apartado «Sin confirmar» lista las afirmaciones concretas que no están verificadas.</dd>
+      <dt><span class="tag partial">Resumen parcial</span></dt><dd>El vídeo no tenía subtítulos y el resumen se basa solo en su título y descripción.</dd>
+    </dl>
+    <h4>Intensidad del debate</h4>
+    <dl>
+      <dt><span class="meter" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span></dt>
+      <dd>Las barras resumen los comentarios en Hacker News y YouTube: una a partir de 20, dos desde 80, tres desde 200, cuatro desde 500 y cinco desde 1.000. En «El pulso de la semana», el tamaño del punto dice lo mismo.</dd>
+    </dl>
+    <h4>Cómo se eligen</h4>
+    <p class="note">Se puntúa cuántas fuentes distintas cuentan la noticia, cuánto se discute, lo reciente que es y su tipo (los avances y las polémicas pesan algo más). Se reparten entre los días y los tipos cuando la semana da para ello, y nunca se rellena con temas flojos. Los resúmenes salen solo de las fuentes enlazadas.</p>
+  </div>
+</template>
+
+{# Detalle de cada noticia: se copia a la hoja al abrirla #}
+{% for s in ranked %}
+<template id="d-{{ s.id }}">
+  <div class="tags">
+    <span class="tag t-{{ s.type }}">{{ icon(s.type) }}{{ type_singular[s.type] }}</span>
+    <span class="tag t-noticia">{{ category_labels[s.category] }}</span>
+    {% if s.official %}<span class="tag official">Fuente oficial</span>{% endif %}
+    {% if s.unconfirmed %}<span class="tag unconfirmed">Sin confirmar</span>{% endif %}
+    {% if s.partial %}<span class="tag partial">Resumen parcial</span>{% endif %}
+  </div>
+  <h2 id="sheet-title">{{ s.headline }}</h2>
+  <p class="lead">{{ s.summary_short }}</p>
+  <div class="info">
+    {% if s.comments %}<span>{% set h = s.comments | heat %}{% if h %}<span class="heat">{{ h }}</span> · {% endif %}{{ s.comments }} comentarios</span>{% endif %}
+    <span>{{ s.sources|length }} {{ "fuente" if s.sources|length == 1 else "fuentes" }}</span>
+    <span>{{ s.reading_minutes }} min de lectura</span>
+  </div>
+  <div class="long">{% for para in s.summary_long.split("\n\n") if para.strip() %}<p>{{ para.strip() }}</p>{% endfor %}</div>
+  {% if s.unconfirmed_claims %}
+  <h4>Sin confirmar</h4>
+  <ul class="claims">{% for c in s.unconfirmed_claims %}<li>{{ c }}</li>{% endfor %}</ul>
+  {% endif %}
+  <h4>Fuentes</h4>
+  <ul>
+    {% for src in s.sources %}
+    <li><span class="kind">{{ {"youtube": "Vídeo", "rss": "Artículo", "lab": "Oficial", "hackernews": "HN"}[src.kind] }}</span>
+      <span><a href="{{ src | source_link }}" target="_blank" rel="noopener">{{ src.name }}</a>{% if src.timestamp %} · min {{ src.timestamp | mmss }}{% endif %}{% if src.partial %} · sin transcripción{% endif %}</span></li>
+    {% endfor %}
+  </ul>
+  {% if s.related %}
+  <h4>Ver historia</h4>
+  <ul class="related">
+    {% for r in s.related %}
+    <li><span class="rel" style="--rc: var(--r-{{ r.relation }})">{{ r.relation | capitalize }}</span>
+      <a href="{{ r.date }}.html#n={{ r.story_id }}">{{ r.date | short_date }} · {{ r.headline }}</a></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</template>
+{% endfor %}
+
+<dialog class="sheet" id="sheet" aria-labelledby="sheet-title">
+  <div class="sheet-head">
+    <div class="grabber" aria-hidden="true"></div>
+    <button class="share" type="button" aria-label="Compartir esta noticia"><span>{{ icon("share") }}</span></button>
+    <button class="close" type="button" aria-label="Cerrar"><span>{{ icon("close") }}</span></button>
+  </div>
+  <div class="sheet-body" id="sheet-body" tabindex="-1" autofocus></div>
+  <nav class="sheet-nav" id="sheet-nav" aria-label="Otras noticias">
+    <button class="nav-btn" type="button" data-step="-1">{{ icon("back") }}Anterior</button>
+    <span class="nav-count" id="nav-count" aria-live="polite"></span>
+    <button class="nav-btn" type="button" data-step="1">Siguiente{{ icon("next") }}</button>
+  </nav>
+</dialog>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(() => {
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+  const DEFAULT_DAY = "{{ default_day }}";
+
+  // Lo leído se guarda solo en este navegador. Si el almacenamiento no está disponible, la página funciona igual.
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  };
+  const READ_KEY = "ia-news-read";
+  const read = new Set(store.get(READ_KEY, []));
+  const ALL = $$("template[id^='d-']").map(t => t.id.slice(2)).filter(id => id !== "help");
+
+  // Aparición escalonada: lo visible al cargar se muestra al instante; lo demás, al entrar en pantalla
+  const io = "IntersectionObserver" in window && !reduce ? new IntersectionObserver(entries => {
+    let i = 0;
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.style.setProperty("--d", `${Math.min(i++ * 50, 250)}ms`);
+      e.target.classList.add("in"); io.unobserve(e.target);
+    });
+  }, { rootMargin: "0px 0px -6% 0px" }) : null;
+  const armReveals = root => $$(".reveal:not(.in)", root).forEach(el => {
+    if (el.closest("[hidden]")) return;
+    if (!io || el.getBoundingClientRect().top < innerHeight) {
+      el.style.transition = "none"; el.classList.add("in");
+      requestAnimationFrame(() => requestAnimationFrame(() => { el.style.transition = ""; }));
+    } else io.observe(el);
+  });
+
+  // ---------- Pantallas: la semana es la principal ----------
+  const views = Object.fromEntries($$(".view").map(v => [v.id.slice(5), v]));
+  let current = null;
+  const show = name => {
+    if (!views[name]) name = "home";
+    if (name === current) return;
+    current = name;
+    Object.entries(views).forEach(([k, v]) => { v.hidden = k !== name; });
+    const v = views[name];
+    v.classList.remove("enter-fwd", "enter-back");
+    if (!reduce) { void v.offsetWidth; v.classList.add(name === "home" ? "enter-back" : "enter-fwd"); }
+    scrollTo(0, 0);
+    if (name === "day") showDay(day);
+    armReveals(v);
+  };
+  const hashFor = name => (name === "home" ? location.pathname : name === "day" ? "#d=" + day : "#" + name);
+  const go = name => { history.pushState(null, "", hashFor(name)); show(name); };
+  $$("[data-view]").forEach(b => b.addEventListener("click", () => go(b.dataset.view)));
+
+  // ---------- Día a día ----------
+  const panes = $$(".day-pane");
+  const dayIds = panes.map(p => p.dataset.pane);
+  const dayBtns = $$("[data-day-btn]");
+  const [prevDay, nextDay] = $$("[data-day-step]");
+  const title = document.getElementById("day-title");
+  const meta = document.getElementById("day-meta");
+  let day = DEFAULT_DAY;
+  function showDay(iso, dir = 0) {
+    if (!dayIds.includes(iso)) iso = DEFAULT_DAY;
+    day = iso;
+    panes.forEach(p => {
+      const on = p.dataset.pane === iso;
+      p.hidden = !on;
+      if (!on) return;
+      p.classList.remove("from-right", "from-left");
+      if (dir && !reduce) { void p.offsetWidth; p.classList.add(dir > 0 ? "from-right" : "from-left"); }
+      title.textContent = p.dataset.label;
+      const n = +p.dataset.n;
+      meta.textContent = n ? `${n} ${n === 1 ? "noticia" : "noticias"} · ${p.dataset.min} min de lectura` : "Un día tranquilo";
+      $$(".reveal", p).forEach(el => el.classList.add("in"));
+    });
+    dayBtns.forEach(b => b.setAttribute("aria-pressed", String(b.dataset.dayBtn === iso)));
+    const i = dayIds.indexOf(iso);
+    prevDay.disabled = i <= 0;
+    nextDay.disabled = i >= dayIds.length - 1;
+  }
+  const changeDay = (iso, dir) => { showDay(iso, dir); history.replaceState(null, "", "#d=" + iso); };
+  dayBtns.forEach(b => b.addEventListener("click", () =>
+    changeDay(b.dataset.dayBtn, Math.sign(dayIds.indexOf(b.dataset.dayBtn) - dayIds.indexOf(day)))));
+  const stepDay = d => {
+    const j = dayIds.indexOf(day) + d;
+    if (j >= 0 && j < dayIds.length) changeDay(dayIds[j], d);
+  };
+  prevDay.addEventListener("click", () => stepDay(-1));
+  nextDay.addEventListener("click", () => stepDay(1));
+  $$("[data-goto-day]").forEach(b => b.addEventListener("click", () => {
+    day = b.dataset.gotoDay;
+    go("day");
+  }));
+  // Deslizar a los lados en la vista día a día cambia de día
+  const dayMain = document.getElementById("day-main");
+  let tx = null, ty = null;
+  dayMain.addEventListener("pointerdown", e => { if (e.pointerType !== "mouse") { tx = e.clientX; ty = e.clientY; } });
+  dayMain.addEventListener("pointerup", e => {
+    if (tx === null) return;
+    const dx = e.clientX - tx, dy = e.clientY - ty; tx = ty = null;
+    if (Math.abs(dx) > 70 && Math.abs(dx) > 2 * Math.abs(dy)) stepDay(dx < 0 ? 1 : -1);
+  });
+
+  // ---------- Progreso de lectura ----------
+  const paintRead = () => {
+    $$("[data-open]").forEach(el => el.classList.toggle("read", read.has(el.dataset.open)));
+    const n = ALL.filter(id => read.has(id)).length;
+    $$("[data-read-count]").forEach(el => {
+      el.textContent = n === 0 ? "Aún no has abierto ninguna" : n === ALL.length ? "Has leído toda la semana" : `${n} de ${ALL.length} leídas`;
+    });
+    $$("[data-read-fill]").forEach(el => el.style.setProperty("--r", ALL.length ? n / ALL.length : 0));
+    $$("[data-type-read]").forEach(el => {
+      const k = el.dataset.typeRead.split(" ").filter(id => read.has(id)).length;
+      el.textContent = k ? ` · ${k} ${k === 1 ? "leída" : "leídas"}` : "";
+    });
+    dayBtns.forEach(b => {
+      const ids = $$(".tile", document.querySelector(`[data-pane="${b.dataset.dayBtn}"]`)).map(t => t.dataset.open);
+      b.classList.toggle("all-read", ids.length > 0 && ids.every(id => read.has(id)));
+    });
+  };
+  const markRead = id => {
+    if (id === "help" || read.has(id)) return;
+    read.add(id); store.set(READ_KEY, [...read]); paintRead();
+  };
+  paintRead();
+
+  // ---------- Filtros y búsqueda (cada vista combina los suyos) ----------
+  const norm = t => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  $$(".view").forEach(view => {
+    const grid = view.querySelector("[data-filterable]");
+    if (!grid) return;
+    const tiles = $$(".tile", grid);
+    const empty = view.querySelector("[data-no-results]");
+    const input = view.querySelector("[data-search]");
+    const f = { cat: "", type: "", day: "", q: "" };
+    const apply = () => {
+      const words = norm(f.q).split(/\s+/).filter(Boolean);
+      let shown = 0;
+      tiles.forEach(t => {
+        const ok = (!f.cat || t.dataset.cat === f.cat) && (!f.type || t.dataset.type === f.type)
+          && (!f.day || t.dataset.day === f.day) && words.every(w => norm(t.dataset.text).includes(w));
+        t.hidden = !ok; t.classList.add("in"); shown += ok;
+      });
+      if (empty) empty.hidden = shown > 0;
+    };
+    $$("[data-filter]", view).forEach(group => {
+      const chips = $$(".chip", group);
+      chips.forEach(chip => chip.addEventListener("click", () => {
+        chips.forEach(c => c.setAttribute("aria-pressed", String(c === chip)));
+        f[group.dataset.filter] = chip.dataset.value;
+        if (document.startViewTransition && !reduce) document.startViewTransition(apply); else apply();
+      }));
+    });
+    if (input) input.addEventListener("input", () => { f.q = input.value; apply(); });
+  });
+
+  // ---------- El pulso de la semana ----------
+  const readout = document.getElementById("pulse-readout");
+  if (readout) {
+    const readoutDefault = readout.innerHTML;
+    $$(".pulse .dot").forEach(dot => {
+      const [when, text] = dot.dataset.label.split("|");
+      const label = () => {
+        readout.style.setProperty("--tc", getComputedStyle(dot).getPropertyValue("--tc"));
+        readout.replaceChildren(Object.assign(document.createElement("b"), { textContent: when + " · " }), text);
+      };
+      dot.addEventListener("pointerenter", label);
+      dot.addEventListener("focus", label);
+      dot.addEventListener("pointerleave", () => { readout.innerHTML = readoutDefault; });
+    });
+  }
+
+  // ---------- Hoja de detalle, con anterior / siguiente ----------
+  const sheet = document.getElementById("sheet");
+  const body = document.getElementById("sheet-body");
+  const nav = document.getElementById("sheet-nav");
+  const count = document.getElementById("nav-count");
+  const [prevBtn, nextBtn] = $$("[data-step]", nav);
+  const shareBtn = sheet.querySelector(".share");
+  let list = ALL, idx = 0, currentId = null, opener = null, pushedSheet = false, expectPop = false;
+
+  const renderStory = (id, dir = 0) => {
+    const tpl = document.getElementById("d-" + id);
+    if (!tpl) return false;
+    body.replaceChildren(tpl.content.cloneNode(true));
+    body.classList.remove("from-left", "from-right");
+    if (dir && !reduce) { void body.offsetWidth; body.classList.add(dir > 0 ? "from-right" : "from-left"); }
+    body.scrollTop = 0;
+    currentId = id;
+    idx = list.indexOf(id);
+    const single = id === "help" || list.length < 2;
+    nav.hidden = single;
+    shareBtn.hidden = id === "help";
+    if (!single) {
+      count.textContent = `${idx + 1} de ${list.length}`;
+      prevBtn.disabled = idx <= 0;
+      nextBtn.disabled = idx >= list.length - 1;
+    }
+    markRead(id);
+    return true;
+  };
+  // El orden de «anterior / siguiente» es el de donde se abrió: el día, la lista (filtrada) o el pulso
+  const contextFor = el => {
+    if (!el) return ALL;
+    if (el.dataset.ctx === "pulse") return $$(".pulse .dot").map(d => d.dataset.open);
+    const scope = el.closest(".day-pane") || el.closest(".grid");
+    return scope ? $$(".tile:not([hidden])", scope).map(t => t.dataset.open) : ALL;
+  };
+  const openSheet = (id, from) => {
+    list = id === "help" ? ["help"] : contextFor(from);
+    if (!list.includes(id)) list = ALL;
+    if (!renderStory(id)) return false;
+    opener = from || null;
+    sheet.classList.remove("closing");
+    if (!sheet.open) sheet.showModal();
+    document.body.classList.add("locked");
+    return true;
+  };
+  const step = d => {
+    const j = idx + d;
+    if (j < 0 || j >= list.length) return;
+    renderStory(list[j], d);
+    history.replaceState(history.state, "", "#n=" + list[j]);
+  };
+  prevBtn.addEventListener("click", () => step(-1));
+  nextBtn.addEventListener("click", () => step(1));
+
+  const closeSheet = () => {
+    if (!sheet.open) return;
+    let done = false;
+    const finish = () => { if (done) return; done = true; sheet.classList.remove("closing"); sheet.close(); };
+    if (reduce) return finish();
+    sheet.classList.add("closing");
+    sheet.addEventListener("animationend", e => { if (e.target === sheet) finish(); });
+    setTimeout(finish, 320); // por si el navegador no emite animationend
+  };
+  sheet.addEventListener("close", () => {
+    document.body.classList.remove("locked");
+    sheet.style.transform = "";
+    // Se quita la entrada de la hoja del historial; ese «atrás» llega con retraso y no debe pisar lo que se haga después
+    if (pushedSheet) { pushedSheet = false; expectPop = true; history.back(); }
+    else if (location.hash.startsWith("#n=")) history.replaceState(null, "", hashFor(current));
+    if (opener && document.contains(opener)) opener.focus({ preventScroll: true });
+  });
+  sheet.addEventListener("cancel", e => { e.preventDefault(); closeSheet(); });
+  sheet.querySelector(".close").addEventListener("click", closeSheet);
+  sheet.addEventListener("click", e => { if (e.target === sheet) closeSheet(); }); // pulsar fuera
+  addEventListener("keydown", e => {
+    if (e.target.closest && e.target.closest("input")) return;
+    const d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+    if (!d) return;
+    if (sheet.open) step(d);
+    else if (current === "day") stepDay(d);
+  });
+
+  document.addEventListener("click", e => {
+    const t = e.target.closest("[data-open], [data-help]");
+    if (!t || sheet.contains(t)) return;
+    const id = t.hasAttribute("data-help") ? "help" : t.dataset.open;
+    if (openSheet(id, t)) {
+      history.pushState({ sheet: id }, "", "#n=" + id);
+      pushedSheet = true;
+    }
+  });
+
+  // Compartir: menú del sistema si existe; si no, copiar el enlace a la noticia
+  const toast = document.getElementById("toast");
+  const say = msg => {
+    toast.textContent = msg; toast.classList.add("show");
+    clearTimeout(say.t); say.t = setTimeout(() => toast.classList.remove("show"), 1800);
+  };
+  shareBtn.addEventListener("click", async () => {
+    const url = location.href.split("#")[0] + "#n=" + currentId;
+    const heading = body.querySelector("h2")?.textContent || document.title;
+    const text = body.querySelector(".lead")?.textContent || "";
+    try {
+      if (navigator.share) { await navigator.share({ title: heading, text, url }); return; }
+      await navigator.clipboard.writeText(`${heading}\n${url}`);
+      say("Enlace copiado");
+    } catch (err) {
+      if (err && err.name !== "AbortError") say("No se pudo compartir");
+    }
+  });
+
+  // Gestos en la hoja: hacia abajo desde la cabecera cierra; a los lados, cambia de noticia.
+  // Los botones de la cabecera quedan fuera del gesto para que sus clics lleguen.
+  const head = sheet.querySelector(".sheet-head");
+  let startY = null;
+  head.addEventListener("pointerdown", e => {
+    if (e.target.closest("button")) return;
+    startY = e.clientY; head.setPointerCapture(e.pointerId);
+  });
+  head.addEventListener("pointermove", e => {
+    if (startY === null) return;
+    sheet.style.transform = `translateY(${Math.max(0, e.clientY - startY)}px)`;
+  });
+  const endDrag = e => {
+    if (startY === null) return;
+    const dy = e.clientY - startY; startY = null;
+    sheet.style.transform = "";
+    if (dy > 90) closeSheet();
+  };
+  head.addEventListener("pointerup", endDrag);
+  head.addEventListener("pointercancel", endDrag);
+  let sx = null, sy = null;
+  body.addEventListener("pointerdown", e => { if (e.pointerType !== "mouse") { sx = e.clientX; sy = e.clientY; } });
+  body.addEventListener("pointerup", e => {
+    if (sx === null) return;
+    const dx = e.clientX - sx, dy = e.clientY - sy; sx = sy = null;
+    if (Math.abs(dx) > 70 && Math.abs(dx) > 2 * Math.abs(dy)) step(dx < 0 ? 1 : -1);
+  });
+
+  // ---------- Estado inicial y botón atrás ----------
+  const route = () => {
+    const h = decodeURIComponent(location.hash.slice(1));
+    if (h.startsWith("n=")) {
+      if (current === null) show("home");
+      if (!sheet.open) openSheet(h.slice(2));
+      return;
+    }
+    if (sheet.open) { pushedSheet = false; sheet.close(); }
+    if (h.startsWith("d=")) { day = dayIds.includes(h.slice(2)) ? h.slice(2) : DEFAULT_DAY; if (current === "day") showDay(day); else show("day"); return; }
+    if (views[h]) { show(h); return; }
+    if (h && document.getElementById("d-" + h)) { show("home"); openSheet(h); return; } // enlaces #id
+    show("home");
+  };
+  addEventListener("popstate", () => {
+    if (expectPop && !location.hash.startsWith("#n=")) {
+      expectPop = false;
+      history.replaceState(null, "", hashFor(current));
+      return;
+    }
+    expectPop = false;
+    route();
+  });
+  route();
+})();
+</script>
+</body>
+</html>

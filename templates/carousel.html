@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>IA News · carrusel {{ week_label }}</title>
+<style>
+/* Carrusel para LinkedIn: diapositivas de 1080×1350 (4:5), una por página del PDF. */
+@page { size: 1080px 1350px; margin: 0; }
+* { box-sizing: border-box; margin: 0; }
+html, body { background: #f2f2f7; }
+body { color: #000; -webkit-font-smoothing: antialiased; -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  font-family: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif; }
+.t-avance { --tc: #564ade; } .t-debate { --tc: #00819f; } .t-polemica { --tc: #c55300; } .t-noticia { --tc: #6c6c70; }
+.slide { width: 1080px; height: 1350px; padding: 88px 88px 72px; display: flex; flex-direction: column; overflow: hidden;
+  page-break-after: always; break-after: page; background: #f2f2f7; }
+.slide:last-child { page-break-after: auto; break-after: auto; }
+.brand { font-size: 26px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #1e6ef4; }
+.foot { margin-top: auto; padding-top: 32px; display: flex; justify-content: space-between; font-size: 24px; color: rgba(60,60,67,.6); font-weight: 600; }
+h1 { font-size: 104px; line-height: 1; font-weight: 800; letter-spacing: -.035em; }
+h2 { font-size: 72px; line-height: 1.05; font-weight: 800; letter-spacing: -.03em; }
+.lead { font-size: 38px; line-height: 1.3; color: rgba(60,60,67,.82); }
+.icon { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+/* Portada */
+.cover h1 { margin-top: 56px; }
+.cover .lead { margin-top: 36px; max-width: 860px; }
+.pulse { margin-top: auto; background: #fff; border-radius: 44px; padding: 44px 44px 36px; box-shadow: 0 2px 4px rgba(0,0,0,.04), 0 24px 56px rgba(0,0,0,.08); }
+.pulse .days { display: grid; grid-template-columns: repeat(7, 1fr); height: 330px; }
+.pulse .day { display: flex; flex-direction: column; justify-content: flex-end; align-items: center; }
+.pulse .dots { display: flex; flex-direction: column-reverse; align-items: center; gap: 10px; }
+.pulse .dots i { display: block; width: var(--s); height: var(--s); border-radius: 50%; background: var(--tc); }
+.pulse .day b { display: block; width: 100%; text-align: center; margin-top: 16px; padding-top: 12px; border-top: 2px solid rgba(60,60,67,.16);
+  font-size: 26px; color: rgba(60,60,67,.75); font-weight: 600; }
+.pulse .day small { display: block; font-size: 20px; font-weight: 500; color: rgba(60,60,67,.5); }
+.swipe { margin-top: 36px; font-size: 30px; font-weight: 700; color: #1e6ef4; display: flex; align-items: center; gap: 12px; }
+
+/* Vistazo */
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 56px; }
+.stat { background: #fff; border-radius: 36px; padding: 40px; }
+.stat .n { font-size: 112px; font-weight: 800; letter-spacing: -.04em; line-height: 1; color: var(--tc); }
+.stat .l { font-size: 32px; font-weight: 700; margin-top: 12px; }
+.stat .d { font-size: 24px; color: rgba(60,60,67,.65); margin-top: 6px; line-height: 1.3; }
+.facts { margin-top: 28px; display: flex; gap: 24px; }
+.fact { flex: 1; background: #fff; border-radius: 28px; padding: 28px 32px; font-size: 26px; color: rgba(60,60,67,.8); line-height: 1.3; }
+.fact b { display: block; font-size: 48px; color: #000; letter-spacing: -.02em; }
+
+/* Diapositiva por tipo */
+.kicker { display: inline-flex; align-items: center; gap: 14px; font-size: 32px; font-weight: 800; color: var(--tc); }
+.kicker .badge { width: 72px; height: 72px; border-radius: 22px; display: grid; place-items: center; font-size: 38px;
+  background: color-mix(in srgb, var(--tc) 13%, #fff); }
+.type h2 { margin-top: 28px; font-size: 58px; }
+.items { margin-top: 44px; display: flex; flex-direction: column; gap: 24px; }
+.item { background: #fff; border-radius: 34px; padding: 38px 42px; }
+.item .h { font-size: 39px; line-height: 1.16; font-weight: 750; letter-spacing: -.015em; }
+.item .s { font-size: 27px; line-height: 1.4; color: rgba(60,60,67,.78); margin-top: 14px;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.more { margin-top: 28px; font-size: 28px; font-weight: 700; color: var(--tc); }
+.item .m { display: flex; gap: 18px; align-items: center; margin-top: 16px; font-size: 22px; color: rgba(60,60,67,.55); font-weight: 600; }
+.meter { display: inline-flex; gap: 4px; }
+.meter i { width: 9px; height: 22px; border-radius: 3px; background: rgba(120,120,128,.22); }
+.meter i.on { background: #c55300; }
+
+/* Lo más debatido */
+.ranking { margin-top: 56px; display: flex; flex-direction: column; gap: 30px; }
+.rank { background: #fff; border-radius: 34px; padding: 36px 40px; }
+.rank .top { display: flex; gap: 24px; align-items: baseline; }
+.rank .pos { font-size: 64px; font-weight: 800; color: rgba(60,60,67,.3); letter-spacing: -.03em; width: 64px; flex: none; }
+.rank .h { font-size: 36px; line-height: 1.2; font-weight: 750; }
+.rank .bar { height: 16px; border-radius: 8px; background: rgba(120,120,128,.14); margin-top: 22px; overflow: hidden; }
+.rank .bar i { display: block; height: 100%; width: calc(var(--w) * 100%); background: var(--tc); border-radius: 8px; }
+.rank .c { font-size: 24px; color: rgba(60,60,67,.65); margin-top: 10px; font-weight: 600; }
+
+/* Cierre */
+.end h2 { margin-top: 56px; }
+.end .lead { margin-top: 32px; }
+.url { margin-top: 48px; background: #000; color: #fff; border-radius: 30px; padding: 34px 40px; font-size: 38px; font-weight: 700; letter-spacing: -.01em; word-break: break-all; }
+.how { margin-top: 48px; display: grid; gap: 18px; }
+.how p { font-size: 28px; line-height: 1.35; color: rgba(60,60,67,.82); display: flex; gap: 18px; }
+.how p b { color: #000; min-width: 36px; }
+.byline { margin-top: 44px; font-size: 30px; font-weight: 700; }
+</style>
+</head>
+<body>
+{%- macro icon(t) -%}
+<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+{%- if t == "avance" -%}<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>
+{%- elif t == "debate" -%}<path d="M4 5h11a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M17 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-4-3h-3"/>
+{%- elif t == "polemica" -%}<path d="M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>
+{%- elif t == "next" -%}<path d="M9 5l7 7-7 7"/>
+{%- else -%}<path d="M4 4h13v16H6a2 2 0 0 1-2-2z"/><path d="M17 8h3v10a2 2 0 0 1-2 2"/><path d="M8 8h5M8 12h5M8 16h3"/>
+{%- endif -%}
+</svg>
+{%- endmacro -%}
+{%- set present = types | selectattr(3) | list -%}
+{%- set total = 4 + present|length -%}
+{%- macro foot(n) -%}<div class="foot"><span>IA News · {{ week_label }}</span><span>{{ n }}/{{ total }}</span></div>{%- endmacro -%}
+
+{# 1. Portada #}
+<section class="slide cover">
+  <p class="brand">IA News · Resumen semanal</p>
+  <h1>{{ week_label }}</h1>
+  <p class="lead">{{ n_stories }} noticias de IA que generaron conversación esta semana: avances, debates, polémicas y noticias.</p>
+  <div class="pulse">
+    <div class="days">
+      {% for d in days %}
+      <div class="day">
+        <div class="dots">{% for s in d.stories %}<i class="t-{{ s.type }}" style="--s: {{ 26 + 8 * (s.comments | heat_level) }}px"></i>{% endfor %}</div>
+        <b>{{ d.day }}<small>{{ d.weekday }}</small></b>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  <p class="swipe">Desliza {{ icon("next") }}</p>
+  {{ foot(1) }}
+</section>
+
+{# 2. La semana en un vistazo #}
+<section class="slide">
+  <p class="brand">La semana en un vistazo</p>
+  <h2 style="margin-top: 28px">Lo que más se movió en IA</h2>
+  <div class="stats">
+    {% for t, label, desc, items in types %}
+    <div class="stat t-{{ t }}"><p class="n">{{ items|length }}</p><p class="l">{{ label }}</p><p class="d">{{ desc }}</p></div>
+    {% endfor %}
+  </div>
+  <div class="facts">
+    <div class="fact"><b>{{ stats.get("items", 0) }}</b>fuentes leídas: vídeos, medios, blogs oficiales y Hacker News</div>
+    <div class="fact"><b>{{ stats.get("candidates", 0) }} → {{ n_stories }}</b>noticias candidatas y las elegidas por su conversación real</div>
+  </div>
+  {{ foot(2) }}
+</section>
+
+{# 3… Una diapositiva por tipo #}
+{% for t, label, desc, items in present %}
+{% set shown = items[:2] %}
+<section class="slide type t-{{ t }}">
+  <p class="kicker"><span class="badge">{{ icon(t) }}</span>{{ label }}</p>
+  <h2>{{ desc }}</h2>
+  <div class="items n{{ shown|length }}">
+    {% for s in shown %}
+    <div class="item">
+      <p class="h">{{ s.headline }}</p>
+      <p class="s">{{ s.summary_short }}</p>
+      <p class="m">
+        {% if s.comments %}<span class="meter">{% for i in range(5) %}<i{% if i < (s.comments | heat_level) %} class="on"{% endif %}></i>{% endfor %}</span>{{ s.comments }} comentarios{% endif %}
+        {% set names = s.sources | source_names %}<span>{{ names[:2] | join(" · ") }}</span>
+      </p>
+    </div>
+    {% endfor %}
+  </div>
+  {% if items|length > 2 %}<p class="more">+{{ items|length - 2 }} más en la edición completa</p>{% endif %}
+  {{ foot(loop.index + 2) }}
+</section>
+{% endfor %}
+
+{# Lo más debatido #}
+{% set debated = ranked | sort(attribute="comments", reverse=true) %}
+{% set mx = (debated[0].comments if debated else 1) or 1 %}
+<section class="slide">
+  <p class="brand">Lo más debatido</p>
+  <h2 style="margin-top: 28px">Donde hubo más conversación</h2>
+  <div class="ranking">
+    {% for s in debated[:3] %}
+    <div class="rank t-{{ s.type }}">
+      <div class="top"><span class="pos">{{ loop.index }}</span><p class="h">{{ s.headline }}</p></div>
+      <div class="bar"><i style="--w: {{ (s.comments / mx) | round(3) }}"></i></div>
+      <p class="c">{{ "{:,}".format(s.comments).replace(",", ".") }} comentarios en Hacker News y YouTube</p>
+    </div>
+    {% endfor %}
+  </div>
+  {{ foot(total - 1) }}
+</section>
+
+{# Cierre #}
+<section class="slide end">
+  <p class="brand">IA News</p>
+  <h2>Cada noticia, ampliada y con sus fuentes</h2>
+  <p class="lead">La edición completa tiene el resumen ampliado de cada noticia, el enlace a sus fuentes y el minuto exacto de los vídeos.</p>
+  <p class="url">{{ site_url | replace("https://", "") }}</p>
+  <div class="how">
+    <p><b>1</b>Lee cada semana vídeos de YouTube, medios, blogs de los laboratorios y Hacker News.</p>
+    <p><b>2</b>Agrupa lo que cuenta lo mismo y puntúa la conversación real que genera.</p>
+    <p><b>3</b>Resume en español, atribuye cada opinión y marca lo que no está confirmado.</p>
+  </div>
+  {% if author %}<p class="byline">Un proyecto de {{ author }}</p>{% endif %}
+  {{ foot(total) }}
+</section>
+</body>
+</html>

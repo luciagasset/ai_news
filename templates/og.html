@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>IA News · vista previa</title>
+<style>
+/* Imagen 1200×630 que muestran LinkedIn y otras redes al compartir el enlace. Siempre en claro. */
+* { box-sizing: border-box; margin: 0; }
+html, body { width: 1200px; height: 630px; overflow: hidden; }
+body {
+  background: #f2f2f7; color: #000; -webkit-font-smoothing: antialiased;
+  font-family: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif;
+  display: grid; grid-template-columns: 1fr 420px; gap: 0; padding: 56px 64px;
+}
+.t-avance { --tc: #564ade; } .t-debate { --tc: #00819f; } .t-polemica { --tc: #c55300; } .t-noticia { --tc: #6c6c70; }
+.left { display: flex; flex-direction: column; padding-right: 48px; }
+.brand { font-size: 22px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #1e6ef4; }
+h1 { font-size: 58px; line-height: 1.05; font-weight: 800; letter-spacing: -.03em; margin-top: 18px; }
+.lead { font-size: 25px; line-height: 1.3; color: rgba(60,60,67,.8); margin-top: 18px; }
+.top { margin-top: auto; padding-top: 24px; border-top: 2px solid rgba(60,60,67,.14); }
+.top .k { font-size: 17px; font-weight: 700; color: rgba(60,60,67,.6); text-transform: uppercase; letter-spacing: .05em; }
+.top .h { font-size: 27px; line-height: 1.25; font-weight: 700; margin-top: 8px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.card { background: #fff; border-radius: 32px; padding: 32px 30px 26px; display: flex; flex-direction: column; box-shadow: 0 2px 4px rgba(0,0,0,.04), 0 18px 40px rgba(0,0,0,.08); }
+.card .ct { font-size: 20px; font-weight: 700; }
+.days { display: grid; grid-template-columns: repeat(7, 1fr); flex: 1; margin-top: 16px; }
+.day { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
+.dots { display: flex; flex-direction: column-reverse; align-items: center; gap: 6px; }
+.dots i { display: block; width: var(--s); height: var(--s); border-radius: 50%; background: var(--tc); }
+.day b { display: block; margin-top: 10px; padding-top: 8px; width: 100%; text-align: center; border-top: 1.5px solid rgba(60,60,67,.18);
+  font-size: 18px; font-weight: 600; color: rgba(60,60,67,.75); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 16px; font-size: 16px; color: rgba(60,60,67,.8); }
+.legend span::before { content: ""; display: inline-block; width: 11px; height: 11px; border-radius: 50%; background: var(--tc); margin-right: 7px; }
+</style>
+</head>
+<body>
+  <div class="left">
+    <p class="brand">IA News · Resumen semanal</p>
+    <h1>{{ week_label }}</h1>
+    <p class="lead">{{ n_stories }} noticias de IA que generaron conversación: avances, debates, polémicas y noticias.</p>
+    {% if ranked %}
+    <div class="top"><p class="k">Lo más destacado</p><p class="h">{{ ranked[0].headline }}</p></div>
+    {% endif %}
+  </div>
+  <div class="card">
+    <p class="ct">El pulso de la semana</p>
+    <div class="days">
+      {% for d in days %}
+      <div class="day">
+        <div class="dots">{% for s in d.stories %}<i class="t-{{ s.type }}" style="--s: {{ 16 + 5 * (s.comments | heat_level) }}px"></i>{% endfor %}</div>
+        <b>{{ d.day }}</b>
+      </div>
+      {% endfor %}
+    </div>
+    <p class="legend">{% for t, label, desc, items in types if items %}<span class="t-{{ t }}">{{ label }}</span>{% endfor %}</p>
+  </div>
+</body>
+</html>

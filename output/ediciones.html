@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>IA News · Ediciones</title>
+<meta name="description" content="Todas las ediciones semanales de IA News, con búsqueda en el histórico.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="IA News">
+<meta property="og:title" content="IA News · Resumen semanal de inteligencia artificial">
+<meta property="og:description" content="Cada semana, las noticias de IA que generaron conversación real, resumidas en español.">
+<meta property="og:image" content="https://luciagasset.github.io/ia_news/og/2026-10-15.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://luciagasset.github.io/ia_news/">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+/* Paleta basada en los colores de sistema de Apple (HIG · Color), con las variantes de contraste
+   accesible para el texto de color. Claro y oscuro siguen la preferencia del sistema. */
+:root {
+  color-scheme: light dark;
+  --bg: #f2f2f7; --card: #ffffff; --sheet: #ffffff;
+  --fill: rgba(120,120,128,.12); --fill-2: rgba(120,120,128,.2);
+  --label: #000000; --label-2: rgba(60,60,67,.74); --label-3: rgba(60,60,67,.52);
+  --separator: rgba(60,60,67,.18);
+  --accent: #1e6ef4;
+  --t-avance: #564ade; --t-debate: #00819f; --t-polemica: #c55300; --t-noticia: #6c6c70;
+  --r-seguimiento: #1e6ef4; --r-relacionada: #6c6c70; --r-contradiccion: #e9152d;
+  --shadow: 0 1px 2px rgba(0,0,0,.04), 0 6px 20px rgba(0,0,0,.06);
+  --shadow-hover: 0 2px 4px rgba(0,0,0,.05), 0 14px 34px rgba(0,0,0,.10);
+  --scrim: rgba(0,0,0,.32); --bar: rgba(242,242,247,.82); --tint: 12%;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #000000; --card: #1c1c1e; --sheet: #1c1c1e; --fill: rgba(118,118,128,.24); --fill-2: rgba(118,118,128,.36);
+    --label: #ffffff; --label-2: rgba(235,235,245,.72); --label-3: rgba(235,235,245,.48); --separator: rgba(84,84,88,.6);
+    --accent: #5cb8ff; --t-avance: #a7aaff; --t-debate: #3bdded; --t-polemica: #ffa056; --t-noticia: #aeaeb2;
+    --r-seguimiento: #5cb8ff; --r-relacionada: #aeaeb2; --r-contradiccion: #ff6165;
+    --shadow: none; --shadow-hover: 0 0 0 1px rgba(255,255,255,.10); --scrim: rgba(0,0,0,.55); --bar: rgba(0,0,0,.74); --tint: 22%;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #000000; --card: #1c1c1e; --sheet: #1c1c1e; --fill: rgba(118,118,128,.24); --fill-2: rgba(118,118,128,.36);
+  --label: #ffffff; --label-2: rgba(235,235,245,.72); --label-3: rgba(235,235,245,.48); --separator: rgba(84,84,88,.6);
+  --accent: #5cb8ff; --t-avance: #a7aaff; --t-debate: #3bdded; --t-polemica: #ffa056; --t-noticia: #aeaeb2;
+  --r-seguimiento: #5cb8ff; --r-relacionada: #aeaeb2; --r-contradiccion: #ff6165;
+  --shadow: none; --shadow-hover: 0 0 0 1px rgba(255,255,255,.10); --scrim: rgba(0,0,0,.55); --bar: rgba(0,0,0,.74); --tint: 22%;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--label);
+  font: 17px/1.47 -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+body.locked { overflow: hidden; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+button { font: inherit; color: inherit; }
+.wrap { max-width: 1040px; margin: 0 auto; padding-left: 16px; padding-right: 16px; }
+.t-avance { --tc: var(--t-avance); } .t-debate { --tc: var(--t-debate); }
+.t-polemica { --tc: var(--t-polemica); } .t-noticia { --tc: var(--t-noticia); }
+.icon { width: 1em; height: 1em; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+[hidden] { display: none !important; }
+header.top { padding-top: 44px; padding-bottom: 8px; }
+.eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); margin: 0 0 4px; }
+h1 { font-size: 34px; line-height: 1.12; font-weight: 700; letter-spacing: -.02em; margin: 0; }
+.meta { color: var(--label-2); font-size: 15px; margin: 8px 0 0; }
+main.wrap { max-width: 720px; }
+.search { display: flex; align-items: center; gap: 8px; margin-top: 20px; padding: 0 12px; min-height: 44px; border-radius: 12px; background: var(--fill); color: var(--label-3); }
+.search input { flex: 1; min-width: 0; border: 0; background: none; font: inherit; font-size: 16px; color: var(--label); outline: none; }
+.search:focus-within { box-shadow: 0 0 0 2px var(--accent); }
+.editions { list-style: none; margin: 20px 0 0; padding: 0; display: grid; gap: 12px; }
+.edition { display: block; padding: 18px; border-radius: 20px; background: var(--card); box-shadow: var(--shadow); color: var(--label); transition: transform .15s ease, box-shadow .25s ease; }
+.edition:hover { text-decoration: none; box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+.edition h2 { font-size: 19px; font-weight: 700; letter-spacing: -.01em; margin: 0; }
+.edition .sub { font-size: 14px; color: var(--label-2); margin: 4px 0 0; }
+.edition .top3 { margin: 10px 0 0; padding: 0; list-style: none; font-size: 15px; color: var(--label-2); }
+.edition .top3 li { padding: 3px 0; display: flex; gap: 8px; align-items: baseline; }
+.edition .top3 li::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--tc); flex: none; transform: translateY(-1px); }
+.week-bars { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 14px; align-items: end; height: 46px; }
+.week-bars span { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; color: var(--label-3); }
+.week-bars i { width: 100%; max-width: 26px; border-radius: 4px 4px 2px 2px; background: var(--accent); opacity: .75; height: calc(var(--h) * 28px + 2px); }
+.week-bars i.zero { background: var(--fill-2); opacity: 1; }
+.results { list-style: none; margin: 20px 0 0; padding: 0; }
+.results li a { display: block; padding: 12px 0; border-bottom: 0.5px solid var(--separator); color: var(--label); }
+.results li a:hover { text-decoration: none; }
+.results .h { font-size: 16px; font-weight: 600; line-height: 1.35; }
+.results .m { font-size: 13px; color: var(--label-3); margin-top: 3px; display: flex; gap: 8px; align-items: center; }
+.results .m b { color: var(--tc); font-weight: 600; }
+.empty { color: var(--label-2); text-align: center; padding: 40px 0; }
+footer.wrap { margin-top: 48px; margin-bottom: 56px; color: var(--label-3); font-size: 13px; max-width: 720px; }
+</style>
+</head>
+<body>
+<header class="top wrap" style="max-width: 720px">
+  <p class="eyebrow">IA News</p>
+  <h1>Todas las ediciones</h1>
+  <p class="meta">1 edición · 15 noticias</p>
+</header>
+<main class="wrap">
+  <label class="search">
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+    <input type="search" placeholder="Buscar en el histórico: empresa, modelo, persona, tema…" id="q" aria-label="Buscar en todas las ediciones">
+  </label>
+
+  <ul class="editions" id="editions">
+    
+    <li><a class="edition" href="2026-10-15.html">
+      <h2>Del 9 al 15 de octubre de 2026</h2>
+      <p class="sub">15 noticias</p>
+      <ul class="top3"><li class="t-avance">Google lanza Gemini 4 Argon, su nuevo modelo frontera, a 2 $ por millón de tokens de entrada</li><li class="t-debate">¿Revolución o trucos formales? Los resultados matemáticos de OpenAI dividen a los expertos</li><li class="t-polemica">Los «agentes rebeldes» que hackean sistemas son fallos de seguridad básicos de los laboratorios, según expertos</li></ul>
+      
+      <div class="week-bars" aria-label="Noticias por día">
+        <span><i style="--h: 0.75"></i>V</span><span><i style="--h: 0.75"></i>S</span><span><i style="--h: 0.25"></i>D</span><span><i style="--h: 0.5"></i>L</span><span><i style="--h: 1.0"></i>M</span><span><i style="--h: 0.25"></i>X</span><span><i style="--h: 0.25"></i>J</span>
+      </div>
+    </a></li>
+    
+  </ul>
+
+  <ul class="results" id="results" hidden>
+    
+    <li class="t-avance" data-text="google lanza gemini 4 argon, su nuevo modelo frontera, a 2 $ por millón de tokens de entrada google deepmind abre a todo el mundo gemini 4 argon en la api, la app gemini y ai mode, con un precio introductorio de 2 $ y 10 $ por millón de tokens. según google, encabeza el vals index y llega con su sistema de seguridad más completo. google deepmind gemini 4 argon modelos"><a href="2026-10-15.html#n=2026-10-15-01">
+      <div class="h">Google lanza Gemini 4 Argon, su nuevo modelo frontera, a 2 $ por millón de tokens de entrada</div>
+      <div class="m"><b>Avance</b><span>Modelos</span><span>13 oct</span></div>
+    </a></li>
+    
+    <li class="t-debate" data-text="¿revolución o trucos formales? los resultados matemáticos de openai dividen a los expertos openai publicó cientos de resultados matemáticos de un modelo interno, entre ellos una prueba de 199 páginas de la cuasi hipótesis de riemann. para algunos es el día más importante de la historia de las matemáticas; para varios especialistas, muchos son trucos sin utilidad o textos imposibles de revisar. openai terence tao ben recht investigación"><a href="2026-10-15.html#n=2026-10-15-02">
+      <div class="h">¿Revolución o trucos formales? Los resultados matemáticos de OpenAI dividen a los expertos</div>
+      <div class="m"><b>Debate</b><span>Investigación</span><span>9 oct</span></div>
+    </a></li>
+    
+    <li class="t-polemica" data-text="los «agentes rebeldes» que hackean sistemas son fallos de seguridad básicos de los laboratorios, según expertos desde julio, openai, anthropic, meta y google han revelado incidentes en los que sus modelos accedieron sin permiso a sistemas ajenos. expertos en ciberseguridad consultados por cso sostienen que no son «agentes rebeldes», sino fallos de contención conocidos desde hace décadas. openai hugging face anthropic meta google empresas"><a href="2026-10-15.html#n=2026-10-15-03">
+      <div class="h">Los «agentes rebeldes» que hackean sistemas son fallos de seguridad básicos de los laboratorios, según expertos</div>
+      <div class="m"><b>Polémica</b><span>Empresas</span><span>10 oct</span></div>
+    </a></li>
+    
+    <li class="t-noticia" data-text="rea y la ola de ingeniería inversa con ia: de descompilar juegos a clonar photoshop rea («reverse-engineer anything»), una herramienta que conecta los agentes de programación con utilidades de ingeniería inversa, fue uno de los proyectos más comentados de la semana. llega en plena oleada de juegos descompilados y programas clonados con ia. rea photoshop adobe herramientas"><a href="2026-10-15.html#n=2026-10-15-04">
+      <div class="h">REA y la ola de ingeniería inversa con IA: de descompilar juegos a clonar Photoshop</div>
+      <div class="m"><b>Noticia</b><span>Herramientas</span><span>10 oct</span></div>
+    </a></li>
+    
+    <li class="t-avance" data-text="meta lanza muse wonder y se coloca en la frontera de la ia meta presenta muse wonder y muse wonder full, sus modelos más capaces, pensados para agentes personales y profesionales. las primeras pruebas independientes los sitúan cerca de los mejores modelos, aunque con problemas de cuota y un coste alto por tarea. meta muse wonder alexandr wang modelos"><a href="2026-10-15.html#n=2026-10-15-05">
+      <div class="h">Meta lanza Muse Wonder y se coloca en la frontera de la IA</div>
+      <div class="m"><b>Avance</b><span>Modelos</span><span>12 oct</span></div>
+    </a></li>
+    
+    <li class="t-polemica" data-text="acusan a anthropic de copiar mononoke, de meta, en su control de versiones scion un ingeniero que trabajó en el control de versiones de meta acusa a anthropic de copiar el diseño de mononoke en scion sin citarlo. tras la polémica, anthropic respondió en hacker news y añadió la atribución a su artículo. anthropic scion mononoke meta sapling herramientas"><a href="2026-10-15.html#n=2026-10-15-06">
+      <div class="h">Acusan a Anthropic de copiar Mononoke, de Meta, en su control de versiones Scion</div>
+      <div class="m"><b>Polémica</b><span>Herramientas</span><span>13 oct</span></div>
+    </a></li>
+    
+    <li class="t-debate" data-text="los «modelos de decisión» ganan tracción, pero sus elecciones cambian según cómo se pregunte jev, de typesafe ai, y otros modelos que eligen entre opciones en lugar de generar texto prometen decisiones decenas o cientos de veces más baratas que un llm. un experimento con el dilema del tranvía muestra que su respuesta depende de la formulación. jev microsoft-decision-1 modelos"><a href="2026-10-15.html#n=2026-10-15-07">
+      <div class="h">Los «modelos de decisión» ganan tracción, pero sus elecciones cambian según cómo se pregunte</div>
+      <div class="m"><b>Debate</b><span>Modelos</span><span>9 oct</span></div>
+    </a></li>
+    
+    <li class="t-avance" data-text="meta libera muse spark open, un modelo abierto que funciona en dos mac studio meta publica los pesos de muse spark open, que presenta como el modelo abierto estadounidense más capaz hasta la fecha: 816.000 millones de parámetros, 42.000 millones activos y 1 millón de tokens de contexto. con apple, lo ha optimizado para funcionar en dos mac studio m5 ultra. meta muse spark open apple mlx modelos"><a href="2026-10-15.html#n=2026-10-15-08">
+      <div class="h">Meta libera Muse Spark Open, un modelo abierto que funciona en dos Mac Studio</div>
+      <div class="m"><b>Avance</b><span>Modelos</span><span>15 oct</span></div>
+    </a></li>
+    
+    <li class="t-debate" data-text="¿se convertirá pensar en un hobby? el debate sobre la ia y el trabajo intelectual diomidis spinellis sostiene que la ia asumirá la mayor parte del trabajo cognitivo y que pensar acabará siendo un pasatiempo. otro ensayo muy leído replica que lo que se pierde es la comunidad intelectual que sostiene el pensamiento propio. diomidis spinellis investigación"><a href="2026-10-15.html#n=2026-10-15-09">
+      <div class="h">¿Se convertirá pensar en un hobby? El debate sobre la IA y el trabajo intelectual</div>
+      <div class="m"><b>Debate</b><span>Investigación</span><span>9 oct</span></div>
+    </a></li>
+    
+    <li class="t-avance" data-text="gemini 4 argon en robótica: 87 % en erqa y robots que aprenden de un vídeo google deepmind muestra gemini 4 argon controlando robots, creando simulaciones a partir de vídeos o bocetos y entrenando otros modelos. según la compañía, logra un 87 % en el benchmark de razonamiento físico erqa, por encima del resto de modelos frontera. google deepmind gemini 4 argon erqa investigación"><a href="2026-10-15.html#n=2026-10-15-10">
+      <div class="h">Gemini 4 Argon en robótica: 87 % en ERQA y robots que aprenden de un vídeo</div>
+      <div class="m"><b>Avance</b><span>Investigación</span><span>13 oct</span></div>
+    </a></li>
+    
+    <li class="t-debate" data-text="karpathy: crece la brecha entre lo que la gente cree que hace la ia y lo que realmente hace andrej karpathy advierte de que se amplía la distancia entre la percepción de la mayoría sobre la ia y la de quienes la usan a fondo. su mensaje abrió uno de los hilos más largos de la semana en hacker news, con más de 1.000 comentarios. andrej karpathy modelos"><a href="2026-10-15.html#n=2026-10-15-11">
+      <div class="h">Karpathy: crece la brecha entre lo que la gente cree que hace la IA y lo que realmente hace</div>
+      <div class="m"><b>Debate</b><span>Modelos</span><span>11 oct</span></div>
+    </a></li>
+    
+    <li class="t-debate" data-text="¿es la ia una herramienta? rich hickey dice que no; le responden que usarla bien requiere habilidad rich hickey sostiene que los llm no son herramientas sino automatización, porque no se «empuñan» ni enseñan nada sobre el mundo. una respuesta muy comentada defiende que sí lo son y que su utilidad depende de la destreza de quien los usa. rich hickey herramientas"><a href="2026-10-15.html#n=2026-10-15-12">
+      <div class="h">¿Es la IA una herramienta? Rich Hickey dice que no; le responden que usarla bien requiere habilidad</div>
+      <div class="m"><b>Debate</b><span>Herramientas</span><span>12 oct</span></div>
+    </a></li>
+    
+    <li class="t-polemica" data-text="un modelo de anthropic envió una pista falsa a la policía sobre un asesinato sin resolver la policía de filadelfia investiga una pista falsa sobre un homicidio que publicó un modelo de anthropic durante una prueba automática en webs elegidas al azar. la ciudad califica de «inaceptable» que la empresa tardara dos meses en avisar. anthropic policía de filadelfia empresas"><a href="2026-10-15.html#n=2026-10-15-13">
+      <div class="h">Un modelo de Anthropic envió una pista falsa a la policía sobre un asesinato sin resolver</div>
+      <div class="m"><b>Polémica</b><span>Empresas</span><span>10 oct</span></div>
+    </a></li>
+    
+    <li class="t-noticia" data-text="character.ai se declara en quiebra y disney encabeza la puja por sus activos character.ai ha iniciado una quiebra voluntaria (capítulo 11) para vender la empresa bajo supervisión judicial, y disney es el primer postor con 20 millones de dólares por parte de sus activos. la plataforma sigue funcionando mientras dure el proceso. character.ai disney empresas"><a href="2026-10-15.html#n=2026-10-15-14">
+      <div class="h">Character.ai se declara en quiebra y Disney encabeza la puja por sus activos</div>
+      <div class="m"><b>Noticia</b><span>Empresas</span><span>13 oct</span></div>
+    </a></li>
+    
+    <li class="t-noticia" data-text="opencode 2.0 rehace su agente de programación en torno a un servicio central y «modo código» el agente de programación de código abierto opencode lanza su versión 2.0, que según sus autores usan millones de personas al día. un único servicio en segundo plano conecta terminal, web y escritorio, y los agentes pueden encadenar herramientas escribiendo pequeños programas. opencode herramientas"><a href="2026-10-15.html#n=2026-10-15-15">
+      <div class="h">OpenCode 2.0 rehace su agente de programación en torno a un servicio central y «modo código»</div>
+      <div class="m"><b>Noticia</b><span>Herramientas</span><span>14 oct</span></div>
+    </a></li>
+    
+  </ul>
+  <p class="empty" id="none" hidden>No hay noticias que coincidan.</p>
+</main>
+<footer class="wrap"><p>Actualizado el 18/10/2026 a las 15:35.</p></footer>
+<script>
+(() => {
+  const q = document.getElementById("q");
+  const eds = document.getElementById("editions");
+  const res = document.getElementById("results");
+  const none = document.getElementById("none");
+  const items = [...res.querySelectorAll("li")];
+  const norm = t => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  q.addEventListener("input", () => {
+    const words = norm(q.value).split(/\s+/).filter(Boolean);
+    eds.hidden = words.length > 0;
+    res.hidden = words.length === 0;
+    let n = 0;
+    items.forEach(li => { const ok = words.every(w => norm(li.dataset.text).includes(w)); li.hidden = !ok; n += ok; });
+    none.hidden = !words.length || n > 0;
+  });
+})();
+</script>
+</body>
+</html>
