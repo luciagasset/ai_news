@@ -4,12 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
-<title>IA News · Ediciones</title>
-<meta name="description" content="Todas las ediciones semanales de IA News, con búsqueda en el histórico.">
+<link rel="icon" type="image/svg+xml" href="icons/logo.svg">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="theme-color" content="#0b0b0f">
+<title>AI News · Ediciones</title>
+<meta name="description" content="Todas las ediciones semanales de AI News, con búsqueda en el histórico.">
 {%- if og_image %}
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="IA News">
-<meta property="og:title" content="IA News · Resumen semanal de inteligencia artificial">
+<meta property="og:site_name" content="AI News">
+<meta property="og:title" content="AI News · Resumen semanal de inteligencia artificial">
 <meta property="og:description" content="Cada semana, las noticias de IA que generaron conversación real, resumidas en español.">
 <meta property="og:image" content="{{ og_image }}">
 <meta property="og:image:width" content="1200">
@@ -23,6 +26,11 @@ header.top { padding-top: 44px; padding-bottom: 8px; }
 .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); margin: 0 0 4px; }
 h1 { font-size: 34px; line-height: 1.12; font-weight: 700; letter-spacing: -.02em; margin: 0; }
 .meta { color: var(--label-2); font-size: 15px; margin: 8px 0 0; }
+.brand-row { margin: 0 0 10px; }
+.wordmark { display: inline-flex; align-items: center; gap: 8px; }
+.wordmark .logo-mark { border-radius: 8px; }
+.wm-text { font-size: 17px; font-weight: 800; letter-spacing: -.01em; }
+.edition:active { transform: scale(.98); }
 main.wrap { max-width: 720px; }
 .search { display: flex; align-items: center; gap: 8px; margin-top: 20px; padding: 0 12px; min-height: 44px; border-radius: 12px; background: var(--fill); color: var(--label-3); }
 .search input { flex: 1; min-width: 0; border: 0; background: none; font: inherit; font-size: 16px; color: var(--label); outline: none; }
@@ -50,8 +58,9 @@ footer.wrap { margin-top: 48px; margin-bottom: 56px; color: var(--label-3); font
 </style>
 </head>
 <body>
+{%- from "partials/logo.html" import wordmark %}
 <header class="top wrap" style="max-width: 720px">
-  <p class="eyebrow">IA News</p>
+  <p class="brand-row">{{ wordmark(28) }}</p>
   <h1>Todas las ediciones</h1>
   <p class="meta">{{ editions|length }} {{ "edición" if editions|length == 1 else "ediciones" }} · {{ editions | map(attribute='stories') | map('length') | sum }} noticias</p>
 </header>

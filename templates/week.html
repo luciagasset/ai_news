@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
-<title>IA News · Semana {{ date | short_date }}</title>
+<title>AI News · Semana {{ date | short_date }}</title>
 <meta name="description" content="Resumen semanal de avances, debates, polémicas y noticias de inteligencia artificial.">
 {%- if og_image %}
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="IA News">
-<meta property="og:title" content="IA News · {{ week_label }}">
+<meta property="og:site_name" content="AI News">
+<meta property="og:title" content="AI News · {{ week_label }}">
 <meta property="og:description" content="{{ n_stories }} noticias de IA que generaron conversación: avances, debates, polémicas y noticias, resumidas en español.">
 <meta property="og:image" content="{{ og_image }}">
 <meta property="og:image:width" content="1200">
@@ -17,7 +17,18 @@
 {% if page_url %}<meta property="og:url" content="{{ page_url }}">{% endif %}
 <meta name="twitter:card" content="summary_large_image">
 {%- endif %}
-<script>document.documentElement.classList.add("js")</script>
+<link rel="icon" type="image/svg+xml" href="icons/logo.svg">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="theme-color" content="#0b0b0f">
+<script>
+document.documentElement.classList.add("js");
+// La entrada se muestra al abrir la edición, una vez por visita, y nunca si se llega con un enlace a una noticia
+(() => {
+  let seen = false;
+  try { seen = sessionStorage.getItem("ai-news-intro-{{ date }}") === "1"; } catch {}
+  if (!seen && !location.hash) document.documentElement.classList.add("show-intro");
+})();
+</script>
 <style>
 {% include "partials/base.css" %}
 
@@ -303,9 +314,71 @@ h2.sec .count { color: var(--label-3); font-weight: 600; }
 .home-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
 .home-actions .all-btn { margin-top: 0; font-size: 16px; }
 .view > .day-head { padding-top: 20px; }
+
+/* ---------- Marca ---------- */
+.wordmark { display: inline-flex; align-items: center; gap: 8px; }
+.wordmark .logo-mark { border-radius: 8px; flex: none; }
+.wm-text { font-size: 17px; font-weight: 800; letter-spacing: -.01em; color: var(--label); }
+.brand-row { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; }
+.brand-row .sub { font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); }
+
+/* ---------- Pulsación: todo lo que se toca responde ---------- */
+button, .ed-link { -webkit-tap-highlight-color: transparent; }
+button:not([disabled]), .ed-link { transition: transform .16s cubic-bezier(.2,.8,.2,1), box-shadow .25s ease, background-color .2s ease, color .2s ease, opacity .2s ease; }
+button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
+
+/* ---------- Entrada ---------- */
+.intro { display: none; position: fixed; inset: 0; z-index: 100; background: var(--bg); color: var(--label);
+  align-items: center; justify-content: center; padding: 24px 20px calc(24px + env(safe-area-inset-bottom)); overflow: hidden; cursor: pointer; }
+.show-intro .intro { display: flex; }
+.show-intro body { overflow: hidden; }
+.intro-inner { width: 100%; max-width: 460px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.intro-logo { width: 84px; height: 84px; border-radius: 20px; box-shadow: 0 14px 40px rgba(0,0,0,.22); }
+.intro-brand { font-size: 40px; font-weight: 800; letter-spacing: -.03em; margin: 18px 0 0; }
+.intro-week { font-size: 16px; color: var(--label-2); margin: 4px 0 0; }
+.intro-pulse { width: 100%; margin-top: 30px; display: grid; grid-template-columns: repeat(var(--n), 1fr); }
+.intro-day { display: flex; flex-direction: column; align-items: center; }
+.intro-dots { height: 150px; display: flex; flex-direction: column-reverse; align-items: center; justify-content: flex-start; gap: 6px; }
+.intro-dot { width: var(--s); height: var(--s); border-radius: 50%; background: var(--tc); flex: none; }
+.intro-day b { width: 100%; padding-top: 8px; margin-top: 4px; border-top: 1px solid var(--separator); font-size: 12px; font-weight: 600; color: var(--label-3); }
+.intro-count { font-size: 17px; color: var(--label-2); margin: 22px 0 0; }
+.intro-count b { display: block; font-size: 64px; line-height: 1; font-weight: 800; letter-spacing: -.04em; color: var(--label); font-variant-numeric: tabular-nums; margin-bottom: 6px; }
+.intro-top { margin: 22px 0 0; font-size: 17px; line-height: 1.35; font-weight: 600; max-width: 400px; }
+.intro-top span { display: block; font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+.intro-go { margin-top: 28px; min-height: 52px; padding: 0 26px; border: 0; border-radius: 26px; background: var(--label); color: var(--bg);
+  font-size: 17px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; position: relative; }
+.intro-go .icon { font-size: 18px; stroke-width: 2.4; }
+.intro-go::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: 0 0 0 0 var(--label); opacity: .25; }
+.intro-skip { margin: 14px 0 0; font-size: 13px; color: var(--label-3); }
+.intro.leaving { animation: intro-out .5s cubic-bezier(.4,0,.2,1) forwards; pointer-events: none; }
+@keyframes intro-out { to { opacity: 0; transform: scale(1.04); } }
+
+/* Coreografía: logo → marca → los puntos caen en sus días → contador → titular → botón */
+.js .intro-logo { animation: logo-in .7s cubic-bezier(.2,.8,.2,1.2) both; }
+.js .intro-logo .lm { transform-box: fill-box; transform-origin: center; animation: pop .5s cubic-bezier(.3,1.6,.5,1) both; }
+.js .intro-logo .lm1 { animation-delay: .25s; } .js .intro-logo .lm2 { animation-delay: .35s; }
+.js .intro-logo .lm3 { animation-delay: .45s; } .js .intro-logo .lm4 { animation-delay: .55s; }
+.js .intro-brand, .js .intro-week { animation: rise .55s cubic-bezier(.2,.8,.2,1) both; }
+.js .intro-brand { animation-delay: .35s; } .js .intro-week { animation-delay: .5s; }
+.js .intro-day b { animation: rise .4s ease both; animation-delay: .7s; }
+.js .intro-dot { animation: drop .7s cubic-bezier(.3,1.35,.55,1) both; animation-delay: var(--d); }
+.js .intro-count { animation: rise .5s ease both; animation-delay: .9s; }
+.js .intro-top { animation: rise .6s cubic-bezier(.2,.8,.2,1) both; animation-delay: var(--t, 2.1s); }
+.js .intro-go { animation: rise .6s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--t, 2.1s) + .3s); }
+.js .intro-go::after { animation: breathe 2.2s ease-out infinite; animation-delay: calc(var(--t, 2.1s) + 1s); }
+.js .intro-skip { animation: rise .5s ease both; animation-delay: calc(var(--t, 2.1s) + .6s); }
+@keyframes logo-in { from { opacity: 0; transform: scale(.6) rotate(-8deg); } to { opacity: 1; transform: none; } }
+@keyframes drop { 0% { opacity: 0; transform: translateY(-160px) scale(.6); } 60% { opacity: 1; } 100% { opacity: 1; transform: none; } }
+@keyframes breathe { 0% { box-shadow: 0 0 0 0 var(--label); opacity: .28; } 100% { box-shadow: 0 0 0 16px var(--label); opacity: 0; } }
+/* Seguro: si el navegador no ejecuta las animaciones (pestaña en segundo plano, navegadores internos de apps),
+   a los pocos segundos todo queda en su estado final */
+.intro.settled * { animation: none !important; }
+@media (prefers-reduced-motion: reduce) { .intro.leaving { animation: none; opacity: 0; } }
 </style>
 </head>
 <body>
+{%- from "partials/logo.html" import logo_mark, wordmark %}
+{%- set ni = namespace(i=0) %}
 {%- macro icon(t) -%}
 <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
 {%- if t == "avance" -%}<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>
@@ -344,10 +417,30 @@ h2.sec .count { color: var(--label-3); font-weight: 600; }
 </button>
 {%- endmacro -%}
 
+<div class="intro" id="intro" role="dialog" aria-modal="true" aria-label="Bienvenida a AI News">
+  <div class="intro-inner">
+    {{ logo_mark(84, "intro-logo", true) }}
+    <p class="intro-brand">AI News</p>
+    <p class="intro-week">{{ week_label }}</p>
+    <div class="intro-pulse" style="--n: {{ days|length }}" aria-hidden="true">
+      {%- for d in days %}
+      <div class="intro-day">
+        <div class="intro-dots">{% for s in d.stories %}{% set ni.i = ni.i + 1 %}<i class="intro-dot t-{{ s.type }}" style="--s: {{ 12 + 3 * (s.comments | heat_level) }}px; --d: {{ (0.8 + ni.i * 0.07) | round(2) }}s"></i>{% endfor %}</div>
+        <b>{{ d.initial }}</b>
+      </div>
+      {%- endfor %}
+    </div>
+    <p class="intro-count"><b id="intro-n" data-to="{{ n_stories }}">{{ n_stories }}</b>noticias de IA que generaron conversación</p>
+    {% if ranked %}<p class="intro-top" style="--t: {{ (1.1 + ni.i * 0.07) | round(2) }}s"><span>Lo más destacado</span>{{ ranked[0].headline }}</p>{% endif %}
+    <button class="intro-go" id="intro-go" type="button" style="--t: {{ (1.1 + ni.i * 0.07) | round(2) }}s">Ver la semana{{ icon("next") }}</button>
+    <p class="intro-skip" style="--t: {{ (1.1 + ni.i * 0.07) | round(2) }}s">o toca en cualquier parte</p>
+  </div>
+</div>
+
 {# ================= Pantalla principal: la semana ================= #}
 <div id="view-home" class="view">
   <header class="top wrap">
-    <p class="eyebrow">IA News · Resumen semanal</p>
+    <p class="brand-row">{{ wordmark(28) }}<span class="sub">Resumen semanal</span></p>
     <h1>{{ week_label }}</h1>
     <p class="meta">{{ n_stories }} {{ "noticia" if n_stories == 1 else "noticias" }} · {{ total_minutes }} min de lectura</p>
     <div class="head-row">
@@ -589,6 +682,52 @@ h2.sec .count { color: var(--label-3); font-weight: 600; }
 </dialog>
 <div class="toast" id="toast" role="status"></div>
 
+<script>
+// Entrada: contador animado y salida al tocar; rebote breve en cualquier botón pulsado
+(() => {
+  const root = document.documentElement;
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const intro = document.getElementById("intro");
+  if (root.classList.contains("show-intro") && intro) {
+    const n = document.getElementById("intro-n");
+    const to = +n.dataset.to;
+    if (!reduce && to > 0) {
+      n.textContent = "0";
+      const start = performance.now() + 900, dur = 1100;
+      const tick = now => {
+        const k = Math.min(Math.max((now - start) / dur, 0), 1);
+        n.textContent = Math.round(to * (1 - Math.pow(1 - k, 3)));
+        if (k < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }
+    setTimeout(() => { intro.classList.add("settled"); n.textContent = to; }, reduce ? 0 : 4200);
+    const go = document.getElementById("intro-go");
+    setTimeout(() => go.focus({ preventScroll: true }), reduce ? 0 : 1200);
+    let done = false;
+    const leave = () => {
+      if (done) return; done = true;
+      try { sessionStorage.setItem("ai-news-intro-{{ date }}", "1"); } catch {}
+      const end = () => { root.classList.remove("show-intro"); intro.remove(); };
+      if (reduce) return end();
+      intro.classList.add("leaving");
+      setTimeout(end, 480);
+    };
+    intro.addEventListener("click", leave);
+    addEventListener("keydown", e => { if (e.key === "Enter" || e.key === "Escape" || e.key === " ") leave(); }, { once: true });
+  } else if (intro) {
+    intro.remove();
+  }
+  if (!reduce && Element.prototype.animate) {
+    document.addEventListener("click", e => {
+      const b = e.target.closest("button:not([disabled]), .ed-link");
+      if (!b || b.closest(".intro")) return;
+      b.animate([{ transform: "scale(.94)" }, { transform: "scale(1.03)" }, { transform: "scale(1)" }],
+                { duration: 340, easing: "cubic-bezier(.2,.8,.2,1)" });
+    });
+  }
+})();
+</script>
 <script>
 (() => {
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;

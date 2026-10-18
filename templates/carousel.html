@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<title>IA News · carrusel {{ week_label }}</title>
+<title>AI News · carrusel {{ week_label }}</title>
 <style>
 /* Carrusel para LinkedIn: diapositivas de 1080×1350 (4:5), una por página del PDF. */
 @page { size: 1080px 1350px; margin: 0; }
@@ -15,6 +15,8 @@ body { color: #000; -webkit-font-smoothing: antialiased; -webkit-print-color-adj
   page-break-after: always; break-after: page; background: #f2f2f7; }
 .slide:last-child { page-break-after: auto; break-after: auto; }
 .brand { font-size: 26px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #1e6ef4; }
+.logo-row { display: flex; align-items: center; gap: 22px; }
+.logo-row .lg { border-radius: 19px; flex: none; }
 .foot { margin-top: auto; padding-top: 32px; display: flex; justify-content: space-between; font-size: 24px; color: rgba(60,60,67,.6); font-weight: 600; }
 h1 { font-size: 104px; line-height: 1; font-weight: 800; letter-spacing: -.035em; }
 h2 { font-size: 72px; line-height: 1.05; font-weight: 800; letter-spacing: -.03em; }
@@ -81,6 +83,7 @@ h2 { font-size: 72px; line-height: 1.05; font-weight: 800; letter-spacing: -.03e
 </style>
 </head>
 <body>
+{%- from "partials/logo.html" import logo_mark %}
 {%- macro icon(t) -%}
 <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
 {%- if t == "avance" -%}<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>
@@ -93,11 +96,11 @@ h2 { font-size: 72px; line-height: 1.05; font-weight: 800; letter-spacing: -.03e
 {%- endmacro -%}
 {%- set present = types | selectattr(3) | list -%}
 {%- set total = 4 + present|length -%}
-{%- macro foot(n) -%}<div class="foot"><span>IA News · {{ week_label }}</span><span>{{ n }}/{{ total }}</span></div>{%- endmacro -%}
+{%- macro foot(n) -%}<div class="foot"><span>AI News · {{ week_label }}</span><span>{{ n }}/{{ total }}</span></div>{%- endmacro -%}
 
 {# 1. Portada #}
 <section class="slide cover">
-  <p class="brand">IA News · Resumen semanal</p>
+  <p class="brand logo-row">{{ logo_mark(76, "lg") }}<span>AI News · Resumen semanal</span></p>
   <h1>{{ week_label }}</h1>
   <p class="lead">{{ n_stories }} noticias de IA que generaron conversación esta semana: avances, debates, polémicas y noticias.</p>
   <div class="pulse">
@@ -173,7 +176,7 @@ h2 { font-size: 72px; line-height: 1.05; font-weight: 800; letter-spacing: -.03e
 
 {# Cierre #}
 <section class="slide end">
-  <p class="brand">IA News</p>
+  <p class="brand logo-row">{{ logo_mark(76, "lg") }}<span>AI News</span></p>
   <h2>Cada noticia, ampliada y con sus fuentes</h2>
   <p class="lead">La edición completa tiene el resumen ampliado de cada noticia, el enlace a sus fuentes y el minuto exacto de los vídeos.</p>
   <p class="url">{{ site_url | replace("https://", "") }}</p>

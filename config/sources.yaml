@@ -1,4 +1,4 @@
-# Fuentes de IA_NEWS. Edita libremente: `enabled: false` desactiva una fuente sin borrarla.
+# Fuentes de AI News. Edita libremente: `enabled: false` desactiva una fuente sin borrarla.
 # Fase 1: 3 canales de YouTube, 2 feeds RSS, Hacker News y 3 laboratorios frontera. Edición semanal.
 
 youtube:
@@ -69,5 +69,5 @@ selection:
 # Publicación. La URL pública se usa para la imagen de vista previa (LinkedIn y otras redes
 # necesitan una dirección absoluta) y para el enlace del carrusel.
 site:
-  url: "https://luciagasset.github.io/ia_news/"
+  url: "https://luciagasset.github.io/ai_news/"
   author: "Lucía Gasset"

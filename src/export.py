@@ -14,6 +14,7 @@ from pathlib import Path
 from .common import DATA, OUTPUT, log
 
 OG_DIR = OUTPUT / "og"
+ICON_DIR = OUTPUT / "icons"
 CAROUSEL_DIR = OUTPUT / "carrusel"
 TMP = DATA / "tmp"
 
@@ -70,3 +71,24 @@ def export_assets(date: str, og_html: str, carousel_html: str) -> dict[str, str]
     if out:
         log.info("Para compartir: %s", ", ".join(out.values()))
     return out
+
+
+def export_icons(svg: str) -> None:
+    """Logo como archivo: logo.svg (pestaña del navegador) e icon-180/512.png (iPhone, redes)."""
+    ICON_DIR.mkdir(parents=True, exist_ok=True)
+    (ICON_DIR / "logo.svg").write_text(svg, encoding="utf-8")
+    chrome = find_chrome()
+    if not chrome:
+        return
+    TMP.mkdir(parents=True, exist_ok=True)
+    for size in (180, 512):
+        page = TMP / f"icon-{size}.html"
+        page.write_text(
+            "<!doctype html><html><body style='margin:0;background:transparent'>"
+            + svg.replace('width="512" height="512"', f'width="{size}" height="{size}"') + "</body></html>",
+            encoding="utf-8")
+        try:
+            _run(chrome, [f"--window-size={size},{size}", "--default-background-color=00000000",
+                          f"--screenshot={ICON_DIR / f'icon-{size}.png'}"], page)
+        except (subprocess.SubprocessError, OSError) as e:
+            log.warning("No se pudo generar el icono de %d px: %s", size, e)

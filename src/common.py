@@ -18,9 +18,9 @@ OUTPUT = ROOT / "output"
 LOGS = ROOT / "logs"
 TEMPLATES = ROOT / "templates"
 
-USER_AGENT = "Mozilla/5.0 (compatible; IA_NEWS/1.0; +https://github.com/)"
+USER_AGENT = "Mozilla/5.0 (compatible; AI News/1.0; +https://github.com/)"
 
-log = logging.getLogger("ia_news")
+log = logging.getLogger("ai_news")
 
 
 def load_config() -> dict:

@@ -4,16 +4,19 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
-<title>IA News · Ediciones</title>
-<meta name="description" content="Todas las ediciones semanales de IA News, con búsqueda en el histórico.">
+<link rel="icon" type="image/svg+xml" href="icons/logo.svg">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="theme-color" content="#0b0b0f">
+<title>AI News · Ediciones</title>
+<meta name="description" content="Todas las ediciones semanales de AI News, con búsqueda en el histórico.">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="IA News">
-<meta property="og:title" content="IA News · Resumen semanal de inteligencia artificial">
+<meta property="og:site_name" content="AI News">
+<meta property="og:title" content="AI News · Resumen semanal de inteligencia artificial">
 <meta property="og:description" content="Cada semana, las noticias de IA que generaron conversación real, resumidas en español.">
-<meta property="og:image" content="https://luciagasset.github.io/ia_news/og/2026-10-15.png">
+<meta property="og:image" content="https://luciagasset.github.io/ai_news/og/2026-10-15.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:url" content="https://luciagasset.github.io/ia_news/">
+<meta property="og:url" content="https://luciagasset.github.io/ai_news/">
 <meta name="twitter:card" content="summary_large_image">
 <style>
 /* Paleta basada en los colores de sistema de Apple (HIG · Color), con las variantes de contraste
@@ -69,6 +72,11 @@ header.top { padding-top: 44px; padding-bottom: 8px; }
 .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); margin: 0 0 4px; }
 h1 { font-size: 34px; line-height: 1.12; font-weight: 700; letter-spacing: -.02em; margin: 0; }
 .meta { color: var(--label-2); font-size: 15px; margin: 8px 0 0; }
+.brand-row { margin: 0 0 10px; }
+.wordmark { display: inline-flex; align-items: center; gap: 8px; }
+.wordmark .logo-mark { border-radius: 8px; }
+.wm-text { font-size: 17px; font-weight: 800; letter-spacing: -.01em; }
+.edition:active { transform: scale(.98); }
 main.wrap { max-width: 720px; }
 .search { display: flex; align-items: center; gap: 8px; margin-top: 20px; padding: 0 12px; min-height: 44px; border-radius: 12px; background: var(--fill); color: var(--label-3); }
 .search input { flex: 1; min-width: 0; border: 0; background: none; font: inherit; font-size: 16px; color: var(--label); outline: none; }
@@ -97,7 +105,15 @@ footer.wrap { margin-top: 48px; margin-bottom: 56px; color: var(--label-3); font
 </head>
 <body>
 <header class="top wrap" style="max-width: 720px">
-  <p class="eyebrow">IA News</p>
+  <p class="brand-row"><span class="wordmark"><svg xmlns="http://www.w3.org/2000/svg" class="logo-mark" width="28" height="28" viewBox="0 0 64 64" role="img" aria-label="AI News">
+  <rect width="64" height="64" rx="15" fill="#0b0b0f"/>
+  <rect x="0.5" y="0.5" width="63" height="63" rx="14.5" fill="none" stroke="rgba(255,255,255,.12)"/>
+  <path d="M10 54.5H54" stroke="rgba(255,255,255,.28)" stroke-width="1.6" stroke-linecap="round"/>
+  <circle class="lm lm1" cx="15" cy="47" r="4" fill="#aeaeb2"/>
+  <circle class="lm lm2" cx="26" cy="40" r="5.5" fill="#3bdded"/>
+  <circle class="lm lm3" cx="38.5" cy="30.5" r="7" fill="#ffa056"/>
+  <circle class="lm lm4" cx="51" cy="18" r="8.5" fill="#a7aaff"/>
+</svg><span class="wm-text">AI News</span></span></p>
   <h1>Todas las ediciones</h1>
   <p class="meta">1 edición · 15 noticias</p>
 </header>
@@ -201,7 +217,7 @@ footer.wrap { margin-top: 48px; margin-bottom: 56px; color: var(--label-3); font
   </ul>
   <p class="empty" id="none" hidden>No hay noticias que coincidan.</p>
 </main>
-<footer class="wrap"><p>Actualizado el 18/10/2026 a las 15:35.</p></footer>
+<footer class="wrap"><p>Actualizado el 18/10/2026 a las 20:33.</p></footer>
 <script>
 (() => {
   const q = document.getElementById("q");

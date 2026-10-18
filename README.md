@@ -1,6 +1,6 @@
-# IA News
+# AI News
 
-**Edición en vivo:** https://luciagasset.github.io/ia_news/
+**Edición en vivo:** https://luciagasset.github.io/ai_news/
 
 Resumen semanal, en español, de lo que se mueve en inteligencia artificial: **avances en modelos frontera,
 debates, polémicas y noticias**. Cada semana genera una edición con 12–15 elementos de los 7 días previos, en tarjetas

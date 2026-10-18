@@ -1,0 +1,17 @@
+{#- Logo de AI News: el «pulso» de la semana en un icono. Cuatro puntos con los colores de los tipos
+    (noticia, debate, polémica, avance) que crecen como una conversación que sube, sobre un eje. -#}
+{%- macro logo_mark(size=40, cls="logo-mark", animated=false) -%}
+<svg xmlns="http://www.w3.org/2000/svg" class="{{ cls }}{% if animated %} logo-anim{% endif %}" width="{{ size }}" height="{{ size }}" viewBox="0 0 64 64" role="img" aria-label="AI News">
+  <rect width="64" height="64" rx="15" fill="#0b0b0f"/>
+  <rect x="0.5" y="0.5" width="63" height="63" rx="14.5" fill="none" stroke="rgba(255,255,255,.12)"/>
+  <path d="M10 54.5H54" stroke="rgba(255,255,255,.28)" stroke-width="1.6" stroke-linecap="round"/>
+  <circle class="lm lm1" cx="15" cy="47" r="4" fill="#aeaeb2"/>
+  <circle class="lm lm2" cx="26" cy="40" r="5.5" fill="#3bdded"/>
+  <circle class="lm lm3" cx="38.5" cy="30.5" r="7" fill="#ffa056"/>
+  <circle class="lm lm4" cx="51" cy="18" r="8.5" fill="#a7aaff"/>
+</svg>
+{%- endmacro -%}
+
+{%- macro wordmark(size=28) -%}
+<span class="wordmark">{{ logo_mark(size, "logo-mark") }}<span class="wm-text">AI News</span></span>
+{%- endmacro -%}

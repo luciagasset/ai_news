@@ -7,7 +7,7 @@ from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from .common import OUTPUT, TEMPLATES
-from .export import export_assets
+from .export import export_assets, export_icons
 from .history import list_days, load_day
 from .models import CATEGORY_LABELS, TYPE_LABELS, TYPE_ORDER, TYPE_SINGULAR, SourceRef, Story
 
@@ -152,6 +152,7 @@ def render_day(date: str, stories: list[Story], failed_sources: list[str], stats
     path = OUTPUT / f"{date}.html"
     path.write_text(env.get_template("week.html").render(**ctx), encoding="utf-8")
     export_assets(date, env.get_template("og.html").render(**ctx), env.get_template("carousel.html").render(**ctx))
+    export_icons(env.from_string('{% from "partials/logo.html" import logo_mark %}{{ logo_mark(512, "logo") }}').render())
     render_index(site_url)
     return str(path)
 
