@@ -422,10 +422,11 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 
 /* ---------- Entrada ---------- */
 .intro { display: none; position: fixed; inset: 0; z-index: 100; background: var(--bg); color: var(--label);
-  align-items: center; justify-content: center; padding: 24px 20px calc(24px + env(safe-area-inset-bottom)); overflow: hidden; cursor: pointer; }
+  align-items: flex-start; justify-content: center; padding: max(24px, calc(12px + env(safe-area-inset-top))) 20px calc(24px + env(safe-area-inset-bottom));
+  overflow-y: auto; overscroll-behavior: contain; cursor: pointer; }
 .show-intro .intro { display: flex; }
 .show-intro body { overflow: hidden; }
-.intro-inner { width: 100%; max-width: 460px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.intro-inner { margin: auto 0; width: 100%; max-width: 460px; display: flex; flex-direction: column; align-items: center; text-align: center; }
 .intro-col { display: contents; }
 .intro-logo { width: 84px; height: 84px; border-radius: 20px; box-shadow: 0 14px 40px rgba(0,0,0,.22); }
 .intro-brand { font-size: 40px; font-weight: 800; letter-spacing: -.03em; margin: 18px 0 0; }
@@ -467,6 +468,18 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 /* Seguro: si el navegador no ejecuta las animaciones (pestaña en segundo plano, navegadores internos de apps),
    a los pocos segundos todo queda en su estado final */
 .intro.settled * { animation: none !important; }
+@media (max-height: 860px) and (orientation: portrait) {
+  .intro-logo { width: 68px; height: 68px; border-radius: 17px; }
+  .intro-brand { font-size: 34px; margin-top: 14px; }
+  .intro-week { font-size: 15px; }
+  .intro-pulse { margin-top: 22px; }
+  .intro-dots { height: 120px; gap: 5px; }
+  .intro-count { margin-top: 18px; }
+  .intro-count b { font-size: 54px; }
+  .intro-top { margin-top: 16px; font-size: 16px; }
+  .intro-go { margin-top: 20px; }
+  .intro-skip { margin-top: 10px; }
+}
 /* Pantallas bajas (móvil en horizontal): la entrada se reparte en dos columnas para caber sin cortarse */
 @media (max-height: 620px) {
   .intro { overflow-y: auto; padding-top: max(16px, env(safe-area-inset-top)); padding-left: max(20px, env(safe-area-inset-left)); padding-right: max(20px, env(safe-area-inset-right)); }
@@ -484,7 +497,6 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
   header.top { padding-top: calc(28px + env(safe-area-inset-top)); }
 }
 @media (max-height: 620px) and (orientation: landscape) {
-  .intro { align-items: center; }
   .intro-inner { max-width: 800px; flex-direction: row; align-items: center; gap: 48px; }
   .intro-col { flex: 1; display: flex; flex-direction: column; align-items: center; }
   .intro-pulse { margin-top: 12px; }
@@ -1765,7 +1777,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
   
   <p><span class="l-es">Cobertura de X parcial: el debate en X llega a través de vídeos de YouTube, Hacker News y medios.</span><span class="l-en">Partial coverage of X: the debate on X arrives through YouTube videos, Hacker News and the press.</span></p>
   <p><span class="l-es">Resúmenes generados con IA a partir de 110 fuentes; pueden contener errores. Cada noticia enlaza a su fuente original.</span><span class="l-en">Summaries written with AI from 110 sources; they may contain errors. Every story links to its original sources.</span></p>
-  <p><span class="l-es">Generado el 18/10/2026 a las 21:01.</span><span class="l-en">Generated on 18/10/2026 a las 21:01.</span></p>
+  <p><span class="l-es">Generado el 18/10/2026 a las 21:23.</span><span class="l-en">Generated on 18/10/2026 a las 21:23.</span></p>
 </footer>
 
 
