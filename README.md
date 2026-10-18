@@ -1,16 +1,22 @@
 # IA News
 
+**Edición en vivo:** https://luciagasset.github.io/ia_news/
+
 Resumen semanal, en español, de lo que se mueve en inteligencia artificial: **avances en modelos frontera,
 debates, polémicas y noticias**. Cada semana genera una edición con 12–15 elementos de los 7 días previos, en tarjetas
 que se amplían al pulsarlas, y guarda un histórico para enlazar historias que continúan.
 
-La edición tiene dos pantallas:
+La edición se abre en la semana:
 
-- **Vista diaria** (principal): se abre en el último día con noticias; un selector y unas flechas recorren los
-  7 días, y cada día ordena sus noticias por tipo (Modelos frontera, En debate, Polémicas, Noticias).
-- **Resumen de la semana**: «El pulso de la semana» (un punto por noticia en el día en que surgió, más
-  grande cuanto más se debatió), el listado completo con búsqueda y filtros por tipo y día, y el acceso al
-  índice de ediciones (`output/index.html`), que permite buscar en todo el histórico.
+- **La semana** (principal): un botón por tipo (Modelos frontera, En debate, Polémicas, Noticias),
+  «El pulso de la semana» (un punto por noticia en el día en que surgió, más grande cuanto más se debatió),
+  lo más destacado, el listado completo con búsqueda y filtros, y el índice de ediciones con búsqueda en
+  todo el histórico.
+- **Día a día**: un selector y unas flechas recorren los 7 días; cada día ordena sus noticias por tipo.
+
+Cada edición genera además dos piezas para compartir en LinkedIn: una **imagen de vista previa**
+(`output/og/<fecha>.png`, con etiquetas Open Graph) y un **carrusel PDF** de 1080×1350
+(`output/carrusel/<fecha>.pdf`).
 
 El criterio no es lo primero que sale en un buscador, sino lo que genera conversación real: cuántas
 fuentes distintas lo cuentan y cuánto se discute en Hacker News y en los comentarios de YouTube.
