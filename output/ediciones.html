@@ -6,7 +6,13 @@
 <meta name="color-scheme" content="light dark">
 <link rel="icon" type="image/svg+xml" href="icons/logo.svg">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
-<meta name="theme-color" content="#0b0b0f">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="AI News">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <script>
 (() => {
   let lang = null;
@@ -76,7 +82,7 @@ button { font: inherit; color: inherit; }
 .t-polemica { --tc: var(--t-polemica); } .t-noticia { --tc: var(--t-noticia); }
 .icon { width: 1em; height: 1em; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 [hidden] { display: none !important; }
-header.top { padding-top: 44px; padding-bottom: 8px; }
+header.top { padding-top: calc(44px + env(safe-area-inset-top)); padding-bottom: 8px; }
 .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); margin: 0 0 4px; }
 h1 { font-size: 34px; line-height: 1.12; font-weight: 700; letter-spacing: -.02em; margin: 0; }
 .meta { color: var(--label-2); font-size: 15px; margin: 8px 0 0; }
@@ -232,7 +238,7 @@ footer.wrap { margin-top: 48px; margin-bottom: 56px; color: var(--label-3); font
   </ul>
   <p class="empty" id="none" hidden><span class="l-es">No hay noticias que coincidan.</span><span class="l-en">No matching stories.</span></p>
 </main>
-<footer class="wrap"><p><span class="l-es">Actualizado el 18/10/2026 a las 20:47.</span><span class="l-en">Updated on 18/10/2026 a las 20:47.</span></p></footer>
+<footer class="wrap"><p><span class="l-es">Actualizado el 18/10/2026 a las 21:01.</span><span class="l-en">Updated on 18/10/2026 a las 21:01.</span></p></footer>
 <script>
 (() => {
   const q = document.getElementById("q");
@@ -257,6 +263,10 @@ footer.wrap { margin-top: 48px; margin-bottom: 56px; color: var(--label-3); font
     applyLang(b.dataset.lang);
   }));
   applyLang(document.documentElement.lang === "en" ? "en" : "es");
+// App instalable: guarda las páginas para abrirlas sin conexión (solo en la web publicada, no en local)
+  if ("serviceWorker" in navigator && location.protocol === "https:") {
+    addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+  }
   const norm = t => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
   q.addEventListener("input", () => {
     const words = norm(q.value).split(/\s+/).filter(Boolean);

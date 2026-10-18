@@ -59,7 +59,9 @@ clasificar y resumir) la hace Claude Code leyendo esos ficheros, con las reglas 
 5. **Histórico y página** (`render`): cada edición se guarda con embeddings, lista para detectar noticias
    relacionadas, y se genera un único HTML autocontenido por semana, con modo claro y oscuro, pensado para
    leerse con una mano en el móvil, además del índice de ediciones. El diseño sigue las Human Interface
-   Guidelines de Apple. La selección se reparte entre los días y los tipos, con mínimos y topes en
+   Guidelines de Apple. Se adapta a móvil, tablet (también en horizontal) y ordenador, y se puede instalar
+   como app (manifiesto + service worker): se abre a pantalla completa y guarda las ediciones leídas para
+   verlas sin conexión. La selección se reparte entre los días y los tipos, con mínimos y topes en
    `config/sources.yaml`.
 
 ## Puesta en marcha

@@ -74,21 +74,90 @@ def export_assets(date: str, og_html: str, carousel_html: str) -> dict[str, str]
 
 
 def export_icons(svg: str) -> None:
-    """Logo como archivo: logo.svg (pestaña del navegador) e icon-180/512.png (iPhone, redes)."""
+    """Logo como archivo: logo.svg (pestaña), icon-180/192/512.png (iPhone, Android, redes) e
+    icon-maskable-512.png (Android recorta el icono en círculo o squircle: el logo va con margen)."""
     ICON_DIR.mkdir(parents=True, exist_ok=True)
     (ICON_DIR / "logo.svg").write_text(svg, encoding="utf-8")
     chrome = find_chrome()
     if not chrome:
         return
     TMP.mkdir(parents=True, exist_ok=True)
-    for size in (180, 512):
-        page = TMP / f"icon-{size}.html"
-        page.write_text(
-            "<!doctype html><html><body style='margin:0;background:transparent'>"
-            + svg.replace('width="512" height="512"', f'width="{size}" height="{size}"') + "</body></html>",
-            encoding="utf-8")
+    jobs = [(size, f"icon-{size}.png", svg.replace('width="512" height="512"', f'width="{size}" height="{size}"'),
+             "transparent") for size in (180, 192, 512)]
+    # Maskable: fondo a sangre del color del icono y el logo al 72 % (zona segura de Android)
+    jobs.append((512, "icon-maskable-512.png",
+                 "<div style='width:512px;height:512px;display:grid;place-items:center'>"
+                 + svg.replace('width="512" height="512"', 'width="368" height="368"') + "</div>", "#0b0b0f"))
+    for size, name, markup, bg in jobs:
+        page = TMP / name.replace(".png", ".html")
+        page.write_text(f"<!doctype html><html><body style='margin:0;background:{bg}'>{markup}</body></html>",
+                        encoding="utf-8")
         try:
             _run(chrome, [f"--window-size={size},{size}", "--default-background-color=00000000",
-                          f"--screenshot={ICON_DIR / f'icon-{size}.png'}"], page)
+                          f"--screenshot={ICON_DIR / name}"], page)
         except (subprocess.SubprocessError, OSError) as e:
-            log.warning("No se pudo generar el icono de %d px: %s", size, e)
+            log.warning("No se pudo generar el icono %s: %s", name, e)
+
+
+def export_pwa(version: str) -> None:
+    """Lo que convierte la web en una app instalable: manifiesto y service worker (funciona sin conexión)."""
+    import json
+
+    manifest = {
+        "name": "AI News · Resumen semanal de IA",
+        "short_name": "AI News",
+        "description": "Las noticias de IA que generan conversación real, cada semana, en español e inglés.",
+        "lang": "es",
+        "start_url": "./",
+        "scope": "./",
+        "display": "standalone",
+        "orientation": "any",
+        "background_color": "#f2f2f7",
+        "theme_color": "#0b0b0f",
+        "icons": [
+            {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png"},
+            {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png"},
+            {"src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"},
+            {"src": "icons/logo.svg", "sizes": "any", "type": "image/svg+xml"},
+        ],
+    }
+    (OUTPUT / "manifest.webmanifest").write_text(json.dumps(manifest, ensure_ascii=False, indent=1), encoding="utf-8")
+    (OUTPUT / "sw.js").write_text(SERVICE_WORKER.replace("__VERSION__", version), encoding="utf-8")
+
+
+# Páginas: primero la red (para ver la edición nueva en cuanto se publica) y, sin conexión, la copia guardada.
+# Iconos, imágenes y PDF: primero la copia guardada.
+SERVICE_WORKER = """// AI News · service worker (generado por src/export.py)
+const CACHE = "ai-news-__VERSION__";
+const CORE = ["./", "./ediciones.html", "./manifest.webmanifest", "./icons/logo.svg",
+              "./icons/icon-192.png", "./icons/icon-512.png"];
+
+self.addEventListener("install", event => {
+  event.waitUntil(caches.open(CACHE).then(c => Promise.allSettled(CORE.map(u => c.add(u)))).then(() => self.skipWaiting()));
+});
+
+self.addEventListener("activate", event => {
+  event.waitUntil(caches.keys()
+    .then(keys => Promise.all(keys.filter(k => k.startsWith("ai-news-") && k !== CACHE).map(k => caches.delete(k))))
+    .then(() => self.clients.claim()));
+});
+
+self.addEventListener("fetch", event => {
+  const req = event.request;
+  if (req.method !== "GET" || new URL(req.url).origin !== location.origin) return;
+  const isPage = req.mode === "navigate" || (req.headers.get("accept") || "").includes("text/html");
+  if (isPage) {
+    event.respondWith(fetch(req).then(res => {
+      const copy = res.clone();
+      caches.open(CACHE).then(c => c.put(req, copy));
+      return res;
+    }).catch(() => caches.match(req, { ignoreSearch: true }).then(r => r || caches.match("./"))));
+  } else {
+    event.respondWith(caches.match(req).then(hit => hit || fetch(req).then(res => {
+      const copy = res.clone();
+      caches.open(CACHE).then(c => c.put(req, copy));
+      return res;
+    })));
+  }
+});
+"""

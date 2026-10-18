@@ -17,7 +17,13 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/svg+xml" href="icons/logo.svg">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
-<meta name="theme-color" content="#0b0b0f">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="AI News">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <script>
 document.documentElement.classList.add("js");
 // Idioma: el elegido antes (si se guardó) o el del navegador
@@ -83,7 +89,7 @@ button { font: inherit; color: inherit; }
 [hidden] { display: none !important; }
 
 /* ---------- Inicio ---------- */
-header.top { padding-top: 44px; padding-bottom: 8px; }
+header.top { padding-top: calc(44px + env(safe-area-inset-top)); padding-bottom: 8px; }
 .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); margin: 0 0 4px; }
 h1 { font-size: 34px; line-height: 1.12; font-weight: 700; letter-spacing: -.02em; margin: 0; }
 .meta { color: var(--label-2); font-size: 15px; margin: 8px 0 0; }
@@ -365,6 +371,26 @@ h2.sec .count { color: var(--label-3); font-weight: 600; }
 .home-actions .all-btn { margin-top: 0; font-size: 16px; }
 .view > .day-head { padding-top: 20px; }
 
+/* ---------- Móvil, tablet e instalación como app ---------- */
+.wrap { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
+.bar { padding-top: env(safe-area-inset-top); }
+#view-day .strip-bar { top: calc(52px + env(safe-area-inset-top)); }
+.view > .day-head { padding-top: 20px; }
+dialog.sheet { max-height: calc(92dvh - env(safe-area-inset-top)); }
+.sheet-nav { padding-bottom: calc(8px + env(safe-area-inset-bottom)); }
+footer.wrap { padding-bottom: env(safe-area-inset-bottom); }
+.install-btn { background: var(--label); color: var(--bg); }
+.install-btn .icon { font-size: 15px; }
+/* Tablet: un poco más de aire y tarjetas algo mayores */
+@media (min-width: 700px) and (max-width: 1100px) {
+  .wrap { padding-left: max(28px, env(safe-area-inset-left)); padding-right: max(28px, env(safe-area-inset-right)); }
+  h1 { font-size: 40px; }
+}
+.install-steps { margin: 6px 0 0; padding: 0; list-style: none; counter-reset: s; }
+.install-steps li { counter-increment: s; display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 0.5px solid var(--separator); font-size: 16px; }
+.install-steps li::before { content: counter(s); flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--fill); display: grid; place-items: center; font-size: 13px; font-weight: 700; color: var(--label-2); }
+.install-steps .icon { display: inline-block; vertical-align: -3px; color: var(--accent); }
+
 /* ---------- Idioma ---------- */
 html[lang="en"] .l-es, html:not([lang="en"]) .l-en { display: none !important; }
 .lang { position: fixed; z-index: 120; top: calc(10px + env(safe-area-inset-top)); right: calc(12px + env(safe-area-inset-right));
@@ -400,6 +426,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 .show-intro .intro { display: flex; }
 .show-intro body { overflow: hidden; }
 .intro-inner { width: 100%; max-width: 460px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.intro-col { display: contents; }
 .intro-logo { width: 84px; height: 84px; border-radius: 20px; box-shadow: 0 14px 40px rgba(0,0,0,.22); }
 .intro-brand { font-size: 40px; font-weight: 800; letter-spacing: -.03em; margin: 18px 0 0; }
 .intro-week { font-size: 16px; color: var(--label-2); margin: 4px 0 0; }
@@ -440,6 +467,28 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 /* Seguro: si el navegador no ejecuta las animaciones (pestaña en segundo plano, navegadores internos de apps),
    a los pocos segundos todo queda en su estado final */
 .intro.settled * { animation: none !important; }
+/* Pantallas bajas (móvil en horizontal): la entrada se reparte en dos columnas para caber sin cortarse */
+@media (max-height: 620px) {
+  .intro { overflow-y: auto; padding-top: max(16px, env(safe-area-inset-top)); padding-left: max(20px, env(safe-area-inset-left)); padding-right: max(20px, env(safe-area-inset-right)); }
+  .intro-logo { width: 52px; height: 52px; border-radius: 13px; }
+  .intro-brand { font-size: 28px; margin-top: 8px; }
+  .intro-week { font-size: 14px; }
+  .intro-pulse { margin-top: 14px; }
+  .intro-dots { height: 96px; gap: 3px; }
+  .intro-dot { width: calc(var(--s) * .75); height: calc(var(--s) * .75); }
+  .intro-count { margin-top: 0; font-size: 15px; }
+  .intro-count b { font-size: 48px; }
+  .intro-top { margin-top: 14px; font-size: 15px; }
+  .intro-go { margin-top: 16px; min-height: 46px; }
+  .intro-skip { margin-top: 10px; }
+  header.top { padding-top: calc(28px + env(safe-area-inset-top)); }
+}
+@media (max-height: 620px) and (orientation: landscape) {
+  .intro { align-items: center; }
+  .intro-inner { max-width: 800px; flex-direction: row; align-items: center; gap: 48px; }
+  .intro-col { flex: 1; display: flex; flex-direction: column; align-items: center; }
+  .intro-pulse { margin-top: 12px; }
+}
 @media (prefers-reduced-motion: reduce) { .intro.leaving { animation: none; opacity: 0; } }
 </style>
 </head>
@@ -451,6 +500,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 
 <div class="intro" id="intro" role="dialog" aria-modal="true" aria-label="Bienvenida a AI News" data-en-aria-label="Welcome to AI News">
   <div class="intro-inner">
+   <div class="intro-col">
     <svg xmlns="http://www.w3.org/2000/svg" class="intro-logo logo-anim" width="84" height="84" viewBox="0 0 64 64" role="img" aria-label="AI News">
   <rect width="64" height="64" rx="15" fill="#0b0b0f"/>
   <rect x="0.5" y="0.5" width="63" height="63" rx="14.5" fill="none" stroke="rgba(255,255,255,.12)"/>
@@ -492,10 +542,13 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
         <b><span class="l-es">J</span><span class="l-en">T</span></b>
       </div>
     </div>
+   </div>
+   <div class="intro-col">
     <p class="intro-count"><b id="intro-n" data-to="15">15</b><span class="l-es">noticias de IA que generaron conversación</span><span class="l-en">AI stories that got people talking</span></p>
     <p class="intro-top" style="--t: 2.15s"><span class="k"><span class="l-es">Lo más destacado</span><span class="l-en">Top story</span></span><span class="l-es">Google lanza Gemini 4 Argon, su nuevo modelo frontera, a 2 $ por millón de tokens de entrada</span><span class="l-en">Google launches Gemini 4 Argon, its new frontier model, at $2 per million input tokens</span></p>
     <button class="intro-go" id="intro-go" type="button" style="--t: 2.15s"><span class="l-es">Ver la semana</span><span class="l-en">See the week</span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
     <p class="intro-skip" style="--t: 2.15s"><span class="l-es">o toca en cualquier parte</span><span class="l-en">or tap anywhere</span></p>
+   </div>
   </div>
 </div>
 
@@ -516,6 +569,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     <div class="head-row">
       <div class="progress-read"><span class="track"><span class="fill" data-read-fill></span></span><span data-read-count></span></div>
       <button class="help-btn" type="button" data-help><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg> <span class="l-es">Cómo leer esta página</span><span class="l-en">How to read this page</span></button>
+      <button class="help-btn install-btn" type="button" data-install hidden><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11"/><path d="M7.5 10.5L12 15l4.5-4.5"/><path d="M5 19h14"/></svg> <span class="l-es">Instalar app</span><span class="l-en">Install app</span></button>
     </div>
   </header>
 
@@ -1711,7 +1765,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
   
   <p><span class="l-es">Cobertura de X parcial: el debate en X llega a través de vídeos de YouTube, Hacker News y medios.</span><span class="l-en">Partial coverage of X: the debate on X arrives through YouTube videos, Hacker News and the press.</span></p>
   <p><span class="l-es">Resúmenes generados con IA a partir de 110 fuentes; pueden contener errores. Cada noticia enlaza a su fuente original.</span><span class="l-en">Summaries written with AI from 110 sources; they may contain errors. Every story links to its original sources.</span></p>
-  <p><span class="l-es">Generado el 18/10/2026 a las 20:47.</span><span class="l-en">Generated on 18/10/2026 a las 20:47.</span></p>
+  <p><span class="l-es">Generado el 18/10/2026 a las 21:01.</span><span class="l-en">Generated on 18/10/2026 a las 21:01.</span></p>
 </footer>
 
 
@@ -1738,6 +1792,25 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     <p class="note"><span class="l-es">Se puntúa cuántas fuentes distintas cuentan la noticia, cuánto se discute, lo reciente que es y su tipo (los avances y las polémicas pesan algo más). Se reparten entre los días y los tipos cuando la semana da para ello, y nunca se rellena con temas flojos. Los resúmenes salen solo de las fuentes enlazadas.</span><span class="l-en">Each story is scored on how many different sources cover it, how much it is discussed, how recent it is and its type (releases and controversies weigh a little more). Stories are spread across days and types when the week allows it, and gaps are never filled with weak topics. Summaries are based only on the linked sources.</span></p>
     <h4><span class="l-es">Idioma</span><span class="l-en">Language</span></h4>
     <p class="note"><span class="l-es">Los resúmenes se escriben en español y se traducen al inglés; las fuentes enlazadas están en su idioma original.</span><span class="l-en">Summaries are written in Spanish and translated into English; linked sources are in their original language.</span></p>
+  </div>
+</template>
+
+
+<template id="d-install">
+  <div class="help">
+    <h2 id="sheet-title"><span class="l-es">Instala AI News</span><span class="l-en">Install AI News</span></h2>
+    <p class="lead"><span class="l-es">Tenla en la pantalla de inicio: se abre a pantalla completa, como una app, y guarda las ediciones que abras para leerlas sin conexión.</span><span class="l-en">Keep it on your home screen: it opens full screen, like an app, and saves the editions you open so you can read them offline.</span></p>
+    <h4>iPhone · iPad (Safari)</h4>
+    <ol class="install-steps">
+      <li><span><span class="l-es">Toca el botón Compartir</span><span class="l-en">Tap the Share button</span> <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg> <span class="l-es">de Safari.</span><span class="l-en">in Safari.</span></span></li>
+      <li><span><span class="l-es">Elige «Añadir a pantalla de inicio»</span><span class="l-en">Choose “Add to Home Screen”</span> <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8v8M8 12h8"/></svg>.</span></li>
+      <li><span><span class="l-es">Abre AI News desde su icono.</span><span class="l-en">Open AI News from its icon.</span></span></li>
+    </ol>
+    <h4>Android · <span class="l-es">ordenador</span><span class="l-en">desktop</span> (Chrome, Edge)</h4>
+    <ol class="install-steps">
+      <li><span><span class="l-es">Abre el menú</span><span class="l-en">Open the menu</span> <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="12" cy="19" r="1.4"/></svg> <span class="l-es">del navegador.</span><span class="l-en">in your browser.</span></span></li>
+      <li><span><span class="l-es">Elige «Instalar app» o «Añadir a pantalla de inicio».</span><span class="l-en">Choose “Install app” or “Add to Home screen”.</span></span></li>
+    </ol>
   </div>
 </template>
 
@@ -2540,7 +2613,8 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
   };
   const READ_KEY = "ia-news-read";
   const read = new Set(store.get(READ_KEY, []));
-  const ALL = $$("template[id^='d-']").map(t => t.id.slice(2)).filter(id => id !== "help");
+  const PAGES = ["help", "install"];  // hojas que no son noticias
+  const ALL = $$("template[id^='d-']").map(t => t.id.slice(2)).filter(id => !PAGES.includes(id));
 
   // Aparición escalonada: lo visible al cargar se muestra al instante; lo demás, al entrar en pantalla
   const io = "IntersectionObserver" in window && !reduce ? new IntersectionObserver(entries => {
@@ -2650,7 +2724,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     });
   };
   const markRead = id => {
-    if (id === "help" || read.has(id)) return;
+    if (PAGES.includes(id) || read.has(id)) return;
     read.add(id); store.set(READ_KEY, [...read]); paintRead();
   };
   paintRead();
@@ -2719,9 +2793,9 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     body.scrollTop = 0;
     currentId = id;
     idx = list.indexOf(id);
-    const single = id === "help" || list.length < 2;
+    const single = PAGES.includes(id) || list.length < 2;
     nav.hidden = single;
-    shareBtn.hidden = id === "help";
+    shareBtn.hidden = PAGES.includes(id);
     if (!single) {
       count.textContent = L(`${idx + 1} de ${list.length}`, `${idx + 1} of ${list.length}`);
       prevBtn.disabled = idx <= 0;
@@ -2738,7 +2812,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     return scope ? $$(".tile:not([hidden])", scope).map(t => t.dataset.open) : ALL;
   };
   const openSheet = (id, from) => {
-    list = id === "help" ? ["help"] : contextFor(from);
+    list = PAGES.includes(id) ? [id] : contextFor(from);
     if (!list.includes(id)) list = ALL;
     if (!renderStory(id)) return false;
     opener = from || null;
@@ -2840,6 +2914,32 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     const dx = e.clientX - sx, dy = e.clientY - sy; sx = sy = null;
     if (Math.abs(dx) > 70 && Math.abs(dx) > 2 * Math.abs(dy)) step(dx < 0 ? 1 : -1);
   });
+
+  // ---------- Instalar como app ----------
+  const installBtn = document.querySelector("[data-install]");
+  const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  let installPrompt = null;
+  if (installBtn && !standalone) {
+    if (isIOS) installBtn.hidden = false;  // Safari no ofrece instalar desde la página: se explican los pasos
+    addEventListener("beforeinstallprompt", e => { e.preventDefault(); installPrompt = e; installBtn.hidden = false; });
+    addEventListener("appinstalled", () => { installBtn.hidden = true; installPrompt = null; });
+    installBtn.addEventListener("click", async () => {
+      if (installPrompt) {
+        installPrompt.prompt();
+        const { outcome } = await installPrompt.userChoice;
+        if (outcome === "accepted") installBtn.hidden = true;
+        installPrompt = null;
+      } else if (openSheet("install", installBtn)) {
+        history.pushState({ sheet: "install" }, "", "#n=install");
+        pushedSheet = true;
+      }
+    });
+  }
+  // App instalable: guarda las páginas para abrirlas sin conexión (solo en la web publicada, no en local)
+  if ("serviceWorker" in navigator && location.protocol === "https:") {
+    addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+  }
 
   // ---------- Idioma ----------
   const TITLE = { es: document.title, en: "AI News · Week October 9–15, 2026" };

@@ -19,7 +19,13 @@
 {%- endif %}
 <link rel="icon" type="image/svg+xml" href="icons/logo.svg">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
-<meta name="theme-color" content="#0b0b0f">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="AI News">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <script>
 document.documentElement.classList.add("js");
 // Idioma: el elegido antes (si se guardó) o el del navegador
@@ -37,7 +43,7 @@ if (!location.hash.startsWith("#n=")) document.documentElement.classList.add("sh
 {% include "partials/base.css" %}
 
 /* ---------- Inicio ---------- */
-header.top { padding-top: 44px; padding-bottom: 8px; }
+header.top { padding-top: calc(44px + env(safe-area-inset-top)); padding-bottom: 8px; }
 .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); margin: 0 0 4px; }
 h1 { font-size: 34px; line-height: 1.12; font-weight: 700; letter-spacing: -.02em; margin: 0; }
 .meta { color: var(--label-2); font-size: 15px; margin: 8px 0 0; }
@@ -319,6 +325,26 @@ h2.sec .count { color: var(--label-3); font-weight: 600; }
 .home-actions .all-btn { margin-top: 0; font-size: 16px; }
 .view > .day-head { padding-top: 20px; }
 
+/* ---------- Móvil, tablet e instalación como app ---------- */
+.wrap { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
+.bar { padding-top: env(safe-area-inset-top); }
+#view-day .strip-bar { top: calc(52px + env(safe-area-inset-top)); }
+.view > .day-head { padding-top: 20px; }
+dialog.sheet { max-height: calc(92dvh - env(safe-area-inset-top)); }
+.sheet-nav { padding-bottom: calc(8px + env(safe-area-inset-bottom)); }
+footer.wrap { padding-bottom: env(safe-area-inset-bottom); }
+.install-btn { background: var(--label); color: var(--bg); }
+.install-btn .icon { font-size: 15px; }
+/* Tablet: un poco más de aire y tarjetas algo mayores */
+@media (min-width: 700px) and (max-width: 1100px) {
+  .wrap { padding-left: max(28px, env(safe-area-inset-left)); padding-right: max(28px, env(safe-area-inset-right)); }
+  h1 { font-size: 40px; }
+}
+.install-steps { margin: 6px 0 0; padding: 0; list-style: none; counter-reset: s; }
+.install-steps li { counter-increment: s; display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 0.5px solid var(--separator); font-size: 16px; }
+.install-steps li::before { content: counter(s); flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--fill); display: grid; place-items: center; font-size: 13px; font-weight: 700; color: var(--label-2); }
+.install-steps .icon { display: inline-block; vertical-align: -3px; color: var(--accent); }
+
 /* ---------- Idioma ---------- */
 html[lang="en"] .l-es, html:not([lang="en"]) .l-en { display: none !important; }
 .lang { position: fixed; z-index: 120; top: calc(10px + env(safe-area-inset-top)); right: calc(12px + env(safe-area-inset-right));
@@ -354,6 +380,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 .show-intro .intro { display: flex; }
 .show-intro body { overflow: hidden; }
 .intro-inner { width: 100%; max-width: 460px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.intro-col { display: contents; }
 .intro-logo { width: 84px; height: 84px; border-radius: 20px; box-shadow: 0 14px 40px rgba(0,0,0,.22); }
 .intro-brand { font-size: 40px; font-weight: 800; letter-spacing: -.03em; margin: 18px 0 0; }
 .intro-week { font-size: 16px; color: var(--label-2); margin: 4px 0 0; }
@@ -394,6 +421,28 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 /* Seguro: si el navegador no ejecuta las animaciones (pestaña en segundo plano, navegadores internos de apps),
    a los pocos segundos todo queda en su estado final */
 .intro.settled * { animation: none !important; }
+/* Pantallas bajas (móvil en horizontal): la entrada se reparte en dos columnas para caber sin cortarse */
+@media (max-height: 620px) {
+  .intro { overflow-y: auto; padding-top: max(16px, env(safe-area-inset-top)); padding-left: max(20px, env(safe-area-inset-left)); padding-right: max(20px, env(safe-area-inset-right)); }
+  .intro-logo { width: 52px; height: 52px; border-radius: 13px; }
+  .intro-brand { font-size: 28px; margin-top: 8px; }
+  .intro-week { font-size: 14px; }
+  .intro-pulse { margin-top: 14px; }
+  .intro-dots { height: 96px; gap: 3px; }
+  .intro-dot { width: calc(var(--s) * .75); height: calc(var(--s) * .75); }
+  .intro-count { margin-top: 0; font-size: 15px; }
+  .intro-count b { font-size: 48px; }
+  .intro-top { margin-top: 14px; font-size: 15px; }
+  .intro-go { margin-top: 16px; min-height: 46px; }
+  .intro-skip { margin-top: 10px; }
+  header.top { padding-top: calc(28px + env(safe-area-inset-top)); }
+}
+@media (max-height: 620px) and (orientation: landscape) {
+  .intro { align-items: center; }
+  .intro-inner { max-width: 800px; flex-direction: row; align-items: center; gap: 48px; }
+  .intro-col { flex: 1; display: flex; flex-direction: column; align-items: center; }
+  .intro-pulse { margin-top: 12px; }
+}
 @media (prefers-reduced-motion: reduce) { .intro.leaving { animation: none; opacity: 0; } }
 </style>
 </head>
@@ -417,6 +466,9 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 {%- elif t == "search" -%}<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>
 {%- elif t == "week" -%}<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M7 14h2M11 14h2M15 14h2M7 17h2M11 17h2"/>
 {%- elif t == "archive" -%}<rect x="3" y="4" width="18" height="5" rx="1.5"/><path d="M5 9v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9"/><path d="M10 13h4"/>
+{%- elif t == "download" -%}<path d="M12 4v11"/><path d="M7.5 10.5L12 15l4.5-4.5"/><path d="M5 19h14"/>
+{%- elif t == "dots" -%}<circle cx="12" cy="5" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="12" cy="19" r="1.4"/>
+{%- elif t == "plus" -%}<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8v8M8 12h8"/>
 {%- elif t == "grid" -%}<path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/>
 {%- else -%}<path d="M4 4h13v16H6a2 2 0 0 1-2-2z"/><path d="M17 8h3v10a2 2 0 0 1-2 2"/><path d="M8 8h5M8 12h5M8 16h3"/>
 {%- endif -%}
@@ -450,6 +502,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 
 <div class="intro" id="intro" role="dialog" aria-modal="true" aria-label="Bienvenida a AI News" data-en-aria-label="Welcome to AI News">
   <div class="intro-inner">
+   <div class="intro-col">
     {{ logo_mark(84, "intro-logo", true) }}
     <p class="intro-brand">AI News</p>
     <p class="intro-week">{{ t(week_label, week_label_en) }}</p>
@@ -461,10 +514,13 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
       </div>
       {%- endfor %}
     </div>
+   </div>
+   <div class="intro-col">
     <p class="intro-count"><b id="intro-n" data-to="{{ n_stories }}">{{ n_stories }}</b>{{ t("noticias de IA que generaron conversación", "AI stories that got people talking") }}</p>
     {% if ranked %}<p class="intro-top" style="--t: {{ (1.1 + ni.i * 0.07) | round(2) }}s"><span class="k">{{ t("Lo más destacado", "Top story") }}</span>{{ t(ranked[0].headline, en(ranked[0], "headline")) }}</p>{% endif %}
     <button class="intro-go" id="intro-go" type="button" style="--t: {{ (1.1 + ni.i * 0.07) | round(2) }}s">{{ t("Ver la semana", "See the week") }}{{ icon("next") }}</button>
     <p class="intro-skip" style="--t: {{ (1.1 + ni.i * 0.07) | round(2) }}s">{{ t("o toca en cualquier parte", "or tap anywhere") }}</p>
+   </div>
   </div>
 </div>
 
@@ -477,6 +533,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     <div class="head-row">
       {% if n_stories %}<div class="progress-read"><span class="track"><span class="fill" data-read-fill></span></span><span data-read-count></span></div>{% endif %}
       <button class="help-btn" type="button" data-help>{{ icon("info") }} {{ t("Cómo leer esta página", "How to read this page") }}</button>
+      <button class="help-btn install-btn" type="button" data-install hidden>{{ icon("download") }} {{ t("Instalar app", "Install app") }}</button>
     </div>
   </header>
 
@@ -662,6 +719,25 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
   </div>
 </template>
 
+{# Cómo instalar la app en el móvil o la tablet #}
+<template id="d-install">
+  <div class="help">
+    <h2 id="sheet-title">{{ t("Instala AI News", "Install AI News") }}</h2>
+    <p class="lead">{{ t("Tenla en la pantalla de inicio: se abre a pantalla completa, como una app, y guarda las ediciones que abras para leerlas sin conexión.", "Keep it on your home screen: it opens full screen, like an app, and saves the editions you open so you can read them offline.") }}</p>
+    <h4>iPhone · iPad (Safari)</h4>
+    <ol class="install-steps">
+      <li><span>{{ t("Toca el botón Compartir", "Tap the Share button") }} {{ icon("share") }} {{ t("de Safari.", "in Safari.") }}</span></li>
+      <li><span>{{ t("Elige «Añadir a pantalla de inicio»", "Choose “Add to Home Screen”") }} {{ icon("plus") }}.</span></li>
+      <li><span>{{ t("Abre AI News desde su icono.", "Open AI News from its icon.") }}</span></li>
+    </ol>
+    <h4>Android · {{ t("ordenador", "desktop") }} (Chrome, Edge)</h4>
+    <ol class="install-steps">
+      <li><span>{{ t("Abre el menú", "Open the menu") }} {{ icon("dots") }} {{ t("del navegador.", "in your browser.") }}</span></li>
+      <li><span>{{ t("Elige «Instalar app» o «Añadir a pantalla de inicio».", "Choose “Install app” or “Add to Home screen”.") }}</span></li>
+    </ol>
+  </div>
+</template>
+
 {# Detalle de cada noticia: se copia a la hoja al abrirla #}
 {% for s in ranked %}
 <template id="d-{{ s.id }}">
@@ -799,7 +875,8 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
   };
   const READ_KEY = "ia-news-read";
   const read = new Set(store.get(READ_KEY, []));
-  const ALL = $$("template[id^='d-']").map(t => t.id.slice(2)).filter(id => id !== "help");
+  const PAGES = ["help", "install"];  // hojas que no son noticias
+  const ALL = $$("template[id^='d-']").map(t => t.id.slice(2)).filter(id => !PAGES.includes(id));
 
   // Aparición escalonada: lo visible al cargar se muestra al instante; lo demás, al entrar en pantalla
   const io = "IntersectionObserver" in window && !reduce ? new IntersectionObserver(entries => {
@@ -909,7 +986,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     });
   };
   const markRead = id => {
-    if (id === "help" || read.has(id)) return;
+    if (PAGES.includes(id) || read.has(id)) return;
     read.add(id); store.set(READ_KEY, [...read]); paintRead();
   };
   paintRead();
@@ -978,9 +1055,9 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     body.scrollTop = 0;
     currentId = id;
     idx = list.indexOf(id);
-    const single = id === "help" || list.length < 2;
+    const single = PAGES.includes(id) || list.length < 2;
     nav.hidden = single;
-    shareBtn.hidden = id === "help";
+    shareBtn.hidden = PAGES.includes(id);
     if (!single) {
       count.textContent = L(`${idx + 1} de ${list.length}`, `${idx + 1} of ${list.length}`);
       prevBtn.disabled = idx <= 0;
@@ -997,7 +1074,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     return scope ? $$(".tile:not([hidden])", scope).map(t => t.dataset.open) : ALL;
   };
   const openSheet = (id, from) => {
-    list = id === "help" ? ["help"] : contextFor(from);
+    list = PAGES.includes(id) ? [id] : contextFor(from);
     if (!list.includes(id)) list = ALL;
     if (!renderStory(id)) return false;
     opener = from || null;
@@ -1099,6 +1176,32 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     const dx = e.clientX - sx, dy = e.clientY - sy; sx = sy = null;
     if (Math.abs(dx) > 70 && Math.abs(dx) > 2 * Math.abs(dy)) step(dx < 0 ? 1 : -1);
   });
+
+  // ---------- Instalar como app ----------
+  const installBtn = document.querySelector("[data-install]");
+  const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  let installPrompt = null;
+  if (installBtn && !standalone) {
+    if (isIOS) installBtn.hidden = false;  // Safari no ofrece instalar desde la página: se explican los pasos
+    addEventListener("beforeinstallprompt", e => { e.preventDefault(); installPrompt = e; installBtn.hidden = false; });
+    addEventListener("appinstalled", () => { installBtn.hidden = true; installPrompt = null; });
+    installBtn.addEventListener("click", async () => {
+      if (installPrompt) {
+        installPrompt.prompt();
+        const { outcome } = await installPrompt.userChoice;
+        if (outcome === "accepted") installBtn.hidden = true;
+        installPrompt = null;
+      } else if (openSheet("install", installBtn)) {
+        history.pushState({ sheet: "install" }, "", "#n=install");
+        pushedSheet = true;
+      }
+    });
+  }
+  // App instalable: guarda las páginas para abrirlas sin conexión (solo en la web publicada, no en local)
+  if ("serviceWorker" in navigator && location.protocol === "https:") {
+    addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+  }
 
   // ---------- Idioma ----------
   const TITLE = { es: document.title, en: "AI News · Week {{ week_label_en }}" };
