@@ -189,14 +189,17 @@ def render_day(date: str, stories: list[Story], failed_sources: list[str], stats
     env = _env()
     OUTPUT.mkdir(parents=True, exist_ok=True)
     path = OUTPUT / f"{date}.html"
-    path.write_text(env.get_template("week.html").render(**ctx), encoding="utf-8")
+    html = env.get_template("week.html").render(**ctx)
+    path.write_text(html, encoding="utf-8")
+    if not newer:  # la portada del sitio es siempre la edición más reciente
+        (OUTPUT / "index.html").write_text(html, encoding="utf-8")
     export_assets(date, env.get_template("og.html").render(**ctx), env.get_template("carousel.html").render(**ctx))
     export_icons(env.from_string('{% from "partials/logo.html" import logo_mark %}{{ logo_mark(512, "logo") }}').render())
     render_index(site_url)
     return str(path)
 
 def render_index(site_url: str = "") -> str:
-    """output/index.html: todas las ediciones semanales, con sus días y búsqueda en todo el histórico."""
+    """output/ediciones.html: todas las ediciones semanales, con sus días y búsqueda en todo el histórico."""
 
     editions = []
     for date in list_days():  # de la más reciente a la más antigua
@@ -212,7 +215,6 @@ def render_index(site_url: str = "") -> str:
         generated=datetime.now().strftime("%d/%m/%Y a las %H:%M"),
     )
     OUTPUT.mkdir(parents=True, exist_ok=True)
-    path = OUTPUT / "index.html"           # portada en GitHub Pages
+    path = OUTPUT / "ediciones.html"
     path.write_text(html, encoding="utf-8")
-    (OUTPUT / "ediciones.html").write_text(html, encoding="utf-8")  # mismo índice con nombre propio (artefactos)
     return str(path)

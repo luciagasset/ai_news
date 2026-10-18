@@ -83,7 +83,7 @@ Para generar un día, abre Claude Code en la carpeta del proyecto y pídele "gen
 | — | Claude Code escribe `candidatos.json` | |
 | 2 | `python run_weekly.py select --date 2026-10-15` | `data/raw/<fecha>/para_resumir.md` |
 | — | Claude Code escribe `resumenes.json` | |
-| 3 | `python run_weekly.py render --date 2026-10-15` | `output/<fecha>.html` y `output/index.html` |
+| 3 | `python run_weekly.py render --date 2026-10-15` | `output/<fecha>.html`, `output/ediciones.html` y la portada `output/index.html` (la última edición) |
 
 `--date` es el último día de la semana (la fecha de cierre); la edición cubre ese día y los 6 anteriores,
 completos. Sin `--date` se usa ayer. `ingest --reuse-raw` reutiliza la descarga guardada. Las transcripciones se cachean en `data/cache/`.

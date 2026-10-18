@@ -28,12 +28,8 @@ document.documentElement.classList.add("js");
   document.documentElement.lang = lang;
 })();
 const L = (es, en) => (document.documentElement.lang === "en" ? en : es);
-// La entrada se muestra al abrir la edición, una vez por visita, y nunca si se llega con un enlace a una noticia
-(() => {
-  let seen = false;
-  try { seen = sessionStorage.getItem("ai-news-intro-2026-10-15") === "1"; } catch {}
-  if (!seen && !location.hash) document.documentElement.classList.add("show-intro");
-})();
+// La entrada se muestra siempre al abrir la edición, salvo con un enlace directo a una noticia (#n=…)
+if (!location.hash.startsWith("#n=")) document.documentElement.classList.add("show-intro");
 </script>
 <style>
 /* Paleta basada en los colores de sistema de Apple (HIG · Color), con las variantes de contraste
@@ -389,6 +385,8 @@ header.top .brand-row, .title-row { padding-right: 104px; }
 .wordmark .logo-mark { border-radius: 8px; flex: none; }
 .wm-text { font-size: 17px; font-weight: 800; letter-spacing: -.01em; color: var(--label); }
 .brand-row { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; }
+.replay { border: 0; background: none; padding: 0; cursor: pointer; border-radius: 10px; }
+.replay:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 .brand-row .sub { font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); }
 
 /* ---------- Pulsación: todo lo que se toca responde ---------- */
@@ -504,7 +502,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 
 <div id="view-home" class="view">
   <header class="top wrap">
-    <p class="brand-row"><span class="wordmark"><svg xmlns="http://www.w3.org/2000/svg" class="logo-mark" width="28" height="28" viewBox="0 0 64 64" role="img" aria-label="AI News">
+    <p class="brand-row"><button class="replay" type="button" data-replay-intro aria-label="Ver de nuevo la entrada" data-en-aria-label="Replay the intro"><span class="wordmark"><svg xmlns="http://www.w3.org/2000/svg" class="logo-mark" width="28" height="28" viewBox="0 0 64 64" role="img" aria-label="AI News">
   <rect width="64" height="64" rx="15" fill="#0b0b0f"/>
   <rect x="0.5" y="0.5" width="63" height="63" rx="14.5" fill="none" stroke="rgba(255,255,255,.12)"/>
   <path d="M10 54.5H54" stroke="rgba(255,255,255,.28)" stroke-width="1.6" stroke-linecap="round"/>
@@ -512,7 +510,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
   <circle class="lm lm2" cx="26" cy="40" r="5.5" fill="#3bdded"/>
   <circle class="lm lm3" cx="38.5" cy="30.5" r="7" fill="#ffa056"/>
   <circle class="lm lm4" cx="51" cy="18" r="8.5" fill="#a7aaff"/>
-</svg><span class="wm-text">AI News</span></span><span class="sub"><span class="l-es">Resumen semanal</span><span class="l-en">Weekly digest</span></span></p>
+</svg><span class="wm-text">AI News</span></span></button><span class="sub"><span class="l-es">Resumen semanal</span><span class="l-en">Weekly digest</span></span></p>
     <h1><span class="l-es">Del 9 al 15 de octubre de 2026</span><span class="l-en">October 9–15, 2026</span></h1>
     <p class="meta">15 <span class="l-es">noticias</span><span class="l-en">stories</span> · 18 <span class="l-es">min de lectura</span><span class="l-en">min read</span></p>
     <div class="head-row">
@@ -1713,7 +1711,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
   
   <p><span class="l-es">Cobertura de X parcial: el debate en X llega a través de vídeos de YouTube, Hacker News y medios.</span><span class="l-en">Partial coverage of X: the debate on X arrives through YouTube videos, Hacker News and the press.</span></p>
   <p><span class="l-es">Resúmenes generados con IA a partir de 110 fuentes; pueden contener errores. Cada noticia enlaza a su fuente original.</span><span class="l-en">Summaries written with AI from 110 sources; they may contain errors. Every story links to its original sources.</span></p>
-  <p><span class="l-es">Generado el 18/10/2026 a las 20:42.</span><span class="l-en">Generated on 18/10/2026 a las 20:42.</span></p>
+  <p><span class="l-es">Generado el 18/10/2026 a las 20:47.</span><span class="l-en">Generated on 18/10/2026 a las 20:47.</span></p>
 </footer>
 
 
@@ -2465,13 +2463,17 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 <div class="toast" id="toast" role="status"></div>
 
 <script>
-// Entrada: contador animado y salida al tocar; rebote breve en cualquier botón pulsado
+// Entrada: contador animado y salida al tocar; se puede volver a ver tocando el logo de la cabecera.
+// Rebote breve en cualquier botón pulsado.
 (() => {
   const root = document.documentElement;
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const intro = document.getElementById("intro");
-  if (root.classList.contains("show-intro") && intro) {
-    const n = document.getElementById("intro-n");
+  const first = document.getElementById("intro");
+  const introHTML = first ? first.outerHTML : "";
+
+  const runIntro = intro => {
+    root.classList.add("show-intro");
+    const n = intro.querySelector("#intro-n");
     const to = +n.dataset.to;
     if (!reduce && to > 0) {
       n.textContent = "0";
@@ -2483,23 +2485,38 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
       };
       requestAnimationFrame(tick);
     }
-    setTimeout(() => { intro.classList.add("settled"); n.textContent = to; }, reduce ? 0 : 4200);
-    const go = document.getElementById("intro-go");
-    setTimeout(() => go.focus({ preventScroll: true }), reduce ? 0 : 1200);
+    // Seguro: si el navegador no ejecuta las animaciones, todo queda visible a los pocos segundos
+    const settle = setTimeout(() => { intro.classList.add("settled"); n.textContent = to; }, reduce ? 0 : 4200);
+    const go = intro.querySelector("#intro-go");
+    const focus = setTimeout(() => go.focus({ preventScroll: true }), reduce ? 0 : 1200);
     let done = false;
+    const onKey = e => { if (e.key === "Enter" || e.key === "Escape" || e.key === " ") { e.preventDefault(); leave(); } };
     const leave = () => {
       if (done) return; done = true;
-      try { sessionStorage.setItem("ai-news-intro-2026-10-15", "1"); } catch {}
+      clearTimeout(settle); clearTimeout(focus);
+      removeEventListener("keydown", onKey);
       const end = () => { root.classList.remove("show-intro"); intro.remove(); };
       if (reduce) return end();
       intro.classList.add("leaving");
       setTimeout(end, 480);
     };
     intro.addEventListener("click", leave);
-    addEventListener("keydown", e => { if (e.key === "Enter" || e.key === "Escape" || e.key === " ") leave(); }, { once: true });
-  } else if (intro) {
-    intro.remove();
-  }
+    addEventListener("keydown", onKey);
+  };
+
+  if (first && root.classList.contains("show-intro")) runIntro(first);
+  else if (first) first.remove();
+
+  // Volver a ver la entrada
+  document.addEventListener("click", e => {
+    if (!e.target.closest("[data-replay-intro]") || !introHTML || document.getElementById("intro")) return;
+    document.body.insertAdjacentHTML("afterbegin", introHTML);
+    const intro = document.getElementById("intro");
+    if (root.lang === "en") intro.setAttribute("aria-label", intro.dataset.enAriaLabel);
+    scrollTo(0, 0);
+    runIntro(intro);
+  });
+
   if (!reduce && Element.prototype.animate) {
     document.addEventListener("click", e => {
       const b = e.target.closest("button:not([disabled]), .ed-link");
