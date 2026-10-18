@@ -125,18 +125,19 @@ dialog.sheet.closing::backdrop { animation: fade-out .22s ease-in forwards; }
 }
 @keyframes fade-in { from { opacity: 0; } }
 @keyframes fade-out { to { opacity: 0; } }
-.sheet-head { position: relative; padding: 8px 16px 0; flex: none; touch-action: none; }
+.sheet-head { position: relative; z-index: 2; min-height: 60px; padding: 8px 16px 0; flex: none; touch-action: none; }
 .grabber { width: 36px; height: 5px; border-radius: 3px; background: var(--fill-2); margin: 0 auto 6px; }
 @media (min-width: 760px) { .grabber { display: none; } }
 .close {
-  position: absolute; top: 8px; right: 10px; width: 44px; height: 44px; border: 0; border-radius: 50%;
-  background: none; cursor: pointer; display: grid; place-items: center;
+  position: absolute; top: 4px; right: 4px; width: 56px; height: 56px; border: 0; border-radius: 50%;
+  background: none; cursor: pointer; display: grid; place-items: center; touch-action: manipulation; -webkit-tap-highlight-color: transparent;
 }
-.close span { width: 30px; height: 30px; border-radius: 50%; background: var(--fill); display: grid; place-items: center; color: var(--label-2); }
-.close .icon { font-size: 15px; stroke-width: 2.6; }
+.close span { width: 34px; height: 34px; border-radius: 50%; background: var(--fill); display: grid; place-items: center; color: var(--label-2); }
+.close:active span { background: var(--fill-2); }
+.close .icon { font-size: 16px; stroke-width: 2.6; }
 .sheet-body:focus { outline: none; }
-.sheet-body { overflow-y: auto; padding: 14px 22px 32px; overscroll-behavior: contain; }
-.sheet-body .tags { font-size: 12px; padding-right: 44px; }
+.sheet-body { overflow-y: auto; padding: 2px 22px 32px; overscroll-behavior: contain; }
+.sheet-body .tags { font-size: 12px; }
 .sheet-body h2 { font-size: 26px; line-height: 1.2; font-weight: 700; letter-spacing: -.02em; margin: 12px 0 0; }
 .sheet-body .lead { font-size: 18px; line-height: 1.45; color: var(--label); font-weight: 500; margin: 12px 0 0; }
 .sheet-body .info { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; margin-top: 12px; font-size: 13px; color: var(--label-3); }
@@ -196,11 +197,11 @@ dialog.sheet.closing::backdrop { animation: fade-out .22s ease-in forwards; }
 .tag.done { --tc: var(--label-3); }
 
 /* ---------- Navegación dentro de la hoja ---------- */
-.share { position: absolute; top: 8px; left: 10px; width: 44px; height: 44px; border: 0; border-radius: 50%; background: none; cursor: pointer; display: grid; place-items: center; }
-.share span { width: 30px; height: 30px; border-radius: 50%; background: var(--fill); display: grid; place-items: center; color: var(--accent); }
+.share { position: absolute; top: 4px; left: 4px; width: 56px; height: 56px; touch-action: manipulation; -webkit-tap-highlight-color: transparent; border: 0; border-radius: 50%; background: none; cursor: pointer; display: grid; place-items: center; }
+.share span { width: 34px; height: 34px; border-radius: 50%; background: var(--fill); display: grid; place-items: center; color: var(--accent); }
 .share .icon { font-size: 15px; }
 .share:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
-.sheet-body > .tags { padding-left: 34px; }
+.sheet-body > .tags { padding-left: 0; }
 .sheet-nav { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px calc(8px + env(safe-area-inset-bottom)); border-top: 0.5px solid var(--separator); background: var(--sheet); }
 .nav-btn { min-height: 44px; padding: 0 14px; border: 0; border-radius: 12px; background: var(--fill); font-size: 15px; font-weight: 600; color: var(--accent); cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: transform .1s ease; }
 .nav-btn:active:not([disabled]) { transform: scale(.96); }
@@ -1122,7 +1123,9 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     if (opener && document.contains(opener)) opener.focus({ preventScroll: true });
   });
   sheet.addEventListener("cancel", e => { e.preventDefault(); closeSheet(); });
-  sheet.querySelector(".close").addEventListener("click", closeSheet);
+  const closeBtn = sheet.querySelector(".close");
+  closeBtn.addEventListener("click", closeSheet);
+  closeBtn.addEventListener("pointerup", e => { if (e.pointerType !== "mouse") closeSheet(); });
   sheet.addEventListener("click", e => { if (e.target === sheet) closeSheet(); }); // pulsar fuera
   addEventListener("keydown", e => {
     if (e.target.closest && e.target.closest("input")) return;
