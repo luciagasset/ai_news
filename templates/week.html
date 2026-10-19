@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
-<title>AI News · Semana {{ date | short_date }}</title>
+<title>AI News{% if not rolling %} · Semana {{ date | short_date }}{% endif %}</title>
 <meta name="description" content="Resumen semanal de avances, debates, polémicas y noticias de inteligencia artificial.">
 {%- if og_image %}
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="AI News">
-<meta property="og:title" content="AI News · {{ week_label }}">
-<meta property="og:description" content="{{ n_stories }} noticias de IA que generaron conversación: avances, debates, polémicas y noticias, resumidas en español.">
+<meta property="og:title" content="AI News · {{ 'Las noticias de IA de los últimos 7 días' if rolling else week_label }}">
+<meta property="og:description" content="Las noticias de IA que generan conversación: avances, debates, polémicas y noticias, resumidas en español cada mañana.">
 <meta property="og:image" content="{{ og_image }}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -420,14 +420,12 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 .intro-col { display: contents; }
 .intro-logo { width: 84px; height: 84px; border-radius: 20px; box-shadow: 0 14px 40px rgba(0,0,0,.22); }
 .intro-brand { font-size: 40px; font-weight: 800; letter-spacing: -.03em; margin: 18px 0 0; }
-.intro-week { font-size: 16px; color: var(--label-2); margin: 4px 0 0; }
+.intro-tag { font-size: 16px; color: var(--label-2); margin: 4px 0 0; }
 .intro-pulse { width: 100%; margin-top: 30px; display: grid; grid-template-columns: repeat(var(--n), 1fr); }
 .intro-day { display: flex; flex-direction: column; align-items: center; }
 .intro-dots { height: 150px; display: flex; flex-direction: column-reverse; align-items: center; justify-content: flex-start; gap: 6px; }
 .intro-dot { width: var(--s); height: var(--s); border-radius: 50%; background: var(--tc); flex: none; }
 .intro-day b { width: 100%; padding-top: 8px; margin-top: 4px; border-top: 1px solid var(--separator); font-size: 12px; font-weight: 600; color: var(--label-3); }
-.intro-count { font-size: 17px; color: var(--label-2); margin: 22px 0 0; }
-.intro-count b { display: block; font-size: 64px; line-height: 1; font-weight: 800; letter-spacing: -.04em; color: var(--label); font-variant-numeric: tabular-nums; margin-bottom: 6px; }
 .intro-top { margin: 22px 0 0; font-size: 17px; line-height: 1.35; font-weight: 600; max-width: 400px; }
 .intro-top .k { display: block; font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
 .intro-go { margin-top: 28px; min-height: 52px; padding: 0 26px; border: 0; border-radius: 26px; background: var(--label); color: var(--bg);
@@ -438,16 +436,15 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 .intro.leaving { animation: intro-out .5s cubic-bezier(.4,0,.2,1) forwards; pointer-events: none; }
 @keyframes intro-out { to { opacity: 0; transform: scale(1.04); } }
 
-/* Coreografía: logo → marca → los puntos caen en sus días → contador → titular → botón */
+/* Coreografía: logo → marca → los puntos caen en sus días → titular → botón */
 .js .intro-logo { animation: logo-in .7s cubic-bezier(.2,.8,.2,1.2) both; }
 .js .intro-logo .lm { transform-box: fill-box; transform-origin: center; animation: pop .5s cubic-bezier(.3,1.6,.5,1) both; }
 .js .intro-logo .lm1 { animation-delay: .25s; } .js .intro-logo .lm2 { animation-delay: .35s; }
 .js .intro-logo .lm3 { animation-delay: .45s; } .js .intro-logo .lm4 { animation-delay: .55s; }
-.js .intro-brand, .js .intro-week { animation: rise .55s cubic-bezier(.2,.8,.2,1) both; }
-.js .intro-brand { animation-delay: .35s; } .js .intro-week { animation-delay: .5s; }
+.js .intro-brand, .js .intro-tag { animation: rise .55s cubic-bezier(.2,.8,.2,1) both; }
+.js .intro-brand { animation-delay: .35s; } .js .intro-tag { animation-delay: .5s; }
 .js .intro-day b { animation: rise .4s ease both; animation-delay: .7s; }
 .js .intro-dot { animation: drop .7s cubic-bezier(.3,1.35,.55,1) both; animation-delay: var(--d); }
-.js .intro-count { animation: rise .5s ease both; animation-delay: .9s; }
 .js .intro-top { animation: rise .6s cubic-bezier(.2,.8,.2,1) both; animation-delay: var(--t, 2.1s); }
 .js .intro-go { animation: rise .6s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--t, 2.1s) + .3s); }
 .js .intro-go::after { animation: breathe 2.2s ease-out infinite; animation-delay: calc(var(--t, 2.1s) + 1s); }
@@ -461,11 +458,9 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 @media (max-height: 860px) and (orientation: portrait) {
   .intro-logo { width: 68px; height: 68px; border-radius: 17px; }
   .intro-brand { font-size: 34px; margin-top: 14px; }
-  .intro-week { font-size: 15px; }
+  .intro-tag { font-size: 15px; }
   .intro-pulse { margin-top: 22px; }
   .intro-dots { height: 120px; gap: 5px; }
-  .intro-count { margin-top: 18px; }
-  .intro-count b { font-size: 54px; }
   .intro-top { margin-top: 16px; font-size: 16px; }
   .intro-go { margin-top: 20px; }
   .intro-skip { margin-top: 10px; }
@@ -475,12 +470,10 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
   .intro { overflow-y: auto; padding-top: max(16px, env(safe-area-inset-top)); padding-left: max(20px, env(safe-area-inset-left)); padding-right: max(20px, env(safe-area-inset-right)); }
   .intro-logo { width: 52px; height: 52px; border-radius: 13px; }
   .intro-brand { font-size: 28px; margin-top: 8px; }
-  .intro-week { font-size: 14px; }
+  .intro-tag { font-size: 14px; }
   .intro-pulse { margin-top: 14px; }
   .intro-dots { height: 96px; gap: 3px; }
   .intro-dot { width: calc(var(--s) * .75); height: calc(var(--s) * .75); }
-  .intro-count { margin-top: 0; font-size: 15px; }
-  .intro-count b { font-size: 48px; }
   .intro-top { margin-top: 14px; font-size: 15px; }
   .intro-go { margin-top: 16px; min-height: 46px; }
   .intro-skip { margin-top: 10px; }
@@ -560,7 +553,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
    <div class="intro-col">
     {{ logo_mark(84, "intro-logo", true) }}
     <p class="intro-brand">AI News</p>
-    <p class="intro-week">{{ t(week_label, week_label_en) }}</p>
+    <p class="intro-tag">{{ t("Lo que se habla de IA, cada mañana", "What people are saying about AI, every morning") if rolling else t(week_label, week_label_en) }}</p>
     <div class="intro-pulse" style="--n: {{ days|length }}" aria-hidden="true">
       {%- for d in days %}
       <div class="intro-day">
@@ -571,7 +564,6 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     </div>
    </div>
    <div class="intro-col">
-    <p class="intro-count"><b id="intro-n" data-to="{{ n_stories }}">{{ n_stories }}</b>{{ t("noticias de IA que generaron conversación", "AI stories that got people talking") }}</p>
     {% if ranked %}<p class="intro-top" style="--t: {{ (1.1 + ni.i * 0.07) | round(2) }}s"><span class="k">{{ t("Lo más destacado", "Top story") }}</span>{{ t(ranked[0].headline, en(ranked[0], "headline")) }}</p>{% endif %}
     <button class="intro-go" id="intro-go" type="button" style="--t: {{ (1.1 + ni.i * 0.07) | round(2) }}s">{{ t("Ver la semana", "See the week") }}{{ icon("next") }}</button>
     <p class="intro-skip" style="--t: {{ (1.1 + ni.i * 0.07) | round(2) }}s">{{ t("o toca en cualquier parte", "or tap anywhere") }}</p>
@@ -583,8 +575,12 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 <div id="view-home" class="view">
   <header class="top wrap">
     <p class="brand-row"><button class="replay" type="button" data-replay-intro aria-label="Ver de nuevo la entrada" data-en-aria-label="Replay the intro">{{ wordmark(28) }}</button><span class="sub">{{ t("Resumen semanal", "Weekly digest") }}</span></p>
+    {% if rolling %}
+    <h1>{{ t("Últimos 7 días", "Last 7 days") }}</h1>
+    <p class="meta">{{ t("Actualizado el " ~ updated, "Updated " ~ updated_en) }}</p>
+    {% else %}
     <h1>{{ t(week_label, week_label_en) }}</h1>
-    <p class="meta">{{ n_stories }} {{ plural(n_stories, "noticia", "noticias", "story", "stories") }} · {{ total_minutes }} {{ t("min de lectura", "min read") }}</p>
+    {% endif %}
     <div class="head-row">
       {% if n_stories %}<div class="progress-read"><span class="track"><span class="fill" data-read-fill></span></span><span data-read-count></span></div>{% endif %}
       <button class="help-btn" type="button" data-help>{{ icon("info") }} {{ t("Cómo leer esta página", "How to read this page") }}</button>
@@ -886,20 +882,8 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 
   const runIntro = intro => {
     root.classList.add("show-intro");
-    const n = intro.querySelector("#intro-n");
-    const to = +n.dataset.to;
-    if (!reduce && to > 0) {
-      n.textContent = "0";
-      const start = performance.now() + 900, dur = 1100;
-      const tick = now => {
-        const k = Math.min(Math.max((now - start) / dur, 0), 1);
-        n.textContent = Math.round(to * (1 - Math.pow(1 - k, 3)));
-        if (k < 1) requestAnimationFrame(tick);
-      };
-      requestAnimationFrame(tick);
-    }
     // Seguro: si el navegador no ejecuta las animaciones, todo queda visible a los pocos segundos
-    const settle = setTimeout(() => { intro.classList.add("settled"); n.textContent = to; }, reduce ? 0 : 4200);
+    const settle = setTimeout(() => intro.classList.add("settled"), reduce ? 0 : 4200);
     const go = intro.querySelector("#intro-go");
     const focus = setTimeout(() => go.focus({ preventScroll: true }), reduce ? 0 : 1200);
     let done = false;
@@ -1051,7 +1035,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     $$("[data-read-count]").forEach(el => {
       el.textContent = n === 0 ? L("Aún no has abierto ninguna", "You haven't opened any yet")
         : n === ALL.length ? L("Has leído toda la semana", "You've read the whole week")
-        : L(`${n} de ${ALL.length} leídas`, `${n} of ${ALL.length} read`);
+        : L(n === 1 ? "1 leída" : `${n} leídas`, `${n} read`);
     });
     $$("[data-read-fill]").forEach(el => el.style.setProperty("--r", ALL.length ? n / ALL.length : 0));
     $$("[data-type-read]").forEach(el => {
@@ -1368,7 +1352,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
   }
 
   // ---------- Idioma ----------
-  const TITLE = { es: document.title, en: "AI News · Week {{ week_label_en }}" };
+  const TITLE = { es: document.title, en: {{ ("AI News" if rolling else "AI News · Week " ~ week_label_en) | tojson }} };
   const ATTRS = ["aria-label", "placeholder"];
   const applyLang = lang => {
     document.documentElement.lang = lang;

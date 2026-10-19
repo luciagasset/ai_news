@@ -223,17 +223,21 @@ def render_edition(date: str, n_days: int = 7, failed_sources: list[str] = (), s
         site_url=site_url,
         author=site.get("author", ""),
         og_image=f"{site_url}og/{date}.png" if site_url else "",
-        page_url=(f"{site_url}{date}.html" if archive else site_url) if site_url else "",
+        page_url=f"{site_url}{date}.html" if site_url else "",
     )
     env = _env()
     OUTPUT.mkdir(parents=True, exist_ok=True)
-    html = env.get_template("week.html").render(**ctx)
+    week = env.get_template("week.html")
     path = OUTPUT / "index.html"
-    if archive:
+    if archive:  # la edición archivada lleva sus fechas
         path = OUTPUT / f"{date}.html"
-        path.write_text(html, encoding="utf-8")
-    if latest:  # la portada del sitio es siempre la edición más reciente
-        (OUTPUT / "index.html").write_text(html, encoding="utf-8")
+        path.write_text(week.render(**ctx, rolling=False), encoding="utf-8")
+    if latest:  # la portada del sitio es siempre la edición más reciente: «Últimos 7 días», sin fechas fijas
+        now = datetime.now()
+        (OUTPUT / "index.html").write_text(week.render(
+            **{**ctx, "page_url": site_url}, rolling=True,
+            updated=f"{DAYS[now.weekday()]} {now.day} de {MONTHS[now.month - 1]}",
+            updated_en=f"{DAYS_EN[now.weekday()]}, {MONTHS_EN[now.month - 1]} {now.day}"), encoding="utf-8")
     export_assets(date, env.get_template("og.html").render(**ctx), env.get_template("carousel.html").render(**ctx))
     _prune_assets(keep=set(archives()) | {date})
     export_icons(env.from_string('{% from "partials/logo.html" import logo_mark %}{{ logo_mark(512, "logo") }}').render())

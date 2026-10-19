@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
-<title>AI News · Semana 18 oct</title>
+<title>AI News</title>
 <meta name="description" content="Resumen semanal de avances, debates, polémicas y noticias de inteligencia artificial.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="AI News">
-<meta property="og:title" content="AI News · Del 12 al 18 de octubre de 2026">
-<meta property="og:description" content="17 noticias de IA que generaron conversación: avances, debates, polémicas y noticias, resumidas en español.">
+<meta property="og:title" content="AI News · Las noticias de IA de los últimos 7 días">
+<meta property="og:description" content="Las noticias de IA que generan conversación: avances, debates, polémicas y noticias, resumidas en español cada mañana.">
 <meta property="og:image" content="https://luciagasset.github.io/ai_news/og/2026-10-18.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -466,14 +466,12 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 .intro-col { display: contents; }
 .intro-logo { width: 84px; height: 84px; border-radius: 20px; box-shadow: 0 14px 40px rgba(0,0,0,.22); }
 .intro-brand { font-size: 40px; font-weight: 800; letter-spacing: -.03em; margin: 18px 0 0; }
-.intro-week { font-size: 16px; color: var(--label-2); margin: 4px 0 0; }
+.intro-tag { font-size: 16px; color: var(--label-2); margin: 4px 0 0; }
 .intro-pulse { width: 100%; margin-top: 30px; display: grid; grid-template-columns: repeat(var(--n), 1fr); }
 .intro-day { display: flex; flex-direction: column; align-items: center; }
 .intro-dots { height: 150px; display: flex; flex-direction: column-reverse; align-items: center; justify-content: flex-start; gap: 6px; }
 .intro-dot { width: var(--s); height: var(--s); border-radius: 50%; background: var(--tc); flex: none; }
 .intro-day b { width: 100%; padding-top: 8px; margin-top: 4px; border-top: 1px solid var(--separator); font-size: 12px; font-weight: 600; color: var(--label-3); }
-.intro-count { font-size: 17px; color: var(--label-2); margin: 22px 0 0; }
-.intro-count b { display: block; font-size: 64px; line-height: 1; font-weight: 800; letter-spacing: -.04em; color: var(--label); font-variant-numeric: tabular-nums; margin-bottom: 6px; }
 .intro-top { margin: 22px 0 0; font-size: 17px; line-height: 1.35; font-weight: 600; max-width: 400px; }
 .intro-top .k { display: block; font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
 .intro-go { margin-top: 28px; min-height: 52px; padding: 0 26px; border: 0; border-radius: 26px; background: var(--label); color: var(--bg);
@@ -484,16 +482,15 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 .intro.leaving { animation: intro-out .5s cubic-bezier(.4,0,.2,1) forwards; pointer-events: none; }
 @keyframes intro-out { to { opacity: 0; transform: scale(1.04); } }
 
-/* Coreografía: logo → marca → los puntos caen en sus días → contador → titular → botón */
+/* Coreografía: logo → marca → los puntos caen en sus días → titular → botón */
 .js .intro-logo { animation: logo-in .7s cubic-bezier(.2,.8,.2,1.2) both; }
 .js .intro-logo .lm { transform-box: fill-box; transform-origin: center; animation: pop .5s cubic-bezier(.3,1.6,.5,1) both; }
 .js .intro-logo .lm1 { animation-delay: .25s; } .js .intro-logo .lm2 { animation-delay: .35s; }
 .js .intro-logo .lm3 { animation-delay: .45s; } .js .intro-logo .lm4 { animation-delay: .55s; }
-.js .intro-brand, .js .intro-week { animation: rise .55s cubic-bezier(.2,.8,.2,1) both; }
-.js .intro-brand { animation-delay: .35s; } .js .intro-week { animation-delay: .5s; }
+.js .intro-brand, .js .intro-tag { animation: rise .55s cubic-bezier(.2,.8,.2,1) both; }
+.js .intro-brand { animation-delay: .35s; } .js .intro-tag { animation-delay: .5s; }
 .js .intro-day b { animation: rise .4s ease both; animation-delay: .7s; }
 .js .intro-dot { animation: drop .7s cubic-bezier(.3,1.35,.55,1) both; animation-delay: var(--d); }
-.js .intro-count { animation: rise .5s ease both; animation-delay: .9s; }
 .js .intro-top { animation: rise .6s cubic-bezier(.2,.8,.2,1) both; animation-delay: var(--t, 2.1s); }
 .js .intro-go { animation: rise .6s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--t, 2.1s) + .3s); }
 .js .intro-go::after { animation: breathe 2.2s ease-out infinite; animation-delay: calc(var(--t, 2.1s) + 1s); }
@@ -507,11 +504,9 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 @media (max-height: 860px) and (orientation: portrait) {
   .intro-logo { width: 68px; height: 68px; border-radius: 17px; }
   .intro-brand { font-size: 34px; margin-top: 14px; }
-  .intro-week { font-size: 15px; }
+  .intro-tag { font-size: 15px; }
   .intro-pulse { margin-top: 22px; }
   .intro-dots { height: 120px; gap: 5px; }
-  .intro-count { margin-top: 18px; }
-  .intro-count b { font-size: 54px; }
   .intro-top { margin-top: 16px; font-size: 16px; }
   .intro-go { margin-top: 20px; }
   .intro-skip { margin-top: 10px; }
@@ -521,12 +516,10 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
   .intro { overflow-y: auto; padding-top: max(16px, env(safe-area-inset-top)); padding-left: max(20px, env(safe-area-inset-left)); padding-right: max(20px, env(safe-area-inset-right)); }
   .intro-logo { width: 52px; height: 52px; border-radius: 13px; }
   .intro-brand { font-size: 28px; margin-top: 8px; }
-  .intro-week { font-size: 14px; }
+  .intro-tag { font-size: 14px; }
   .intro-pulse { margin-top: 14px; }
   .intro-dots { height: 96px; gap: 3px; }
   .intro-dot { width: calc(var(--s) * .75); height: calc(var(--s) * .75); }
-  .intro-count { margin-top: 0; font-size: 15px; }
-  .intro-count b { font-size: 48px; }
   .intro-top { margin-top: 14px; font-size: 15px; }
   .intro-go { margin-top: 16px; min-height: 46px; }
   .intro-skip { margin-top: 10px; }
@@ -559,7 +552,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
   <circle class="lm lm4" cx="51" cy="18" r="8.5" fill="#a7aaff"/>
 </svg>
     <p class="intro-brand">AI News</p>
-    <p class="intro-week"><span class="l-es">Del 12 al 18 de octubre de 2026</span><span class="l-en">October 12–18, 2026</span></p>
+    <p class="intro-tag"><span class="l-es">Lo que se habla de IA, cada mañana</span><span class="l-en">What people are saying about AI, every morning</span></p>
     <div class="intro-pulse" style="--n: 7" aria-hidden="true">
       <div class="intro-day">
         <div class="intro-dots"><i class="intro-dot t-avance" style="--s: 24px; --d: 0.87s"></i><i class="intro-dot t-debate" style="--s: 24px; --d: 0.94s"></i></div>
@@ -592,7 +585,6 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     </div>
    </div>
    <div class="intro-col">
-    <p class="intro-count"><b id="intro-n" data-to="17">17</b><span class="l-es">noticias de IA que generaron conversación</span><span class="l-en">AI stories that got people talking</span></p>
     <p class="intro-top" style="--t: 2.29s"><span class="k"><span class="l-es">Lo más destacado</span><span class="l-en">Top story</span></span><span class="l-es">Google lanza Gemini 4 Argon, su nuevo modelo frontera, a 2 $ por millón de tokens de entrada</span><span class="l-en">Google launches Gemini 4 Argon, its new frontier model, at $2 per million input tokens</span></p>
     <button class="intro-go" id="intro-go" type="button" style="--t: 2.29s"><span class="l-es">Ver la semana</span><span class="l-en">See the week</span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
     <p class="intro-skip" style="--t: 2.29s"><span class="l-es">o toca en cualquier parte</span><span class="l-en">or tap anywhere</span></p>
@@ -612,8 +604,10 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
   <circle class="lm lm3" cx="38.5" cy="30.5" r="7" fill="#ffa056"/>
   <circle class="lm lm4" cx="51" cy="18" r="8.5" fill="#a7aaff"/>
 </svg><span class="wm-text">AI News</span></span></button><span class="sub"><span class="l-es">Resumen semanal</span><span class="l-en">Weekly digest</span></span></p>
-    <h1><span class="l-es">Del 12 al 18 de octubre de 2026</span><span class="l-en">October 12–18, 2026</span></h1>
-    <p class="meta">17 <span class="l-es">noticias</span><span class="l-en">stories</span> · 23 <span class="l-es">min de lectura</span><span class="l-en">min read</span></p>
+    
+    <h1><span class="l-es">Últimos 7 días</span><span class="l-en">Last 7 days</span></h1>
+    <p class="meta"><span class="l-es">Actualizado el lunes 19 de octubre</span><span class="l-en">Updated Monday, October 19</span></p>
+    
     <div class="head-row">
       <div class="progress-read"><span class="track"><span class="fill" data-read-fill></span></span><span data-read-count></span></div>
       <button class="help-btn" type="button" data-help><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg> <span class="l-es">Cómo leer esta página</span><span class="l-en">How to read this page</span></button>
@@ -1925,7 +1919,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
   
   <p><span class="l-es">Cobertura de X parcial: el debate en X llega a través de vídeos de YouTube, Hacker News y medios.</span><span class="l-en">Partial coverage of X: the debate on X arrives through YouTube videos, Hacker News and the press.</span></p>
   <p><span class="l-es">Resúmenes generados con IA a partir de 46 fuentes; pueden contener errores. Cada noticia enlaza a su fuente original.</span><span class="l-en">Summaries written with AI from 46 sources; they may contain errors. Every story links to its original sources.</span></p>
-  <p><span class="l-es">Actualizado el 19/10/2026 a las 14:01. Se actualiza cada mañana.</span><span class="l-en">Updated on 19/10/2026 a las 14:01. Updated every morning.</span></p>
+  <p><span class="l-es">Actualizado el 19/10/2026 a las 14:08. Se actualiza cada mañana.</span><span class="l-en">Updated on 19/10/2026 a las 14:08. Updated every morning.</span></p>
 </footer>
 
 
@@ -2707,20 +2701,8 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 
   const runIntro = intro => {
     root.classList.add("show-intro");
-    const n = intro.querySelector("#intro-n");
-    const to = +n.dataset.to;
-    if (!reduce && to > 0) {
-      n.textContent = "0";
-      const start = performance.now() + 900, dur = 1100;
-      const tick = now => {
-        const k = Math.min(Math.max((now - start) / dur, 0), 1);
-        n.textContent = Math.round(to * (1 - Math.pow(1 - k, 3)));
-        if (k < 1) requestAnimationFrame(tick);
-      };
-      requestAnimationFrame(tick);
-    }
     // Seguro: si el navegador no ejecuta las animaciones, todo queda visible a los pocos segundos
-    const settle = setTimeout(() => { intro.classList.add("settled"); n.textContent = to; }, reduce ? 0 : 4200);
+    const settle = setTimeout(() => intro.classList.add("settled"), reduce ? 0 : 4200);
     const go = intro.querySelector("#intro-go");
     const focus = setTimeout(() => go.focus({ preventScroll: true }), reduce ? 0 : 1200);
     let done = false;
@@ -2872,7 +2854,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     $$("[data-read-count]").forEach(el => {
       el.textContent = n === 0 ? L("Aún no has abierto ninguna", "You haven't opened any yet")
         : n === ALL.length ? L("Has leído toda la semana", "You've read the whole week")
-        : L(`${n} de ${ALL.length} leídas`, `${n} of ${ALL.length} read`);
+        : L(n === 1 ? "1 leída" : `${n} leídas`, `${n} read`);
     });
     $$("[data-read-fill]").forEach(el => el.style.setProperty("--r", ALL.length ? n / ALL.length : 0));
     $$("[data-type-read]").forEach(el => {
@@ -3189,7 +3171,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
   }
 
   // ---------- Idioma ----------
-  const TITLE = { es: document.title, en: "AI News · Week October 12–18, 2026" };
+  const TITLE = { es: document.title, en: "AI News" };
   const ATTRS = ["aria-label", "placeholder"];
   const applyLang = lang => {
     document.documentElement.lang = lang;
