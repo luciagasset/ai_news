@@ -53,6 +53,10 @@ header.top { padding-top: calc(44px + env(safe-area-inset-top)); padding-bottom:
 .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); margin: 0 0 4px; }
 h1 { font-size: 34px; line-height: 1.12; font-weight: 700; letter-spacing: -.02em; margin: 0; }
 .meta { color: var(--label-2); font-size: 15px; margin: 8px 0 0; }
+.about { font-size: 16px; line-height: 1.45; color: var(--label); margin: 14px 0 0; max-width: 560px; }
+.about-link { border: 0; background: none; padding: 0; font: inherit; color: var(--accent); cursor: pointer; white-space: nowrap; }
+.about-link:hover { text-decoration: underline; }
+.about-link:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
 .daynav { display: flex; gap: 16px; margin-top: 10px; font-size: 15px; }
 
 .tile:focus-visible, .back:focus-visible, .close:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
@@ -93,7 +97,7 @@ h2.block { font-size: 22px; font-weight: 700; letter-spacing: -.01em; margin: 36
 }
 @media (hover: hover) { .tile:hover { box-shadow: var(--shadow-hover); transform: translateY(-3px); } }
 .tile:active { transform: scale(.97); }
-.tags { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; font-size: 11px; font-weight: 600; }
+.tags { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; font-size: 12px; font-weight: 600; }
 .tag { color: var(--tc); background: color-mix(in srgb, var(--tc) var(--tint), transparent); padding: 3px 7px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px; }
 .tag .icon { font-size: 12px; }
 .tag.official { --tc: var(--accent); }
@@ -102,8 +106,10 @@ h2.block { font-size: 22px; font-weight: 700; letter-spacing: -.01em; margin: 36
   font-size: 17px; line-height: 1.28; font-weight: 600; letter-spacing: -.01em; margin: 12px 0 0;
   display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden; flex-shrink: 0;
 }
-.tile .src { margin-top: auto; padding-top: 10px; font-size: 12px; color: var(--label-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.tile .stats { display: flex; align-items: center; gap: 8px; margin-top: 4px; font-size: 12px; color: var(--label-3); }
+.tile .src { margin-top: auto; padding-top: 10px; font-size: 13px; color: var(--label-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tile .stats { display: flex; align-items: center; gap: 12px; margin-top: 4px; font-size: 13px; color: var(--label-2); }
+.tile .stats > span { display: inline-flex; align-items: center; gap: 4px; }
+.tile .stats .icon { font-size: 14px; }
 .meter { display: inline-flex; gap: 2px; }
 .meter i { width: 4px; height: 10px; border-radius: 2px; background: var(--fill-2); }
 .meter i.on { background: var(--t-polemica); }
@@ -179,15 +185,11 @@ dialog.sheet.closing::backdrop { animation: fade-out .22s ease-in forwards; }
 .dot:hover::before, .dot:focus-visible::before, .dot.hot::before { transform: scale(1.35); }
 .dot:focus-visible { outline: none; }
 .dot:focus-visible::before { box-shadow: 0 0 0 3px var(--card), 0 0 0 5px var(--accent); }
-.dot.read::before { background: var(--card); box-shadow: inset 0 0 0 2px var(--tc); }
-.day-label { width: 100%; text-align: center; border-top: 0.5px solid var(--separator); padding-top: 6px; margin-top: 4px; font-size: 11px; color: var(--label-3); line-height: 1.2; }
+.day-label { width: 100%; text-align: center; border-top: 0.5px solid var(--separator); padding-top: 6px; margin-top: 4px; font-size: 12px; color: var(--label-2); line-height: 1.2; }
 .day-label b { display: block; font-size: 14px; font-weight: 600; color: var(--label-2); }
 .day.quiet .day-label b { color: var(--label-3); font-weight: 500; }
-.pulse-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 12px 0 0; font-size: 12px; color: var(--label-2); }
+.pulse-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 12px 0 0; font-size: 13px; color: var(--label-2); }
 .pulse-legend > span::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--tc); margin-right: 5px; }
-.pulse-legend > .read-key { color: var(--label-3); }
-.pulse-legend > .read-key::before { background: none; box-shadow: inset 0 0 0 1.5px var(--label-3); }
-html:not(.js) .read-key { display: none; }
 .js .pulse .dot::before { animation: pop .55s cubic-bezier(.3,1.5,.5,1) both; animation-delay: var(--d, 0s); }
 @keyframes pop { from { transform: scale(0); } }
 
@@ -198,9 +200,15 @@ html:not(.js) .read-key { display: none; }
 
 /* ---------- Leídas ---------- */
 .tile .done { display: none; }
-.tile.read .done { display: inline-flex; }
-.tile.read { opacity: .62; }
-@media (hover: hover) { .tile.read:hover { opacity: 1; } }
+.tile { position: relative; }
+.tile .done { position: absolute; top: 10px; right: 10px; width: 24px; height: 24px; border-radius: 50%;
+  background: var(--accent); color: #fff; place-items: center; }
+.tile .done .icon { font-size: 14px; stroke-width: 3; }
+.done-demo { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); color: #fff; }
+.done-demo .icon { font-size: 11px; stroke-width: 3; }
+.tile.read .done { display: grid; }
+.tile.read .tags { padding-right: 28px; }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .tag.done { --tc: var(--label-3); }
 
 /* ---------- Navegación dentro de la hoja ---------- */
@@ -346,7 +354,7 @@ h2.sec .count { color: var(--label-3); font-weight: 600; }
   .grid.latest { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); overflow: visible; margin: 12px 0 0; padding: 0; }
   .grid.latest .tile { min-height: 240px; }
 }
-section + .pulse { margin-top: 24px; }
+.grid + .pulse { margin-top: 36px; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .chip { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border: 0; border-radius: 22px;
   background: var(--card); box-shadow: var(--shadow); font-size: 15px; font-weight: 600; color: var(--label); cursor: pointer; }
@@ -401,7 +409,6 @@ header.top .brand-row, .title-row { padding-right: 148px; }
 .wordmark .logo-mark { border-radius: 8px; flex: none; }
 .wm-text { font-size: 17px; font-weight: 800; letter-spacing: -.01em; color: var(--label); }
 .brand-row { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; }
-.brand-row .sub { font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); }
 
 /* ---------- Pulsación: todo lo que se toca responde ---------- */
 button, .ed-link { -webkit-tap-highlight-color: transparent; }
@@ -450,6 +457,8 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 {%- elif t == "x" -%}<path d="M5 4l14 16M19 4L5 20"/>
 {%- elif t == "mail" -%}<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M4 7l8 6 8-6"/>
 {%- elif t == "link" -%}<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>
+{%- elif t == "comment" -%}<path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/>
+{%- elif t == "clock" -%}<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>
 {%- elif t == "check" -%}<path d="M5 12.5l4.5 4.5L19 7.5"/>
 {%- elif t == "info" -%}<circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/>
 {%- elif t == "search" -%}<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>
@@ -471,14 +480,14 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     <span class="tag">{{ icon(s.type) }}{{ t(type_singular[s.type], type_singular_en[s.type]) }}</span>
     {% if new %}<span class="tag new">{{ t("Nuevo", "New") }}</span>{% endif %}
     {% if s.official %}<span class="tag official">{{ t("Oficial", "Official") }}</span>{% endif %}
-    <span class="tag done">{{ icon("check") }}{{ t("Leída", "Read") }}</span>
   </span>
+  <span class="done">{{ icon("check") }}<span class="vh">{{ t("Leída", "Read") }}</span></span>
   <h3>{{ t(s.headline, en(s, "headline")) }}</h3>
   {% set names = s.sources | source_names %}
   <span class="src">{{ names[:2] | join(", ") }}{% if names|length > 2 %} +{{ names|length - 2 }}{% endif %}</span>
   <span class="stats">
-    {% if s.comments %}{% set lv = s.comments | heat_level %}<span class="meter" aria-label="Intensidad del debate: {{ lv }} de 5" data-en-aria-label="Debate intensity: {{ lv }} of 5">{% for i in range(5) %}<i{% if i < lv %} class="on"{% endif %}></i>{% endfor %}</span>{% endif %}
-    <span>{{ s.reading_minutes }} min</span>
+    {% if s.comments %}<span aria-label="{{ s.comments }} comentarios" data-en-aria-label="{{ s.comments }} comments">{{ icon("comment") }}{{ s.comments }}</span>{% endif %}
+    <span aria-label="{{ s.reading_minutes }} min de lectura" data-en-aria-label="{{ s.reading_minutes }} min read">{{ icon("clock") }}{{ s.reading_minutes }} min</span>
   </span>
 </button>
 {%- endmacro -%}
@@ -498,10 +507,12 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 {# ================= Pantalla principal: la semana ================= #}
 <div id="view-home" class="view">
   <header class="top wrap">
-    <p class="brand-row">{{ wordmark(28) }}<span class="sub">{{ t("Resumen semanal", "Weekly digest") }}</span></p>
+    <p class="brand-row">{{ wordmark(28) }}</p>
     {% if rolling %}
     <h1>{{ t("Esta semana", "This week") }}</h1>
     <p class="meta">{{ t("Actualizado el " ~ updated, "Updated " ~ updated_en) }}</p>
+    <p class="about">{{ t("Las noticias de inteligencia artificial que más se comentan, resumidas en español cada mañana. Toca una para leerla.", "The artificial intelligence stories people are talking about most, summarised every morning. Tap one to read it.") }}
+      <button class="about-link" type="button" data-help>{{ t("Cómo funciona", "How it works") }}</button></p>
     {% else %}
     <h1>{{ t(week_label, week_label_en) }}</h1>
     {% endif %}
@@ -519,6 +530,14 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
         {% for s in last.stories %}{{ tile(s, rolling and last.iso == date) }}{% endfor %}
       </div>
     </section>
+
+    {% set top = ranked | rejectattr("id", "in", last_ids) | list %}
+    {% if top %}
+    <h2 class="block">{{ t("Lo más destacado", "Top stories") }}</h2>
+    <div class="grid">
+      {% for s in top[:4] %}{{ tile(s) }}{% endfor %}
+    </div>
+    {% endif %}
 
     <section class="pulse" aria-labelledby="h-pulse">
       <h2 id="h-pulse">{{ t("El pulso de la semana", "The week's pulse") }}</h2>
@@ -541,16 +560,8 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
         </div>
         {%- endfor %}
       </div>
-      <p class="pulse-legend" aria-hidden="true">{% for tp, label, desc, items in types if items %}<span class="t-{{ tp }}">{{ t(label, type_labels_en[tp]) }}</span>{% endfor %}<span class="read-key">{{ t("Hueco: ya leída", "Hollow: already read") }}</span></p>
+      <p class="pulse-legend" aria-hidden="true">{% for tp, label, desc, items in types if items %}<span class="t-{{ tp }}">{{ t(label, type_labels_en[tp]) }}</span>{% endfor %}</p>
     </section>
-
-    {% set top = ranked | rejectattr("id", "in", last_ids) | list %}
-    {% if top %}
-    <h2 class="block">{{ t("Lo más destacado", "Top stories") }}</h2>
-    <div class="grid">
-      {% for s in top[:4] %}{{ tile(s) }}{% endfor %}
-    </div>
-    {% endif %}
 
     <h2 class="block">{{ t("Por tipo", "By type") }}</h2>
     <nav class="chips" aria-label="Tipos de noticia" data-en-aria-label="Story types">
@@ -685,10 +696,12 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
       <dt><span class="tag official">{{ t("Fuente oficial", "Official source") }}</span></dt><dd>{{ t("El anuncio viene de la propia empresa o laboratorio.", "The announcement comes from the company or lab itself.") }}</dd>
       <dt><span class="tag partial">{{ t("Resumen parcial", "Partial summary") }}</span></dt><dd>{{ t("El vídeo no tenía subtítulos y el resumen se basa solo en su título y descripción.", "The video had no captions, so the summary relies only on its title and description.") }}</dd>
     </dl>
-    <h4>{{ t("Intensidad del debate", "Debate intensity") }}</h4>
+    <h4>{{ t("En cada tarjeta", "On each card") }}</h4>
     <dl>
-      <dt><span class="meter" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span></dt>
-      <dd>{{ t("Las barras resumen los comentarios en Hacker News y YouTube: una a partir de 20, dos desde 80, tres desde 200, cuatro desde 500 y cinco desde 1.000. En «El pulso de la semana», el tamaño del punto dice lo mismo.", "The bars summarise comments on Hacker News and YouTube: one from 20, two from 80, three from 200, four from 500 and five from 1,000. In “The week's pulse”, the size of each dot says the same.") }}</dd>
+      <dt><span class="tag t-noticia">{{ icon("comment") }}86</span></dt>
+      <dd>{{ t("Comentarios sobre la noticia en Hacker News y YouTube: cuantos más, más se está debatiendo. En «El pulso de la semana», el tamaño del punto dice lo mismo.", "Comments on the story on Hacker News and YouTube: the more there are, the more it is being debated. In “The week's pulse”, the size of each dot says the same.") }}</dd>
+      <dt><span class="tag t-noticia"><span class="done-demo">{{ icon("check") }}</span></span></dt>
+      <dd>{{ t("Ya la has leído en este dispositivo.", "You have already read it on this device.") }}</dd>
     </dl>
     <h4>{{ t("Cómo se eligen", "How they are chosen") }}</h4>
     <p class="note">{{ t("Se puntúa cuántas fuentes distintas cuentan la noticia, cuánto se discute, lo reciente que es y su tipo (los avances y las polémicas pesan algo más). Se reparten entre los días y los tipos cuando la semana da para ello, y nunca se rellena con temas flojos. Los resúmenes salen solo de las fuentes enlazadas.", "Each story is scored on how many different sources cover it, how much it is discussed, how recent it is and its type (releases and controversies weigh a little more). Stories are spread across days and types when the week allows it, and gaps are never filled with weak topics. Summaries are based only on the linked sources.") }}</p>
@@ -927,7 +940,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 
   // ---------- Progreso de lectura ----------
   const paintRead = () => {
-    $$("[data-open]").forEach(el => el.classList.toggle("read", read.has(el.dataset.open)));
+    $$(".tile[data-open]").forEach(el => el.classList.toggle("read", read.has(el.dataset.open)));
     const n = ALL.filter(id => read.has(id)).length;
     $$("[data-read-count]").forEach(el => {
       el.textContent = n === 0 ? L("Aún no has abierto ninguna", "You haven't opened any yet")

@@ -16,13 +16,13 @@ Category = Literal["modelos", "empresas", "investigacion", "regulacion", "herram
 
 TYPE_ORDER: list[StoryType] = ["avance", "debate", "polemica", "noticia"]
 TYPE_LABELS = {
-    "avance": "Modelos frontera",
-    "debate": "En debate",
+    "avance": "Avances",
+    "debate": "Debates",
     "polemica": "Polémicas",
     "noticia": "Noticias",
 }
 TYPE_SINGULAR = {"avance": "Avance", "debate": "Debate", "polemica": "Polémica", "noticia": "Noticia"}
-TYPE_LABELS_EN = {"avance": "Frontier models", "debate": "Debates", "polemica": "Controversies", "noticia": "News"}
+TYPE_LABELS_EN = {"avance": "Releases", "debate": "Debates", "polemica": "Controversies", "noticia": "News"}
 TYPE_SINGULAR_EN = {"avance": "Release", "debate": "Debate", "polemica": "Controversy", "noticia": "News"}
 CATEGORY_LABELS_EN = {"modelos": "Models", "empresas": "Companies", "investigacion": "Research",
                       "regulacion": "Regulation", "herramientas": "Tools"}

@@ -149,6 +149,10 @@ header.top { padding-top: calc(44px + env(safe-area-inset-top)); padding-bottom:
 .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); margin: 0 0 4px; }
 h1 { font-size: 34px; line-height: 1.12; font-weight: 700; letter-spacing: -.02em; margin: 0; }
 .meta { color: var(--label-2); font-size: 15px; margin: 8px 0 0; }
+.about { font-size: 16px; line-height: 1.45; color: var(--label); margin: 14px 0 0; max-width: 560px; }
+.about-link { border: 0; background: none; padding: 0; font: inherit; color: var(--accent); cursor: pointer; white-space: nowrap; }
+.about-link:hover { text-decoration: underline; }
+.about-link:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
 .daynav { display: flex; gap: 16px; margin-top: 10px; font-size: 15px; }
 
 .tile:focus-visible, .back:focus-visible, .close:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
@@ -189,7 +193,7 @@ h2.block { font-size: 22px; font-weight: 700; letter-spacing: -.01em; margin: 36
 }
 @media (hover: hover) { .tile:hover { box-shadow: var(--shadow-hover); transform: translateY(-3px); } }
 .tile:active { transform: scale(.97); }
-.tags { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; font-size: 11px; font-weight: 600; }
+.tags { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; font-size: 12px; font-weight: 600; }
 .tag { color: var(--tc); background: color-mix(in srgb, var(--tc) var(--tint), transparent); padding: 3px 7px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px; }
 .tag .icon { font-size: 12px; }
 .tag.official { --tc: var(--accent); }
@@ -198,8 +202,10 @@ h2.block { font-size: 22px; font-weight: 700; letter-spacing: -.01em; margin: 36
   font-size: 17px; line-height: 1.28; font-weight: 600; letter-spacing: -.01em; margin: 12px 0 0;
   display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden; flex-shrink: 0;
 }
-.tile .src { margin-top: auto; padding-top: 10px; font-size: 12px; color: var(--label-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.tile .stats { display: flex; align-items: center; gap: 8px; margin-top: 4px; font-size: 12px; color: var(--label-3); }
+.tile .src { margin-top: auto; padding-top: 10px; font-size: 13px; color: var(--label-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tile .stats { display: flex; align-items: center; gap: 12px; margin-top: 4px; font-size: 13px; color: var(--label-2); }
+.tile .stats > span { display: inline-flex; align-items: center; gap: 4px; }
+.tile .stats .icon { font-size: 14px; }
 .meter { display: inline-flex; gap: 2px; }
 .meter i { width: 4px; height: 10px; border-radius: 2px; background: var(--fill-2); }
 .meter i.on { background: var(--t-polemica); }
@@ -275,15 +281,11 @@ dialog.sheet.closing::backdrop { animation: fade-out .22s ease-in forwards; }
 .dot:hover::before, .dot:focus-visible::before, .dot.hot::before { transform: scale(1.35); }
 .dot:focus-visible { outline: none; }
 .dot:focus-visible::before { box-shadow: 0 0 0 3px var(--card), 0 0 0 5px var(--accent); }
-.dot.read::before { background: var(--card); box-shadow: inset 0 0 0 2px var(--tc); }
-.day-label { width: 100%; text-align: center; border-top: 0.5px solid var(--separator); padding-top: 6px; margin-top: 4px; font-size: 11px; color: var(--label-3); line-height: 1.2; }
+.day-label { width: 100%; text-align: center; border-top: 0.5px solid var(--separator); padding-top: 6px; margin-top: 4px; font-size: 12px; color: var(--label-2); line-height: 1.2; }
 .day-label b { display: block; font-size: 14px; font-weight: 600; color: var(--label-2); }
 .day.quiet .day-label b { color: var(--label-3); font-weight: 500; }
-.pulse-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 12px 0 0; font-size: 12px; color: var(--label-2); }
+.pulse-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 12px 0 0; font-size: 13px; color: var(--label-2); }
 .pulse-legend > span::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--tc); margin-right: 5px; }
-.pulse-legend > .read-key { color: var(--label-3); }
-.pulse-legend > .read-key::before { background: none; box-shadow: inset 0 0 0 1.5px var(--label-3); }
-html:not(.js) .read-key { display: none; }
 .js .pulse .dot::before { animation: pop .55s cubic-bezier(.3,1.5,.5,1) both; animation-delay: var(--d, 0s); }
 @keyframes pop { from { transform: scale(0); } }
 
@@ -294,9 +296,15 @@ html:not(.js) .read-key { display: none; }
 
 /* ---------- Leídas ---------- */
 .tile .done { display: none; }
-.tile.read .done { display: inline-flex; }
-.tile.read { opacity: .62; }
-@media (hover: hover) { .tile.read:hover { opacity: 1; } }
+.tile { position: relative; }
+.tile .done { position: absolute; top: 10px; right: 10px; width: 24px; height: 24px; border-radius: 50%;
+  background: var(--accent); color: #fff; place-items: center; }
+.tile .done .icon { font-size: 14px; stroke-width: 3; }
+.done-demo { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); color: #fff; }
+.done-demo .icon { font-size: 11px; stroke-width: 3; }
+.tile.read .done { display: grid; }
+.tile.read .tags { padding-right: 28px; }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .tag.done { --tc: var(--label-3); }
 
 /* ---------- Navegación dentro de la hoja ---------- */
@@ -442,7 +450,7 @@ h2.sec .count { color: var(--label-3); font-weight: 600; }
   .grid.latest { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); overflow: visible; margin: 12px 0 0; padding: 0; }
   .grid.latest .tile { min-height: 240px; }
 }
-section + .pulse { margin-top: 24px; }
+.grid + .pulse { margin-top: 36px; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .chip { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border: 0; border-radius: 22px;
   background: var(--card); box-shadow: var(--shadow); font-size: 15px; font-weight: 600; color: var(--label); cursor: pointer; }
@@ -497,7 +505,6 @@ header.top .brand-row, .title-row { padding-right: 148px; }
 .wordmark .logo-mark { border-radius: 8px; flex: none; }
 .wm-text { font-size: 17px; font-weight: 800; letter-spacing: -.01em; color: var(--label); }
 .brand-row { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; }
-.brand-row .sub { font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); }
 
 /* ---------- Pulsación: todo lo que se toca responde ---------- */
 button, .ed-link { -webkit-tap-highlight-color: transparent; }
@@ -555,7 +562,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
   <circle class="lm lm2" cx="26" cy="40" r="5.5" fill="#3bdded"/>
   <circle class="lm lm3" cx="38.5" cy="30.5" r="7" fill="#ffa056"/>
   <path class="lm lm4" d="M50 9Q51.8 17.2 60 19Q51.8 20.8 50 29Q48.2 20.8 40 19Q48.2 17.2 50 9Z" fill="#a7aaff"/>
-</svg><span class="wm-text">AI News</span></span><span class="sub"><span class="l-es">Resumen semanal</span><span class="l-en">Weekly digest</span></span></p>
+</svg><span class="wm-text">AI News</span></span></p>
     
     <h1><span class="l-es">Del 5 al 11 de octubre de 2026</span><span class="l-en">October 5–11, 2026</span></h1>
     
@@ -574,18 +581,86 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     <span class="tag"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h11a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M17 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-4-3h-3"/></svg><span class="l-es">Debate</span><span class="l-en">Debate</span></span>
     
     
-    <span class="tag done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="l-es">Leída</span><span class="l-en">Read</span></span>
   </span>
+  <span class="done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="vh"><span class="l-es">Leída</span><span class="l-en">Read</span></span></span>
   <h3><span class="l-es">Karpathy: crece la brecha entre lo que la gente cree que hace la IA y lo que realmente hace</span><span class="l-en">Karpathy: the gap between what people think AI does and what it really does is growing</span></h3>
   
   <span class="src">AI Explained, twitter.com +1</span>
   <span class="stats">
-    <span class="meter" aria-label="Intensidad del debate: 5 de 5" data-en-aria-label="Debate intensity: 5 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>
-    <span>1 min</span>
+    <span aria-label="1072 comentarios" data-en-aria-label="1072 comments"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>1072</span>
+    <span aria-label="1 min de lectura" data-en-aria-label="1 min read"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>1 min</span>
   </span>
 </button>
       </div>
     </section>
+
+    
+    
+    <h2 class="block"><span class="l-es">Lo más destacado</span><span class="l-en">Top stories</span></h2>
+    <div class="grid">
+      <button class="tile t-debate reveal" type="button" data-open="2026-10-15-02" data-type="debate" data-day="2026-10-09"
+  data-cat="investigacion" data-text="¿revolución o trucos formales? los resultados matemáticos de openai dividen a los expertos openai publicó cientos de resultados matemáticos de un modelo interno, entre ellos una prueba de 199 páginas de la cuasi hipótesis de riemann. para algunos es el día más importante de la historia de las matemáticas; para varios especialistas, muchos son trucos sin utilidad o textos imposibles de revisar. revolution or formal tricks? openai&#39;s mathematical results divide the experts openai published hundreds of mathematical results from an internal model, including a 199-page proof of the quasi-riemann hypothesis. for some it is the most important day in the history of mathematics; for several specialists, many are useless tricks or papers that are impossible to review. openai terence tao ben recht investigación research" aria-haspopup="dialog">
+  <span class="tags">
+    <span class="tag"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h11a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M17 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-4-3h-3"/></svg><span class="l-es">Debate</span><span class="l-en">Debate</span></span>
+    
+    
+  </span>
+  <span class="done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="vh"><span class="l-es">Leída</span><span class="l-en">Read</span></span></span>
+  <h3><span class="l-es">¿Revolución o trucos formales? Los resultados matemáticos de OpenAI dividen a los expertos</span><span class="l-en">Revolution or formal tricks? OpenAI&#39;s mathematical results divide the experts</span></h3>
+  
+  <span class="src">AI Explained, Matthew Berman +5</span>
+  <span class="stats">
+    <span aria-label="1286 comentarios" data-en-aria-label="1286 comments"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>1286</span>
+    <span aria-label="2 min de lectura" data-en-aria-label="2 min read"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>2 min</span>
+  </span>
+</button><button class="tile t-polemica reveal" type="button" data-open="2026-10-15-03" data-type="polemica" data-day="2026-10-10"
+  data-cat="empresas" data-text="los «agentes rebeldes» que hackean sistemas son fallos de seguridad básicos de los laboratorios, según expertos desde julio, openai, anthropic, meta y google han revelado incidentes en los que sus modelos accedieron sin permiso a sistemas ajenos. expertos en ciberseguridad consultados por cso sostienen que no son «agentes rebeldes», sino fallos de contención conocidos desde hace décadas. the “rogue agents” hacking systems are basic security failures by the labs, experts say since july, openai, anthropic, meta and google have disclosed incidents in which their models accessed other systems without permission. cybersecurity experts interviewed by cso argue these are not “rogue agents” but containment failures that have been understood for decades. openai hugging face anthropic meta google empresas companies" aria-haspopup="dialog">
+  <span class="tags">
+    <span class="tag"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg><span class="l-es">Polémica</span><span class="l-en">Controversy</span></span>
+    
+    
+  </span>
+  <span class="done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="vh"><span class="l-es">Leída</span><span class="l-en">Read</span></span></span>
+  <h3><span class="l-es">Los «agentes rebeldes» que hackean sistemas son fallos de seguridad básicos de los laboratorios, según expertos</span><span class="l-en">The “rogue agents” hacking systems are basic security failures by the labs, experts say</span></h3>
+  
+  <span class="src">csoonline.com, Hacker News +2</span>
+  <span class="stats">
+    <span aria-label="1181 comentarios" data-en-aria-label="1181 comments"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>1181</span>
+    <span aria-label="1 min de lectura" data-en-aria-label="1 min read"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>1 min</span>
+  </span>
+</button><button class="tile t-noticia reveal" type="button" data-open="2026-10-15-04" data-type="noticia" data-day="2026-10-10"
+  data-cat="herramientas" data-text="rea y la ola de ingeniería inversa con ia: de descompilar juegos a clonar photoshop rea («reverse-engineer anything»), una herramienta que conecta los agentes de programación con utilidades de ingeniería inversa, fue uno de los proyectos más comentados de la semana. llega en plena oleada de juegos descompilados y programas clonados con ia. rea and the wave of ai reverse engineering: from decompiling games to cloning photoshop rea (“reverse-engineer anything”), a tool that connects coding agents to reverse-engineering utilities, was one of the most talked-about projects of the week. it arrives in the middle of a wave of games decompiled and programs cloned with ai. rea photoshop adobe herramientas tools" aria-haspopup="dialog">
+  <span class="tags">
+    <span class="tag"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h13v16H6a2 2 0 0 1-2-2z"/><path d="M17 8h3v10a2 2 0 0 1-2 2"/><path d="M8 8h5M8 12h5M8 16h3"/></svg><span class="l-es">Noticia</span><span class="l-en">News</span></span>
+    
+    
+  </span>
+  <span class="done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="vh"><span class="l-es">Leída</span><span class="l-en">Read</span></span></span>
+  <h3><span class="l-es">REA y la ola de ingeniería inversa con IA: de descompilar juegos a clonar Photoshop</span><span class="l-en">REA and the wave of AI reverse engineering: from decompiling games to cloning Photoshop</span></h3>
+  
+  <span class="src">Matthew Berman, AI Explained +4</span>
+  <span class="stats">
+    <span aria-label="1627 comentarios" data-en-aria-label="1627 comments"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>1627</span>
+    <span aria-label="2 min de lectura" data-en-aria-label="2 min read"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>2 min</span>
+  </span>
+</button><button class="tile t-debate reveal" type="button" data-open="2026-10-15-07" data-type="debate" data-day="2026-10-09"
+  data-cat="modelos" data-text="los «modelos de decisión» ganan tracción, pero sus elecciones cambian según cómo se pregunte jev, de typesafe ai, y otros modelos que eligen entre opciones en lugar de generar texto prometen decisiones decenas o cientos de veces más baratas que un llm. un experimento con el dilema del tranvía muestra que su respuesta depende de la formulación. “decision models” gain traction, but their choices change depending on how you ask jev, from typesafe ai, and other models that pick between options instead of generating text promise decisions tens or hundreds of times cheaper than an llm. an experiment with the trolley problem shows that their answer depends on the wording. jev microsoft-decision-1 modelos models" aria-haspopup="dialog">
+  <span class="tags">
+    <span class="tag"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h11a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M17 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-4-3h-3"/></svg><span class="l-es">Debate</span><span class="l-en">Debate</span></span>
+    
+    
+  </span>
+  <span class="done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="vh"><span class="l-es">Leída</span><span class="l-en">Read</span></span></span>
+  <h3><span class="l-es">Los «modelos de decisión» ganan tracción, pero sus elecciones cambian según cómo se pregunte</span><span class="l-en">“Decision models” gain traction, but their choices change depending on how you ask</span></h3>
+  
+  <span class="src">zachlandes.com, Hacker News +2</span>
+  <span class="stats">
+    <span aria-label="427 comentarios" data-en-aria-label="427 comments"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>427</span>
+    <span aria-label="1 min de lectura" data-en-aria-label="1 min read"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>1 min</span>
+  </span>
+</button>
+    </div>
+    
 
     <section class="pulse" aria-labelledby="h-pulse">
       <h2 id="h-pulse"><span class="l-es">El pulso de la semana</span><span class="l-en">The week&#39;s pulse</span></h2>
@@ -669,82 +744,14 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
           <button class="day-label" type="button" data-goto-day="2026-10-11" aria-label="Ver Domingo, 11 de octubre" data-en-aria-label="See Sunday, October 11"><b>11</b><span class="l-es">dom</span><span class="l-en">Sun</span></button>
         </div>
       </div>
-      <p class="pulse-legend" aria-hidden="true"><span class="t-debate"><span class="l-es">En debate</span><span class="l-en">Debates</span></span><span class="t-polemica"><span class="l-es">Polémicas</span><span class="l-en">Controversies</span></span><span class="t-noticia"><span class="l-es">Noticias</span><span class="l-en">News</span></span><span class="read-key"><span class="l-es">Hueco: ya leída</span><span class="l-en">Hollow: already read</span></span></p>
+      <p class="pulse-legend" aria-hidden="true"><span class="t-debate"><span class="l-es">Debates</span><span class="l-en">Debates</span></span><span class="t-polemica"><span class="l-es">Polémicas</span><span class="l-en">Controversies</span></span><span class="t-noticia"><span class="l-es">Noticias</span><span class="l-en">News</span></span></p>
     </section>
-
-    
-    
-    <h2 class="block"><span class="l-es">Lo más destacado</span><span class="l-en">Top stories</span></h2>
-    <div class="grid">
-      <button class="tile t-debate reveal" type="button" data-open="2026-10-15-02" data-type="debate" data-day="2026-10-09"
-  data-cat="investigacion" data-text="¿revolución o trucos formales? los resultados matemáticos de openai dividen a los expertos openai publicó cientos de resultados matemáticos de un modelo interno, entre ellos una prueba de 199 páginas de la cuasi hipótesis de riemann. para algunos es el día más importante de la historia de las matemáticas; para varios especialistas, muchos son trucos sin utilidad o textos imposibles de revisar. revolution or formal tricks? openai&#39;s mathematical results divide the experts openai published hundreds of mathematical results from an internal model, including a 199-page proof of the quasi-riemann hypothesis. for some it is the most important day in the history of mathematics; for several specialists, many are useless tricks or papers that are impossible to review. openai terence tao ben recht investigación research" aria-haspopup="dialog">
-  <span class="tags">
-    <span class="tag"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h11a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M17 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-4-3h-3"/></svg><span class="l-es">Debate</span><span class="l-en">Debate</span></span>
-    
-    
-    <span class="tag done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="l-es">Leída</span><span class="l-en">Read</span></span>
-  </span>
-  <h3><span class="l-es">¿Revolución o trucos formales? Los resultados matemáticos de OpenAI dividen a los expertos</span><span class="l-en">Revolution or formal tricks? OpenAI&#39;s mathematical results divide the experts</span></h3>
-  
-  <span class="src">AI Explained, Matthew Berman +5</span>
-  <span class="stats">
-    <span class="meter" aria-label="Intensidad del debate: 5 de 5" data-en-aria-label="Debate intensity: 5 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>
-    <span>2 min</span>
-  </span>
-</button><button class="tile t-polemica reveal" type="button" data-open="2026-10-15-03" data-type="polemica" data-day="2026-10-10"
-  data-cat="empresas" data-text="los «agentes rebeldes» que hackean sistemas son fallos de seguridad básicos de los laboratorios, según expertos desde julio, openai, anthropic, meta y google han revelado incidentes en los que sus modelos accedieron sin permiso a sistemas ajenos. expertos en ciberseguridad consultados por cso sostienen que no son «agentes rebeldes», sino fallos de contención conocidos desde hace décadas. the “rogue agents” hacking systems are basic security failures by the labs, experts say since july, openai, anthropic, meta and google have disclosed incidents in which their models accessed other systems without permission. cybersecurity experts interviewed by cso argue these are not “rogue agents” but containment failures that have been understood for decades. openai hugging face anthropic meta google empresas companies" aria-haspopup="dialog">
-  <span class="tags">
-    <span class="tag"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg><span class="l-es">Polémica</span><span class="l-en">Controversy</span></span>
-    
-    
-    <span class="tag done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="l-es">Leída</span><span class="l-en">Read</span></span>
-  </span>
-  <h3><span class="l-es">Los «agentes rebeldes» que hackean sistemas son fallos de seguridad básicos de los laboratorios, según expertos</span><span class="l-en">The “rogue agents” hacking systems are basic security failures by the labs, experts say</span></h3>
-  
-  <span class="src">csoonline.com, Hacker News +2</span>
-  <span class="stats">
-    <span class="meter" aria-label="Intensidad del debate: 5 de 5" data-en-aria-label="Debate intensity: 5 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>
-    <span>1 min</span>
-  </span>
-</button><button class="tile t-noticia reveal" type="button" data-open="2026-10-15-04" data-type="noticia" data-day="2026-10-10"
-  data-cat="herramientas" data-text="rea y la ola de ingeniería inversa con ia: de descompilar juegos a clonar photoshop rea («reverse-engineer anything»), una herramienta que conecta los agentes de programación con utilidades de ingeniería inversa, fue uno de los proyectos más comentados de la semana. llega en plena oleada de juegos descompilados y programas clonados con ia. rea and the wave of ai reverse engineering: from decompiling games to cloning photoshop rea (“reverse-engineer anything”), a tool that connects coding agents to reverse-engineering utilities, was one of the most talked-about projects of the week. it arrives in the middle of a wave of games decompiled and programs cloned with ai. rea photoshop adobe herramientas tools" aria-haspopup="dialog">
-  <span class="tags">
-    <span class="tag"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h13v16H6a2 2 0 0 1-2-2z"/><path d="M17 8h3v10a2 2 0 0 1-2 2"/><path d="M8 8h5M8 12h5M8 16h3"/></svg><span class="l-es">Noticia</span><span class="l-en">News</span></span>
-    
-    
-    <span class="tag done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="l-es">Leída</span><span class="l-en">Read</span></span>
-  </span>
-  <h3><span class="l-es">REA y la ola de ingeniería inversa con IA: de descompilar juegos a clonar Photoshop</span><span class="l-en">REA and the wave of AI reverse engineering: from decompiling games to cloning Photoshop</span></h3>
-  
-  <span class="src">Matthew Berman, AI Explained +4</span>
-  <span class="stats">
-    <span class="meter" aria-label="Intensidad del debate: 5 de 5" data-en-aria-label="Debate intensity: 5 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>
-    <span>2 min</span>
-  </span>
-</button><button class="tile t-debate reveal" type="button" data-open="2026-10-15-07" data-type="debate" data-day="2026-10-09"
-  data-cat="modelos" data-text="los «modelos de decisión» ganan tracción, pero sus elecciones cambian según cómo se pregunte jev, de typesafe ai, y otros modelos que eligen entre opciones en lugar de generar texto prometen decisiones decenas o cientos de veces más baratas que un llm. un experimento con el dilema del tranvía muestra que su respuesta depende de la formulación. “decision models” gain traction, but their choices change depending on how you ask jev, from typesafe ai, and other models that pick between options instead of generating text promise decisions tens or hundreds of times cheaper than an llm. an experiment with the trolley problem shows that their answer depends on the wording. jev microsoft-decision-1 modelos models" aria-haspopup="dialog">
-  <span class="tags">
-    <span class="tag"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h11a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M17 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-4-3h-3"/></svg><span class="l-es">Debate</span><span class="l-en">Debate</span></span>
-    
-    
-    <span class="tag done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="l-es">Leída</span><span class="l-en">Read</span></span>
-  </span>
-  <h3><span class="l-es">Los «modelos de decisión» ganan tracción, pero sus elecciones cambian según cómo se pregunte</span><span class="l-en">“Decision models” gain traction, but their choices change depending on how you ask</span></h3>
-  
-  <span class="src">zachlandes.com, Hacker News +2</span>
-  <span class="stats">
-    <span class="meter" aria-label="Intensidad del debate: 3 de 5" data-en-aria-label="Debate intensity: 3 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span>
-    <span>1 min</span>
-  </span>
-</button>
-    </div>
-    
 
     <h2 class="block"><span class="l-es">Por tipo</span><span class="l-en">By type</span></h2>
     <nav class="chips" aria-label="Tipos de noticia" data-en-aria-label="Story types">
       <button class="chip" type="button" data-view="todas"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg><span class="l-es">Todas</span><span class="l-en">All</span></button>
       
-      <button class="chip t-debate" type="button" data-view="debate"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h11a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M17 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-4-3h-3"/></svg><span class="l-es">En debate</span><span class="l-en">Debates</span><span class="n">4</span></button>
+      <button class="chip t-debate" type="button" data-view="debate"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h11a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M17 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-4-3h-3"/></svg><span class="l-es">Debates</span><span class="l-en">Debates</span><span class="n">4</span></button>
       
       <button class="chip t-polemica" type="button" data-view="polemica"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg><span class="l-es">Polémicas</span><span class="l-en">Controversies</span><span class="n">2</span></button>
       
@@ -770,7 +777,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     <button class="back" type="button" data-view="home"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span class="l-es">Semana</span><span class="l-en">Week</span></button>
   </div></div>
   <main class="wrap">
-    <h2 class="view-title"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h11a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M17 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-4-3h-3"/></svg><span class="l-es">En debate</span><span class="l-en">Debates</span></h2>
+    <h2 class="view-title"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h11a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M17 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-4-3h-3"/></svg><span class="l-es">Debates</span><span class="l-en">Debates</span></h2>
     <p class="view-sub">4 <span class="l-es">noticias</span><span class="l-en">stories</span> · <span class="l-es">Del 5 al 11 de octubre de 2026</span><span class="l-en">October 5–11, 2026</span></p>
     
     
@@ -785,14 +792,14 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     <span class="tag"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h11a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M17 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-4-3h-3"/></svg><span class="l-es">Debate</span><span class="l-en">Debate</span></span>
     
     
-    <span class="tag done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="l-es">Leída</span><span class="l-en">Read</span></span>
   </span>
+  <span class="done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="vh"><span class="l-es">Leída</span><span class="l-en">Read</span></span></span>
   <h3><span class="l-es">¿Revolución o trucos formales? Los resultados matemáticos de OpenAI dividen a los expertos</span><span class="l-en">Revolution or formal tricks? OpenAI&#39;s mathematical results divide the experts</span></h3>
   
   <span class="src">AI Explained, Matthew Berman +5</span>
   <span class="stats">
-    <span class="meter" aria-label="Intensidad del debate: 5 de 5" data-en-aria-label="Debate intensity: 5 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>
-    <span>2 min</span>
+    <span aria-label="1286 comentarios" data-en-aria-label="1286 comments"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>1286</span>
+    <span aria-label="2 min de lectura" data-en-aria-label="2 min read"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>2 min</span>
   </span>
 </button><button class="tile t-debate reveal" type="button" data-open="2026-10-15-07" data-type="debate" data-day="2026-10-09"
   data-cat="modelos" data-text="los «modelos de decisión» ganan tracción, pero sus elecciones cambian según cómo se pregunte jev, de typesafe ai, y otros modelos que eligen entre opciones en lugar de generar texto prometen decisiones decenas o cientos de veces más baratas que un llm. un experimento con el dilema del tranvía muestra que su respuesta depende de la formulación. “decision models” gain traction, but their choices change depending on how you ask jev, from typesafe ai, and other models that pick between options instead of generating text promise decisions tens or hundreds of times cheaper than an llm. an experiment with the trolley problem shows that their answer depends on the wording. jev microsoft-decision-1 modelos models" aria-haspopup="dialog">
@@ -800,14 +807,14 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     <span class="tag"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h11a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M17 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-4-3h-3"/></svg><span class="l-es">Debate</span><span class="l-en">Debate</span></span>
     
     
-    <span class="tag done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="l-es">Leída</span><span class="l-en">Read</span></span>
   </span>
+  <span class="done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="vh"><span class="l-es">Leída</span><span class="l-en">Read</span></span></span>
   <h3><span class="l-es">Los «modelos de decisión» ganan tracción, pero sus elecciones cambian según cómo se pregunte</span><span class="l-en">“Decision models” gain traction, but their choices change depending on how you ask</span></h3>
   
   <span class="src">zachlandes.com, Hacker News +2</span>
   <span class="stats">
-    <span class="meter" aria-label="Intensidad del debate: 3 de 5" data-en-aria-label="Debate intensity: 3 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span>
-    <span>1 min</span>
+    <span aria-label="427 comentarios" data-en-aria-label="427 comments"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>427</span>
+    <span aria-label="1 min de lectura" data-en-aria-label="1 min read"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>1 min</span>
   </span>
 </button><button class="tile t-debate reveal" type="button" data-open="2026-10-15-09" data-type="debate" data-day="2026-10-09"
   data-cat="investigacion" data-text="¿se convertirá pensar en un hobby? el debate sobre la ia y el trabajo intelectual diomidis spinellis sostiene que la ia asumirá la mayor parte del trabajo cognitivo y que pensar acabará siendo un pasatiempo. otro ensayo muy leído replica que lo que se pierde es la comunidad intelectual que sostiene el pensamiento propio. will thinking become a hobby? the debate over ai and intellectual work diomidis spinellis argues that ai will take over most cognitive work and that thinking will end up as a pastime. another widely read essay replies that what is being lost is the intellectual community that sustains independent thought. diomidis spinellis investigación research" aria-haspopup="dialog">
@@ -815,14 +822,14 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     <span class="tag"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h11a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M17 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-4-3h-3"/></svg><span class="l-es">Debate</span><span class="l-en">Debate</span></span>
     
     
-    <span class="tag done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="l-es">Leída</span><span class="l-en">Read</span></span>
   </span>
+  <span class="done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="vh"><span class="l-es">Leída</span><span class="l-en">Read</span></span></span>
   <h3><span class="l-es">¿Se convertirá pensar en un hobby? El debate sobre la IA y el trabajo intelectual</span><span class="l-en">Will thinking become a hobby? The debate over AI and intellectual work</span></h3>
   
   <span class="src">spinellis.gr, Hacker News +2</span>
   <span class="stats">
-    <span class="meter" aria-label="Intensidad del debate: 4 de 5" data-en-aria-label="Debate intensity: 4 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span>
-    <span>1 min</span>
+    <span aria-label="849 comentarios" data-en-aria-label="849 comments"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>849</span>
+    <span aria-label="1 min de lectura" data-en-aria-label="1 min read"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>1 min</span>
   </span>
 </button><button class="tile t-debate reveal" type="button" data-open="2026-10-15-11" data-type="debate" data-day="2026-10-11"
   data-cat="modelos" data-text="karpathy: crece la brecha entre lo que la gente cree que hace la ia y lo que realmente hace andrej karpathy advierte de que se amplía la distancia entre la percepción de la mayoría sobre la ia y la de quienes la usan a fondo. su mensaje abrió uno de los hilos más largos de la semana en hacker news, con más de 1.000 comentarios. karpathy: the gap between what people think ai does and what it really does is growing andrej karpathy warns that the distance between how most people perceive ai and how those who use it intensively see it is widening. his post started one of the longest threads of the week on hacker news, with more than 1,000 comments. andrej karpathy modelos models" aria-haspopup="dialog">
@@ -830,14 +837,14 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     <span class="tag"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h11a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M17 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-4-3h-3"/></svg><span class="l-es">Debate</span><span class="l-en">Debate</span></span>
     
     
-    <span class="tag done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="l-es">Leída</span><span class="l-en">Read</span></span>
   </span>
+  <span class="done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="vh"><span class="l-es">Leída</span><span class="l-en">Read</span></span></span>
   <h3><span class="l-es">Karpathy: crece la brecha entre lo que la gente cree que hace la IA y lo que realmente hace</span><span class="l-en">Karpathy: the gap between what people think AI does and what it really does is growing</span></h3>
   
   <span class="src">AI Explained, twitter.com +1</span>
   <span class="stats">
-    <span class="meter" aria-label="Intensidad del debate: 5 de 5" data-en-aria-label="Debate intensity: 5 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>
-    <span>1 min</span>
+    <span aria-label="1072 comentarios" data-en-aria-label="1072 comments"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>1072</span>
+    <span aria-label="1 min de lectura" data-en-aria-label="1 min read"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>1 min</span>
   </span>
 </button></div>
   </main>
@@ -858,14 +865,14 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     <span class="tag"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg><span class="l-es">Polémica</span><span class="l-en">Controversy</span></span>
     
     
-    <span class="tag done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="l-es">Leída</span><span class="l-en">Read</span></span>
   </span>
+  <span class="done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="vh"><span class="l-es">Leída</span><span class="l-en">Read</span></span></span>
   <h3><span class="l-es">Los «agentes rebeldes» que hackean sistemas son fallos de seguridad básicos de los laboratorios, según expertos</span><span class="l-en">The “rogue agents” hacking systems are basic security failures by the labs, experts say</span></h3>
   
   <span class="src">csoonline.com, Hacker News +2</span>
   <span class="stats">
-    <span class="meter" aria-label="Intensidad del debate: 5 de 5" data-en-aria-label="Debate intensity: 5 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>
-    <span>1 min</span>
+    <span aria-label="1181 comentarios" data-en-aria-label="1181 comments"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>1181</span>
+    <span aria-label="1 min de lectura" data-en-aria-label="1 min read"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>1 min</span>
   </span>
 </button><button class="tile t-polemica reveal" type="button" data-open="2026-10-15-13" data-type="polemica" data-day="2026-10-10"
   data-cat="empresas" data-text="un modelo de anthropic envió una pista falsa a la policía sobre un asesinato sin resolver la policía de filadelfia investiga una pista falsa sobre un homicidio que publicó un modelo de anthropic durante una prueba automática en webs elegidas al azar. la ciudad califica de «inaceptable» que la empresa tardara dos meses en avisar. an anthropic model sent police a false tip about an unsolved murder philadelphia police are investigating a false tip about a homicide posted by an anthropic model during an automated test on randomly chosen websites. the city calls it “unacceptable” that the company took two months to report it. anthropic policía de filadelfia empresas companies" aria-haspopup="dialog">
@@ -873,14 +880,14 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     <span class="tag"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg><span class="l-es">Polémica</span><span class="l-en">Controversy</span></span>
     
     
-    <span class="tag done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="l-es">Leída</span><span class="l-en">Read</span></span>
   </span>
+  <span class="done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="vh"><span class="l-es">Leída</span><span class="l-en">Read</span></span></span>
   <h3><span class="l-es">Un modelo de Anthropic envió una pista falsa a la policía sobre un asesinato sin resolver</span><span class="l-en">An Anthropic model sent police a false tip about an unsolved murder</span></h3>
   
   <span class="src">AI Explained, nbcphiladelphia.com +1</span>
   <span class="stats">
-    <span class="meter" aria-label="Intensidad del debate: 2 de 5" data-en-aria-label="Debate intensity: 2 of 5"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span>
-    <span>1 min</span>
+    <span aria-label="157 comentarios" data-en-aria-label="157 comments"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>157</span>
+    <span aria-label="1 min de lectura" data-en-aria-label="1 min read"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>1 min</span>
   </span>
 </button></div>
   </main>
@@ -901,14 +908,14 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     <span class="tag"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h13v16H6a2 2 0 0 1-2-2z"/><path d="M17 8h3v10a2 2 0 0 1-2 2"/><path d="M8 8h5M8 12h5M8 16h3"/></svg><span class="l-es">Noticia</span><span class="l-en">News</span></span>
     
     
-    <span class="tag done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="l-es">Leída</span><span class="l-en">Read</span></span>
   </span>
+  <span class="done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="vh"><span class="l-es">Leída</span><span class="l-en">Read</span></span></span>
   <h3><span class="l-es">REA y la ola de ingeniería inversa con IA: de descompilar juegos a clonar Photoshop</span><span class="l-en">REA and the wave of AI reverse engineering: from decompiling games to cloning Photoshop</span></h3>
   
   <span class="src">Matthew Berman, AI Explained +4</span>
   <span class="stats">
-    <span class="meter" aria-label="Intensidad del debate: 5 de 5" data-en-aria-label="Debate intensity: 5 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>
-    <span>2 min</span>
+    <span aria-label="1627 comentarios" data-en-aria-label="1627 comments"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>1627</span>
+    <span aria-label="2 min de lectura" data-en-aria-label="2 min read"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>2 min</span>
   </span>
 </button></div>
   </main>
@@ -926,7 +933,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     <label class="search"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input type="search" placeholder="Buscar: empresa, modelo, tema…" data-en-placeholder="Search: company, model, topic…" data-search aria-label="Buscar noticias" data-en-aria-label="Search stories"></label>
     <nav class="filters" aria-label="Filtrar por tipo" data-en-aria-label="Filter by type" role="group" data-filter="type">
       <button class="chip" type="button" data-value="" aria-pressed="true"><span class="l-es">Todos</span><span class="l-en">All</span></button>
-      <button class="chip t-debate" type="button" data-value="debate" aria-pressed="false"><span class="chip-dot"></span><span class="l-es">En debate</span><span class="l-en">Debates</span> <span class="n">4</span></button><button class="chip t-polemica" type="button" data-value="polemica" aria-pressed="false"><span class="chip-dot"></span><span class="l-es">Polémicas</span><span class="l-en">Controversies</span> <span class="n">2</span></button><button class="chip t-noticia" type="button" data-value="noticia" aria-pressed="false"><span class="chip-dot"></span><span class="l-es">Noticias</span><span class="l-en">News</span> <span class="n">1</span></button>
+      <button class="chip t-debate" type="button" data-value="debate" aria-pressed="false"><span class="chip-dot"></span><span class="l-es">Debates</span><span class="l-en">Debates</span> <span class="n">4</span></button><button class="chip t-polemica" type="button" data-value="polemica" aria-pressed="false"><span class="chip-dot"></span><span class="l-es">Polémicas</span><span class="l-en">Controversies</span> <span class="n">2</span></button><button class="chip t-noticia" type="button" data-value="noticia" aria-pressed="false"><span class="chip-dot"></span><span class="l-es">Noticias</span><span class="l-en">News</span> <span class="n">1</span></button>
     </nav>
     <nav class="filters" aria-label="Filtrar por día" data-en-aria-label="Filter by day" role="group" data-filter="day">
       <button class="chip" type="button" data-value="" aria-pressed="true"><span class="l-es">Toda la semana</span><span class="l-en">All week</span></button>
@@ -938,14 +945,14 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     <span class="tag"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h11a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M17 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-4-3h-3"/></svg><span class="l-es">Debate</span><span class="l-en">Debate</span></span>
     
     
-    <span class="tag done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="l-es">Leída</span><span class="l-en">Read</span></span>
   </span>
+  <span class="done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="vh"><span class="l-es">Leída</span><span class="l-en">Read</span></span></span>
   <h3><span class="l-es">¿Revolución o trucos formales? Los resultados matemáticos de OpenAI dividen a los expertos</span><span class="l-en">Revolution or formal tricks? OpenAI&#39;s mathematical results divide the experts</span></h3>
   
   <span class="src">AI Explained, Matthew Berman +5</span>
   <span class="stats">
-    <span class="meter" aria-label="Intensidad del debate: 5 de 5" data-en-aria-label="Debate intensity: 5 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>
-    <span>2 min</span>
+    <span aria-label="1286 comentarios" data-en-aria-label="1286 comments"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>1286</span>
+    <span aria-label="2 min de lectura" data-en-aria-label="2 min read"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>2 min</span>
   </span>
 </button><button class="tile t-polemica reveal" type="button" data-open="2026-10-15-03" data-type="polemica" data-day="2026-10-10"
   data-cat="empresas" data-text="los «agentes rebeldes» que hackean sistemas son fallos de seguridad básicos de los laboratorios, según expertos desde julio, openai, anthropic, meta y google han revelado incidentes en los que sus modelos accedieron sin permiso a sistemas ajenos. expertos en ciberseguridad consultados por cso sostienen que no son «agentes rebeldes», sino fallos de contención conocidos desde hace décadas. the “rogue agents” hacking systems are basic security failures by the labs, experts say since july, openai, anthropic, meta and google have disclosed incidents in which their models accessed other systems without permission. cybersecurity experts interviewed by cso argue these are not “rogue agents” but containment failures that have been understood for decades. openai hugging face anthropic meta google empresas companies" aria-haspopup="dialog">
@@ -953,14 +960,14 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     <span class="tag"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg><span class="l-es">Polémica</span><span class="l-en">Controversy</span></span>
     
     
-    <span class="tag done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="l-es">Leída</span><span class="l-en">Read</span></span>
   </span>
+  <span class="done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="vh"><span class="l-es">Leída</span><span class="l-en">Read</span></span></span>
   <h3><span class="l-es">Los «agentes rebeldes» que hackean sistemas son fallos de seguridad básicos de los laboratorios, según expertos</span><span class="l-en">The “rogue agents” hacking systems are basic security failures by the labs, experts say</span></h3>
   
   <span class="src">csoonline.com, Hacker News +2</span>
   <span class="stats">
-    <span class="meter" aria-label="Intensidad del debate: 5 de 5" data-en-aria-label="Debate intensity: 5 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>
-    <span>1 min</span>
+    <span aria-label="1181 comentarios" data-en-aria-label="1181 comments"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>1181</span>
+    <span aria-label="1 min de lectura" data-en-aria-label="1 min read"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>1 min</span>
   </span>
 </button><button class="tile t-noticia reveal" type="button" data-open="2026-10-15-04" data-type="noticia" data-day="2026-10-10"
   data-cat="herramientas" data-text="rea y la ola de ingeniería inversa con ia: de descompilar juegos a clonar photoshop rea («reverse-engineer anything»), una herramienta que conecta los agentes de programación con utilidades de ingeniería inversa, fue uno de los proyectos más comentados de la semana. llega en plena oleada de juegos descompilados y programas clonados con ia. rea and the wave of ai reverse engineering: from decompiling games to cloning photoshop rea (“reverse-engineer anything”), a tool that connects coding agents to reverse-engineering utilities, was one of the most talked-about projects of the week. it arrives in the middle of a wave of games decompiled and programs cloned with ai. rea photoshop adobe herramientas tools" aria-haspopup="dialog">
@@ -968,14 +975,14 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     <span class="tag"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h13v16H6a2 2 0 0 1-2-2z"/><path d="M17 8h3v10a2 2 0 0 1-2 2"/><path d="M8 8h5M8 12h5M8 16h3"/></svg><span class="l-es">Noticia</span><span class="l-en">News</span></span>
     
     
-    <span class="tag done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="l-es">Leída</span><span class="l-en">Read</span></span>
   </span>
+  <span class="done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="vh"><span class="l-es">Leída</span><span class="l-en">Read</span></span></span>
   <h3><span class="l-es">REA y la ola de ingeniería inversa con IA: de descompilar juegos a clonar Photoshop</span><span class="l-en">REA and the wave of AI reverse engineering: from decompiling games to cloning Photoshop</span></h3>
   
   <span class="src">Matthew Berman, AI Explained +4</span>
   <span class="stats">
-    <span class="meter" aria-label="Intensidad del debate: 5 de 5" data-en-aria-label="Debate intensity: 5 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>
-    <span>2 min</span>
+    <span aria-label="1627 comentarios" data-en-aria-label="1627 comments"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>1627</span>
+    <span aria-label="2 min de lectura" data-en-aria-label="2 min read"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>2 min</span>
   </span>
 </button><button class="tile t-debate reveal" type="button" data-open="2026-10-15-07" data-type="debate" data-day="2026-10-09"
   data-cat="modelos" data-text="los «modelos de decisión» ganan tracción, pero sus elecciones cambian según cómo se pregunte jev, de typesafe ai, y otros modelos que eligen entre opciones en lugar de generar texto prometen decisiones decenas o cientos de veces más baratas que un llm. un experimento con el dilema del tranvía muestra que su respuesta depende de la formulación. “decision models” gain traction, but their choices change depending on how you ask jev, from typesafe ai, and other models that pick between options instead of generating text promise decisions tens or hundreds of times cheaper than an llm. an experiment with the trolley problem shows that their answer depends on the wording. jev microsoft-decision-1 modelos models" aria-haspopup="dialog">
@@ -983,14 +990,14 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     <span class="tag"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h11a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M17 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-4-3h-3"/></svg><span class="l-es">Debate</span><span class="l-en">Debate</span></span>
     
     
-    <span class="tag done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="l-es">Leída</span><span class="l-en">Read</span></span>
   </span>
+  <span class="done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="vh"><span class="l-es">Leída</span><span class="l-en">Read</span></span></span>
   <h3><span class="l-es">Los «modelos de decisión» ganan tracción, pero sus elecciones cambian según cómo se pregunte</span><span class="l-en">“Decision models” gain traction, but their choices change depending on how you ask</span></h3>
   
   <span class="src">zachlandes.com, Hacker News +2</span>
   <span class="stats">
-    <span class="meter" aria-label="Intensidad del debate: 3 de 5" data-en-aria-label="Debate intensity: 3 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span>
-    <span>1 min</span>
+    <span aria-label="427 comentarios" data-en-aria-label="427 comments"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>427</span>
+    <span aria-label="1 min de lectura" data-en-aria-label="1 min read"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>1 min</span>
   </span>
 </button><button class="tile t-debate reveal" type="button" data-open="2026-10-15-09" data-type="debate" data-day="2026-10-09"
   data-cat="investigacion" data-text="¿se convertirá pensar en un hobby? el debate sobre la ia y el trabajo intelectual diomidis spinellis sostiene que la ia asumirá la mayor parte del trabajo cognitivo y que pensar acabará siendo un pasatiempo. otro ensayo muy leído replica que lo que se pierde es la comunidad intelectual que sostiene el pensamiento propio. will thinking become a hobby? the debate over ai and intellectual work diomidis spinellis argues that ai will take over most cognitive work and that thinking will end up as a pastime. another widely read essay replies that what is being lost is the intellectual community that sustains independent thought. diomidis spinellis investigación research" aria-haspopup="dialog">
@@ -998,14 +1005,14 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     <span class="tag"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h11a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M17 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-4-3h-3"/></svg><span class="l-es">Debate</span><span class="l-en">Debate</span></span>
     
     
-    <span class="tag done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="l-es">Leída</span><span class="l-en">Read</span></span>
   </span>
+  <span class="done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="vh"><span class="l-es">Leída</span><span class="l-en">Read</span></span></span>
   <h3><span class="l-es">¿Se convertirá pensar en un hobby? El debate sobre la IA y el trabajo intelectual</span><span class="l-en">Will thinking become a hobby? The debate over AI and intellectual work</span></h3>
   
   <span class="src">spinellis.gr, Hacker News +2</span>
   <span class="stats">
-    <span class="meter" aria-label="Intensidad del debate: 4 de 5" data-en-aria-label="Debate intensity: 4 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span>
-    <span>1 min</span>
+    <span aria-label="849 comentarios" data-en-aria-label="849 comments"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>849</span>
+    <span aria-label="1 min de lectura" data-en-aria-label="1 min read"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>1 min</span>
   </span>
 </button><button class="tile t-debate reveal" type="button" data-open="2026-10-15-11" data-type="debate" data-day="2026-10-11"
   data-cat="modelos" data-text="karpathy: crece la brecha entre lo que la gente cree que hace la ia y lo que realmente hace andrej karpathy advierte de que se amplía la distancia entre la percepción de la mayoría sobre la ia y la de quienes la usan a fondo. su mensaje abrió uno de los hilos más largos de la semana en hacker news, con más de 1.000 comentarios. karpathy: the gap between what people think ai does and what it really does is growing andrej karpathy warns that the distance between how most people perceive ai and how those who use it intensively see it is widening. his post started one of the longest threads of the week on hacker news, with more than 1,000 comments. andrej karpathy modelos models" aria-haspopup="dialog">
@@ -1013,14 +1020,14 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     <span class="tag"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h11a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M17 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-4-3h-3"/></svg><span class="l-es">Debate</span><span class="l-en">Debate</span></span>
     
     
-    <span class="tag done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="l-es">Leída</span><span class="l-en">Read</span></span>
   </span>
+  <span class="done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="vh"><span class="l-es">Leída</span><span class="l-en">Read</span></span></span>
   <h3><span class="l-es">Karpathy: crece la brecha entre lo que la gente cree que hace la IA y lo que realmente hace</span><span class="l-en">Karpathy: the gap between what people think AI does and what it really does is growing</span></h3>
   
   <span class="src">AI Explained, twitter.com +1</span>
   <span class="stats">
-    <span class="meter" aria-label="Intensidad del debate: 5 de 5" data-en-aria-label="Debate intensity: 5 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>
-    <span>1 min</span>
+    <span aria-label="1072 comentarios" data-en-aria-label="1072 comments"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>1072</span>
+    <span aria-label="1 min de lectura" data-en-aria-label="1 min read"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>1 min</span>
   </span>
 </button><button class="tile t-polemica reveal" type="button" data-open="2026-10-15-13" data-type="polemica" data-day="2026-10-10"
   data-cat="empresas" data-text="un modelo de anthropic envió una pista falsa a la policía sobre un asesinato sin resolver la policía de filadelfia investiga una pista falsa sobre un homicidio que publicó un modelo de anthropic durante una prueba automática en webs elegidas al azar. la ciudad califica de «inaceptable» que la empresa tardara dos meses en avisar. an anthropic model sent police a false tip about an unsolved murder philadelphia police are investigating a false tip about a homicide posted by an anthropic model during an automated test on randomly chosen websites. the city calls it “unacceptable” that the company took two months to report it. anthropic policía de filadelfia empresas companies" aria-haspopup="dialog">
@@ -1028,14 +1035,14 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     <span class="tag"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg><span class="l-es">Polémica</span><span class="l-en">Controversy</span></span>
     
     
-    <span class="tag done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="l-es">Leída</span><span class="l-en">Read</span></span>
   </span>
+  <span class="done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="vh"><span class="l-es">Leída</span><span class="l-en">Read</span></span></span>
   <h3><span class="l-es">Un modelo de Anthropic envió una pista falsa a la policía sobre un asesinato sin resolver</span><span class="l-en">An Anthropic model sent police a false tip about an unsolved murder</span></h3>
   
   <span class="src">AI Explained, nbcphiladelphia.com +1</span>
   <span class="stats">
-    <span class="meter" aria-label="Intensidad del debate: 2 de 5" data-en-aria-label="Debate intensity: 2 of 5"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span>
-    <span>1 min</span>
+    <span aria-label="157 comentarios" data-en-aria-label="157 comments"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>157</span>
+    <span aria-label="1 min de lectura" data-en-aria-label="1 min read"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>1 min</span>
   </span>
 </button></div>
     <p class="empty" data-no-results hidden><span class="l-es">No hay noticias que coincidan.</span><span class="l-en">No matching stories.</span></p>
@@ -1163,22 +1170,22 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     <div class="day-pane" data-pane="2026-10-09" data-label="Viernes, 9 de octubre" data-label-en="Friday, October 9" data-n="3"
       data-min="4" hidden>
       
-      <section class="t-debate" aria-label="En debate" data-en-aria-label="Debates">
-        <h2 class="sec"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h11a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M17 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-4-3h-3"/></svg><span class="l-es">En debate</span><span class="l-en">Debates</span><span class="count">3</span></h2>
+      <section class="t-debate" aria-label="Debates" data-en-aria-label="Debates">
+        <h2 class="sec"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h11a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M17 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-4-3h-3"/></svg><span class="l-es">Debates</span><span class="l-en">Debates</span><span class="count">3</span></h2>
         <div class="grid"><button class="tile t-debate reveal" type="button" data-open="2026-10-15-02" data-type="debate" data-day="2026-10-09"
   data-cat="investigacion" data-text="¿revolución o trucos formales? los resultados matemáticos de openai dividen a los expertos openai publicó cientos de resultados matemáticos de un modelo interno, entre ellos una prueba de 199 páginas de la cuasi hipótesis de riemann. para algunos es el día más importante de la historia de las matemáticas; para varios especialistas, muchos son trucos sin utilidad o textos imposibles de revisar. revolution or formal tricks? openai&#39;s mathematical results divide the experts openai published hundreds of mathematical results from an internal model, including a 199-page proof of the quasi-riemann hypothesis. for some it is the most important day in the history of mathematics; for several specialists, many are useless tricks or papers that are impossible to review. openai terence tao ben recht investigación research" aria-haspopup="dialog">
   <span class="tags">
     <span class="tag"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h11a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M17 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-4-3h-3"/></svg><span class="l-es">Debate</span><span class="l-en">Debate</span></span>
     
     
-    <span class="tag done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="l-es">Leída</span><span class="l-en">Read</span></span>
   </span>
+  <span class="done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="vh"><span class="l-es">Leída</span><span class="l-en">Read</span></span></span>
   <h3><span class="l-es">¿Revolución o trucos formales? Los resultados matemáticos de OpenAI dividen a los expertos</span><span class="l-en">Revolution or formal tricks? OpenAI&#39;s mathematical results divide the experts</span></h3>
   
   <span class="src">AI Explained, Matthew Berman +5</span>
   <span class="stats">
-    <span class="meter" aria-label="Intensidad del debate: 5 de 5" data-en-aria-label="Debate intensity: 5 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>
-    <span>2 min</span>
+    <span aria-label="1286 comentarios" data-en-aria-label="1286 comments"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>1286</span>
+    <span aria-label="2 min de lectura" data-en-aria-label="2 min read"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>2 min</span>
   </span>
 </button><button class="tile t-debate reveal" type="button" data-open="2026-10-15-07" data-type="debate" data-day="2026-10-09"
   data-cat="modelos" data-text="los «modelos de decisión» ganan tracción, pero sus elecciones cambian según cómo se pregunte jev, de typesafe ai, y otros modelos que eligen entre opciones en lugar de generar texto prometen decisiones decenas o cientos de veces más baratas que un llm. un experimento con el dilema del tranvía muestra que su respuesta depende de la formulación. “decision models” gain traction, but their choices change depending on how you ask jev, from typesafe ai, and other models that pick between options instead of generating text promise decisions tens or hundreds of times cheaper than an llm. an experiment with the trolley problem shows that their answer depends on the wording. jev microsoft-decision-1 modelos models" aria-haspopup="dialog">
@@ -1186,14 +1193,14 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     <span class="tag"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h11a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M17 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-4-3h-3"/></svg><span class="l-es">Debate</span><span class="l-en">Debate</span></span>
     
     
-    <span class="tag done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="l-es">Leída</span><span class="l-en">Read</span></span>
   </span>
+  <span class="done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="vh"><span class="l-es">Leída</span><span class="l-en">Read</span></span></span>
   <h3><span class="l-es">Los «modelos de decisión» ganan tracción, pero sus elecciones cambian según cómo se pregunte</span><span class="l-en">“Decision models” gain traction, but their choices change depending on how you ask</span></h3>
   
   <span class="src">zachlandes.com, Hacker News +2</span>
   <span class="stats">
-    <span class="meter" aria-label="Intensidad del debate: 3 de 5" data-en-aria-label="Debate intensity: 3 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span>
-    <span>1 min</span>
+    <span aria-label="427 comentarios" data-en-aria-label="427 comments"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>427</span>
+    <span aria-label="1 min de lectura" data-en-aria-label="1 min read"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>1 min</span>
   </span>
 </button><button class="tile t-debate reveal" type="button" data-open="2026-10-15-09" data-type="debate" data-day="2026-10-09"
   data-cat="investigacion" data-text="¿se convertirá pensar en un hobby? el debate sobre la ia y el trabajo intelectual diomidis spinellis sostiene que la ia asumirá la mayor parte del trabajo cognitivo y que pensar acabará siendo un pasatiempo. otro ensayo muy leído replica que lo que se pierde es la comunidad intelectual que sostiene el pensamiento propio. will thinking become a hobby? the debate over ai and intellectual work diomidis spinellis argues that ai will take over most cognitive work and that thinking will end up as a pastime. another widely read essay replies that what is being lost is the intellectual community that sustains independent thought. diomidis spinellis investigación research" aria-haspopup="dialog">
@@ -1201,14 +1208,14 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     <span class="tag"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h11a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M17 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-4-3h-3"/></svg><span class="l-es">Debate</span><span class="l-en">Debate</span></span>
     
     
-    <span class="tag done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="l-es">Leída</span><span class="l-en">Read</span></span>
   </span>
+  <span class="done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="vh"><span class="l-es">Leída</span><span class="l-en">Read</span></span></span>
   <h3><span class="l-es">¿Se convertirá pensar en un hobby? El debate sobre la IA y el trabajo intelectual</span><span class="l-en">Will thinking become a hobby? The debate over AI and intellectual work</span></h3>
   
   <span class="src">spinellis.gr, Hacker News +2</span>
   <span class="stats">
-    <span class="meter" aria-label="Intensidad del debate: 4 de 5" data-en-aria-label="Debate intensity: 4 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span>
-    <span>1 min</span>
+    <span aria-label="849 comentarios" data-en-aria-label="849 comments"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>849</span>
+    <span aria-label="1 min de lectura" data-en-aria-label="1 min read"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>1 min</span>
   </span>
 </button></div>
       </section>
@@ -1226,14 +1233,14 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     <span class="tag"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg><span class="l-es">Polémica</span><span class="l-en">Controversy</span></span>
     
     
-    <span class="tag done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="l-es">Leída</span><span class="l-en">Read</span></span>
   </span>
+  <span class="done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="vh"><span class="l-es">Leída</span><span class="l-en">Read</span></span></span>
   <h3><span class="l-es">Los «agentes rebeldes» que hackean sistemas son fallos de seguridad básicos de los laboratorios, según expertos</span><span class="l-en">The “rogue agents” hacking systems are basic security failures by the labs, experts say</span></h3>
   
   <span class="src">csoonline.com, Hacker News +2</span>
   <span class="stats">
-    <span class="meter" aria-label="Intensidad del debate: 5 de 5" data-en-aria-label="Debate intensity: 5 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>
-    <span>1 min</span>
+    <span aria-label="1181 comentarios" data-en-aria-label="1181 comments"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>1181</span>
+    <span aria-label="1 min de lectura" data-en-aria-label="1 min read"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>1 min</span>
   </span>
 </button><button class="tile t-polemica reveal" type="button" data-open="2026-10-15-13" data-type="polemica" data-day="2026-10-10"
   data-cat="empresas" data-text="un modelo de anthropic envió una pista falsa a la policía sobre un asesinato sin resolver la policía de filadelfia investiga una pista falsa sobre un homicidio que publicó un modelo de anthropic durante una prueba automática en webs elegidas al azar. la ciudad califica de «inaceptable» que la empresa tardara dos meses en avisar. an anthropic model sent police a false tip about an unsolved murder philadelphia police are investigating a false tip about a homicide posted by an anthropic model during an automated test on randomly chosen websites. the city calls it “unacceptable” that the company took two months to report it. anthropic policía de filadelfia empresas companies" aria-haspopup="dialog">
@@ -1241,14 +1248,14 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     <span class="tag"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg><span class="l-es">Polémica</span><span class="l-en">Controversy</span></span>
     
     
-    <span class="tag done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="l-es">Leída</span><span class="l-en">Read</span></span>
   </span>
+  <span class="done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="vh"><span class="l-es">Leída</span><span class="l-en">Read</span></span></span>
   <h3><span class="l-es">Un modelo de Anthropic envió una pista falsa a la policía sobre un asesinato sin resolver</span><span class="l-en">An Anthropic model sent police a false tip about an unsolved murder</span></h3>
   
   <span class="src">AI Explained, nbcphiladelphia.com +1</span>
   <span class="stats">
-    <span class="meter" aria-label="Intensidad del debate: 2 de 5" data-en-aria-label="Debate intensity: 2 of 5"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span>
-    <span>1 min</span>
+    <span aria-label="157 comentarios" data-en-aria-label="157 comments"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>157</span>
+    <span aria-label="1 min de lectura" data-en-aria-label="1 min read"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>1 min</span>
   </span>
 </button></div>
       </section>
@@ -1261,14 +1268,14 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     <span class="tag"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h13v16H6a2 2 0 0 1-2-2z"/><path d="M17 8h3v10a2 2 0 0 1-2 2"/><path d="M8 8h5M8 12h5M8 16h3"/></svg><span class="l-es">Noticia</span><span class="l-en">News</span></span>
     
     
-    <span class="tag done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="l-es">Leída</span><span class="l-en">Read</span></span>
   </span>
+  <span class="done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="vh"><span class="l-es">Leída</span><span class="l-en">Read</span></span></span>
   <h3><span class="l-es">REA y la ola de ingeniería inversa con IA: de descompilar juegos a clonar Photoshop</span><span class="l-en">REA and the wave of AI reverse engineering: from decompiling games to cloning Photoshop</span></h3>
   
   <span class="src">Matthew Berman, AI Explained +4</span>
   <span class="stats">
-    <span class="meter" aria-label="Intensidad del debate: 5 de 5" data-en-aria-label="Debate intensity: 5 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>
-    <span>2 min</span>
+    <span aria-label="1627 comentarios" data-en-aria-label="1627 comments"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>1627</span>
+    <span aria-label="2 min de lectura" data-en-aria-label="2 min read"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>2 min</span>
   </span>
 </button></div>
       </section>
@@ -1278,22 +1285,22 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     <div class="day-pane" data-pane="2026-10-11" data-label="Domingo, 11 de octubre" data-label-en="Sunday, October 11" data-n="1"
       data-min="1">
       
-      <section class="t-debate" aria-label="En debate" data-en-aria-label="Debates">
-        <h2 class="sec"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h11a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M17 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-4-3h-3"/></svg><span class="l-es">En debate</span><span class="l-en">Debates</span><span class="count">1</span></h2>
+      <section class="t-debate" aria-label="Debates" data-en-aria-label="Debates">
+        <h2 class="sec"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h11a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M17 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-4-3h-3"/></svg><span class="l-es">Debates</span><span class="l-en">Debates</span><span class="count">1</span></h2>
         <div class="grid"><button class="tile t-debate reveal" type="button" data-open="2026-10-15-11" data-type="debate" data-day="2026-10-11"
   data-cat="modelos" data-text="karpathy: crece la brecha entre lo que la gente cree que hace la ia y lo que realmente hace andrej karpathy advierte de que se amplía la distancia entre la percepción de la mayoría sobre la ia y la de quienes la usan a fondo. su mensaje abrió uno de los hilos más largos de la semana en hacker news, con más de 1.000 comentarios. karpathy: the gap between what people think ai does and what it really does is growing andrej karpathy warns that the distance between how most people perceive ai and how those who use it intensively see it is widening. his post started one of the longest threads of the week on hacker news, with more than 1,000 comments. andrej karpathy modelos models" aria-haspopup="dialog">
   <span class="tags">
     <span class="tag"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h11a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M17 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-4-3h-3"/></svg><span class="l-es">Debate</span><span class="l-en">Debate</span></span>
     
     
-    <span class="tag done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="l-es">Leída</span><span class="l-en">Read</span></span>
   </span>
+  <span class="done"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="vh"><span class="l-es">Leída</span><span class="l-en">Read</span></span></span>
   <h3><span class="l-es">Karpathy: crece la brecha entre lo que la gente cree que hace la IA y lo que realmente hace</span><span class="l-en">Karpathy: the gap between what people think AI does and what it really does is growing</span></h3>
   
   <span class="src">AI Explained, twitter.com +1</span>
   <span class="stats">
-    <span class="meter" aria-label="Intensidad del debate: 5 de 5" data-en-aria-label="Debate intensity: 5 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>
-    <span>1 min</span>
+    <span aria-label="1072 comentarios" data-en-aria-label="1072 comments"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>1072</span>
+    <span aria-label="1 min de lectura" data-en-aria-label="1 min read"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>1 min</span>
   </span>
 </button></div>
       </section>
@@ -1307,7 +1314,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
   
   <p><span class="l-es">Cobertura de X parcial: el debate en X llega a través de vídeos de YouTube, Hacker News y medios.</span><span class="l-en">Partial coverage of X: the debate on X arrives through YouTube videos, Hacker News and the press.</span></p>
   <p><span class="l-es">Resúmenes generados con IA a partir de 0 fuentes; pueden contener errores. Cada noticia enlaza a su fuente original.</span><span class="l-en">Summaries written with AI from 0 sources; they may contain errors. Every story links to its original sources.</span></p>
-  <p><span class="l-es">Actualizado el 19/10/2026 a las 20:09. Se actualiza cada mañana.</span><span class="l-en">Updated on 19/10/2026 a las 20:09. Updated every morning.</span></p>
+  <p><span class="l-es">Actualizado el 19/10/2026 a las 22:01. Se actualiza cada mañana.</span><span class="l-en">Updated on 19/10/2026 a las 22:01. Updated every morning.</span></p>
 </footer>
 
 
@@ -1324,10 +1331,12 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
       <dt><span class="tag official"><span class="l-es">Fuente oficial</span><span class="l-en">Official source</span></span></dt><dd><span class="l-es">El anuncio viene de la propia empresa o laboratorio.</span><span class="l-en">The announcement comes from the company or lab itself.</span></dd>
       <dt><span class="tag partial"><span class="l-es">Resumen parcial</span><span class="l-en">Partial summary</span></span></dt><dd><span class="l-es">El vídeo no tenía subtítulos y el resumen se basa solo en su título y descripción.</span><span class="l-en">The video had no captions, so the summary relies only on its title and description.</span></dd>
     </dl>
-    <h4><span class="l-es">Intensidad del debate</span><span class="l-en">Debate intensity</span></h4>
+    <h4><span class="l-es">En cada tarjeta</span><span class="l-en">On each card</span></h4>
     <dl>
-      <dt><span class="meter" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span></dt>
-      <dd><span class="l-es">Las barras resumen los comentarios en Hacker News y YouTube: una a partir de 20, dos desde 80, tres desde 200, cuatro desde 500 y cinco desde 1.000. En «El pulso de la semana», el tamaño del punto dice lo mismo.</span><span class="l-en">The bars summarise comments on Hacker News and YouTube: one from 20, two from 80, three from 200, four from 500 and five from 1,000. In “The week&#39;s pulse”, the size of each dot says the same.</span></dd>
+      <dt><span class="tag t-noticia"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>86</span></dt>
+      <dd><span class="l-es">Comentarios sobre la noticia en Hacker News y YouTube: cuantos más, más se está debatiendo. En «El pulso de la semana», el tamaño del punto dice lo mismo.</span><span class="l-en">Comments on the story on Hacker News and YouTube: the more there are, the more it is being debated. In “The week&#39;s pulse”, the size of each dot says the same.</span></dd>
+      <dt><span class="tag t-noticia"><span class="done-demo"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></span></dt>
+      <dd><span class="l-es">Ya la has leído en este dispositivo.</span><span class="l-en">You have already read it on this device.</span></dd>
     </dl>
     <h4><span class="l-es">Cómo se eligen</span><span class="l-en">How they are chosen</span></h4>
     <p class="note"><span class="l-es">Se puntúa cuántas fuentes distintas cuentan la noticia, cuánto se discute, lo reciente que es y su tipo (los avances y las polémicas pesan algo más). Se reparten entre los días y los tipos cuando la semana da para ello, y nunca se rellena con temas flojos. Los resúmenes salen solo de las fuentes enlazadas.</span><span class="l-en">Each story is scored on how many different sources cover it, how much it is discussed, how recent it is and its type (releases and controversies weigh a little more). Stories are spread across days and types when the week allows it, and gaps are never filled with weak topics. Summaries are based only on the linked sources.</span></p>
@@ -1866,7 +1875,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 
   // ---------- Progreso de lectura ----------
   const paintRead = () => {
-    $$("[data-open]").forEach(el => el.classList.toggle("read", read.has(el.dataset.open)));
+    $$(".tile[data-open]").forEach(el => el.classList.toggle("read", read.has(el.dataset.open)));
     const n = ALL.filter(id => read.has(id)).length;
     $$("[data-read-count]").forEach(el => {
       el.textContent = n === 0 ? L("Aún no has abierto ninguna", "You haven't opened any yet")
