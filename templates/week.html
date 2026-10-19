@@ -217,10 +217,45 @@ dialog.sheet.closing::backdrop { animation: fade-out .22s ease-in forwards; }
 .help dt { margin-top: 12px; }
 .help dd { margin: 4px 0 0; color: var(--label-2); font-size: 15px; }
 .help .note { font-size: 15px; color: var(--label-2); margin: 4px 0 0; }
-.toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translate(-50%, 20px); opacity: 0;
+/* El aviso va en la capa superior (popover) para verse también encima de la hoja y del menú de compartir */
+.toast { position: fixed; inset: auto auto calc(24px + env(safe-area-inset-bottom)) 50%; margin: 0; border: 0; overflow: visible;
+  max-width: calc(100vw - 32px); transform: translate(-50%, 20px); opacity: 0;
   background: var(--label); color: var(--bg); font-size: 15px; font-weight: 600; padding: 10px 16px; border-radius: 22px; z-index: 50;
-  transition: opacity .2s ease, transform .25s cubic-bezier(.2,.8,.2,1); pointer-events: none; }
+  transition: opacity .2s ease, transform .25s cubic-bezier(.2,.8,.2,1); pointer-events: none; text-align: center; }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* ---------- Compartir ---------- */
+dialog.share-menu {
+  border: 0; padding: 18px 16px calc(12px + env(safe-area-inset-bottom)); margin: auto auto 0; width: 100%; max-width: 480px;
+  max-height: 92dvh; overflow-y: auto; background: var(--sheet); color: var(--label); border-radius: 20px 20px 0 0;
+  box-shadow: 0 -10px 40px rgba(0,0,0,.18);
+}
+@media (min-width: 760px) { dialog.share-menu { margin: auto; border-radius: 22px; padding-bottom: 14px; } }
+dialog.share-menu::backdrop { background: var(--scrim); }
+dialog.share-menu[open] { animation: sheet-in .3s cubic-bezier(.2,.8,.2,1); }
+.sm-preview { display: flex; gap: 12px; align-items: center; }
+.sm-preview img { width: 96px; height: auto; aspect-ratio: 1200 / 630; border-radius: 10px; flex: none; object-fit: cover; background: var(--fill); }
+.sm-preview > div { min-width: 0; }
+.sm-k { margin: 0; font-size: 13px; font-weight: 600; color: var(--label-3); }
+.sm-preview h3 { margin: 2px 0 0; font-size: 16px; line-height: 1.3; font-weight: 600;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.sm-url { margin: 2px 0 0; font-size: 12px; color: var(--label-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sm-apps { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; margin-top: 18px; }
+@media (max-width: 400px) { .sm-apps { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 10px; } }
+.sm-app { display: flex; flex-direction: column; align-items: center; gap: 6px; min-height: 44px; padding: 4px 0; border: 0; background: none;
+  font-size: 12px; color: var(--label-2); cursor: pointer; text-decoration: none !important; -webkit-tap-highlight-color: transparent; }
+.sm-ic { width: 52px; height: 52px; border-radius: 14px; background: var(--bc); color: #fff; display: grid; place-items: center; }
+.sm-ic .icon { font-size: 26px; }
+.sm-app:active .sm-ic { transform: scale(.94); }
+.sm-app:focus-visible { outline: none; } .sm-app:focus-visible .sm-ic { box-shadow: 0 0 0 3px var(--sheet), 0 0 0 5px var(--accent); }
+.sm-list { margin-top: 18px; border-radius: 12px; background: var(--fill); overflow: hidden; }
+.sm-list > * { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 0 14px; border: 0; background: none;
+  font-size: 16px; color: var(--label); cursor: pointer; text-align: left; text-decoration: none !important; }
+.sm-list > * + * { border-top: 0.5px solid var(--separator); }
+.sm-list .icon { font-size: 19px; color: var(--accent); }
+.sm-list > :active { background: var(--fill); }
+.sm-cancel { display: block; width: 100%; min-height: 48px; margin-top: 10px; border: 0; border-radius: 12px; background: var(--fill);
+  font-size: 16px; font-weight: 600; color: var(--accent); cursor: pointer; }
 
 /* ---------- Movimiento ---------- */
 @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
@@ -474,6 +509,13 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 {%- elif t == "next" -%}<path d="M9 5l7 7-7 7"/>
 {%- elif t == "close" -%}<path d="M6 6l12 12M18 6L6 18"/>
 {%- elif t == "share" -%}<path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>
+{%- elif t == "whatsapp" -%}<path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"/><path d="M9.2 8.6c.1 2.6 3.2 5.8 6 6.1l1.1-1.4-1.9-.9-.8.8c-1-.4-2-1.4-2.4-2.4l.8-.8-.9-1.9z" fill="currentColor" stroke-width="1"/>
+{%- elif t == "instagram" -%}<rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.2 6.8h.01" stroke-width="2.6"/>
+{%- elif t == "telegram" -%}<path d="M21 4L3 11l6 2.2L19 7l-8 7.5V20l3.2-3.6L18 19z"/>
+{%- elif t == "linkedin" -%}<path d="M7 10v7M7 7h.01" stroke-width="2.4"/><path d="M11 17v-7M11 13a3 3 0 0 1 6 0v4"/>
+{%- elif t == "x" -%}<path d="M5 4l14 16M19 4L5 20"/>
+{%- elif t == "mail" -%}<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M4 7l8 6 8-6"/>
+{%- elif t == "link" -%}<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>
 {%- elif t == "check" -%}<path d="M5 12.5l4.5 4.5L19 7.5"/>
 {%- elif t == "info" -%}<circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/>
 {%- elif t == "search" -%}<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>
@@ -702,14 +744,14 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
   {% if failed_sources %}<p class="warn">{{ t("Fuentes no disponibles:", "Sources unavailable:") }} {{ failed_sources | join(", ") }}.</p>{% endif %}
   <p>{{ t("Cobertura de X parcial: el debate en X llega a través de vídeos de YouTube, Hacker News y medios.", "Partial coverage of X: the debate on X arrives through YouTube videos, Hacker News and the press.") }}</p>
   <p>{{ t("Resúmenes generados con IA a partir de " ~ stats.get("items", 0) ~ " fuentes; pueden contener errores. Cada noticia enlaza a su fuente original.", "Summaries written with AI from " ~ stats.get("items", 0) ~ " sources; they may contain errors. Every story links to its original sources.") }}</p>
-  <p>{{ t("Generado el " ~ generated ~ ".", "Generated on " ~ generated ~ ".") }}</p>
+  <p>{{ t("Actualizado el " ~ generated ~ ". Se actualiza cada mañana.", "Updated on " ~ generated ~ ". Updated every morning.") }}</p>
 </footer>
 
 {# Guía: qué significa cada etiqueta #}
 <template id="d-help">
   <div class="help">
     <h2 id="sheet-title">{{ t("Cómo leer esta página", "How to read this page") }}</h2>
-    <p class="lead">{{ t("Cada semana se eligen entre 12 y 15 noticias de IA según cuánta conversación real generan, no según lo que sale primero en un buscador. La vista día a día las muestra el día en que surgieron.", "Every week, 12 to 15 AI stories are picked by how much real conversation they generate, not by what ranks first on a search engine. The day-by-day view shows them on the day they broke.") }}</p>
+    <p class="lead">{{ t("Cada mañana se añaden las noticias de IA del día anterior que más conversación real generan, no lo que sale primero en un buscador. La página muestra siempre los 7 últimos días; la vista día a día las coloca el día en que surgieron.", "Every morning, the previous day’s AI stories that generate the most real conversation are added, not what ranks first on a search engine. The page always shows the last 7 days; the day-by-day view places each story on the day it broke.") }}</p>
     <h4>{{ t("Tipos", "Types") }}</h4>
     <dl>
       {% for tp, label, desc, items in types %}<dt class="t-{{ tp }}"><span class="tag">{{ icon(tp) }}{{ t(type_singular[tp], type_singular_en[tp]) }}</span></dt><dd>{{ t(desc, type_desc_en[tp]) }}.</dd>{% endfor %}
@@ -753,7 +795,8 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 
 {# Detalle de cada noticia: se copia a la hoja al abrirla #}
 {% for s in ranked %}
-<template id="d-{{ s.id }}">
+<template id="d-{{ s.id }}" data-h="{{ s.headline }}" data-h-en="{{ en(s, 'headline') }}"
+  data-c="{{ s.summary_short | first_sentence }}" data-c-en="{{ en(s, 'summary_short') | first_sentence }}"{% if s.unconfirmed %} data-unconfirmed{% endif %}>
   <div class="tags">
     <span class="tag t-{{ s.type }}">{{ icon(s.type) }}{{ t(type_singular[s.type], type_singular_en[s.type]) }}</span>
     <span class="tag t-noticia">{{ t(category_labels[s.category], category_labels_en[s.category]) }}</span>
@@ -808,7 +851,29 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     <button class="nav-btn" type="button" data-step="1">{{ t("Siguiente", "Next") }}{{ icon("next") }}</button>
   </nav>
 </dialog>
-<div class="toast" id="toast" role="status"></div>
+
+{# Compartir una noticia: se abre encima de la hoja. Muestra cómo se verá el enlace y una fila por app #}
+<dialog class="share-menu" id="share-menu" aria-labelledby="share-title">
+  <div class="sm-preview">
+    <img id="share-img" alt="" width="1200" height="630" hidden>
+    <div><p class="sm-k">{{ t("Compartir noticia", "Share story") }}</p><h3 id="share-title"></h3><p class="sm-url" id="share-url"></p></div>
+  </div>
+  <div class="sm-apps">
+    <a class="sm-app" data-to="whatsapp" target="_blank" rel="noopener"><span class="sm-ic" style="--bc:#25d366">{{ icon("whatsapp") }}</span>WhatsApp</a>
+    <button class="sm-app" type="button" data-to="instagram"><span class="sm-ic" style="--bc:#e1306c">{{ icon("instagram") }}</span>Instagram</button>
+    <a class="sm-app" data-to="telegram" target="_blank" rel="noopener"><span class="sm-ic" style="--bc:#2aabee">{{ icon("telegram") }}</span>Telegram</a>
+    <a class="sm-app" data-to="linkedin" target="_blank" rel="noopener"><span class="sm-ic" style="--bc:#0a66c2">{{ icon("linkedin") }}</span>LinkedIn</a>
+    <a class="sm-app" data-to="x" target="_blank" rel="noopener"><span class="sm-ic" style="--bc:#000">{{ icon("x") }}</span>X</a>
+    <a class="sm-app" data-to="email"><span class="sm-ic" style="--bc:#8e8e93">{{ icon("mail") }}</span>{{ t("Correo", "Email") }}</a>
+  </div>
+  <div class="sm-list">
+    <button type="button" data-to="copy">{{ icon("link") }}<span>{{ t("Copiar enlace", "Copy link") }}</span></button>
+    <a data-to="image" download>{{ icon("download") }}<span>{{ t("Descargar imagen para Instagram", "Download image for Instagram") }}</span></a>
+    <button type="button" data-to="native" hidden>{{ icon("dots") }}<span>{{ t("Más apps…", "More apps…") }}</span></button>
+  </div>
+  <button class="sm-cancel" type="button">{{ t("Cancelar", "Cancel") }}</button>
+</dialog>
+<div class="toast" id="toast" role="status" popover="manual"></div>
 
 <script>
 // Entrada: contador animado y salida al tocar; se puede volver a ver tocando el logo de la cabecera.
@@ -1130,7 +1195,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
   addEventListener("keydown", e => {
     if (e.target.closest && e.target.closest("input")) return;
     const d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
-    if (!d) return;
+    if (!d || document.getElementById("share-menu").open) return;
     if (sheet.open) step(d);
     else if (current === "day") stepDay(d);
   });
@@ -1145,24 +1210,108 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     }
   });
 
-  // Compartir: menú del sistema si existe; si no, copiar el enlace a la noticia
+  // Aviso breve. Va en la capa superior (popover) para que se vea encima de las hojas abiertas
   const toast = document.getElementById("toast");
-  const say = msg => {
-    toast.textContent = msg; toast.classList.add("show");
-    clearTimeout(say.t); say.t = setTimeout(() => toast.classList.remove("show"), 1800);
+  const say = (msg, ms = 2200) => {
+    toast.textContent = msg;
+    if (toast.showPopover) { try { toast.hidePopover(); } catch {} toast.showPopover(); }
+    else [...document.querySelectorAll("dialog[open]")].concat(document.body).shift().append(toast);
+    requestAnimationFrame(() => toast.classList.add("show"));
+    clearTimeout(say.t); say.t = setTimeout(() => toast.classList.remove("show"), ms);
   };
-  shareBtn.addEventListener("click", async () => {
-    const url = location.href.split("#")[0] + "#n=" + currentId;
-    const heading = body.querySelector("h2")?.textContent || document.title;
-    const text = body.querySelector(".lead")?.textContent || "";
-    try {
-      if (navigator.share) { await navigator.share({ title: heading, text, url }); return; }
-      await navigator.clipboard.writeText(`${heading}\n${url}`);
-      say(L("Enlace copiado", "Link copied"));
-    } catch (err) {
-      if (err && err.name !== "AbortError") say(L("No se pudo compartir", "Couldn't share"));
+
+  // ---------- Compartir una noticia ----------
+  // Cada noticia tiene su página (noticias/<id>.html) con su titular e imagen, para que WhatsApp, LinkedIn o
+  // Telegram muestren esa noticia y no la edición entera. Instagram no acepta enlaces desde la web: se comparte
+  // la imagen cuadrada de la noticia (en el móvil, con la hoja del sistema; en el ordenador, se descarga).
+  const SITE = {{ site_url | tojson }};
+  const menu = document.getElementById("share-menu");
+  const shareImg = document.getElementById("share-img");
+  const nativeBtn = menu.querySelector("[data-to='native']");
+  nativeBtn.hidden = !navigator.share;
+  let shared = null;
+  const enc = encodeURIComponent;
+  const storyShare = id => {
+    const tpl = document.getElementById("d-" + id);
+    const headline = L(tpl.dataset.h, tpl.dataset.hEn);
+    const context = L(tpl.dataset.c, tpl.dataset.cEn);
+    const flag = tpl.hasAttribute("data-unconfirmed") ? L("Sin confirmar. ", "Unconfirmed. ") : "";
+    return { id, headline, text: `${headline}\n${flag}${context}`,
+             url: new URL(`noticias/${id}.html`, SITE || location.href).href,
+             image: new URL(`instagram/${id}.png`, location.href).href, file: null };
+  };
+  const copyText = async str => {
+    try { await navigator.clipboard.writeText(str); return true; } catch {}
+    const ta = Object.assign(document.createElement("textarea"), { value: str });  // http o file://
+    ta.setAttribute("readonly", ""); ta.style.cssText = "position:fixed;opacity:0";
+    menu.append(ta); ta.select();
+    let ok = false; try { ok = document.execCommand("copy"); } catch {}
+    ta.remove(); return ok;
+  };
+  const openShare = id => {
+    shared = storyShare(id);
+    const { headline, text, url } = shared;
+    document.getElementById("share-title").textContent = headline;
+    document.getElementById("share-url").textContent = url.replace(/^https?:\/\//, "");
+    shareImg.hidden = true;
+    shareImg.onload = () => { shareImg.hidden = false; };
+    shareImg.src = `og/noticias/${id}.png`;
+    const links = {
+      whatsapp: `https://wa.me/?text=${enc(text + "\n" + url)}`,
+      telegram: `https://t.me/share/url?url=${enc(url)}&text=${enc(text)}`,
+      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${enc(url)}`,
+      x: `https://x.com/intent/post?text=${enc(headline)}&url=${enc(url)}`,
+      email: `mailto:?subject=${enc(headline)}&body=${enc(text + "\n\n" + url)}`,
+    };
+    Object.entries(links).forEach(([k, href]) => { menu.querySelector(`[data-to='${k}']`).href = href; });
+    const img = menu.querySelector("[data-to='image']");
+    img.href = shared.image; img.download = `ai-news-${id}.png`;
+    // La imagen se prepara ya: el móvil solo deja abrir la hoja del sistema justo al tocar, sin esperas
+    const mine = shared;
+    fetch(mine.image).then(r => r.ok ? r.blob() : null).then(b => {
+      if (b) mine.file = new File([b], `ai-news-${id}.png`, { type: "image/png" });
+    }).catch(() => {});
+    menu.showModal();
+  };
+  const closeShare = () => { if (menu.open) menu.close(); };
+  menu.addEventListener("click", async e => {
+    if (e.target === menu) return closeShare();  // pulsar fuera
+    const el = e.target.closest("[data-to], .sm-cancel");
+    if (!el || !shared) return;
+    if (el.classList.contains("sm-cancel")) return closeShare();
+    const to = el.dataset.to;
+    if (to === "copy") {
+      say(await copyText(shared.url) ? L("Enlace copiado", "Link copied") : L("No se pudo copiar el enlace", "Couldn't copy the link"));
+      return closeShare();
     }
+    if (to === "native") {
+      e.preventDefault();
+      try { await navigator.share({ title: shared.headline, text: shared.text, url: shared.url }); closeShare(); }
+      catch (err) { if (err.name !== "AbortError") say(L("No se pudo compartir", "Couldn't share")); }
+      return;
+    }
+    if (to === "instagram") {
+      const { file, text } = shared;
+      if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+        try { await navigator.share({ files: [file], text }); closeShare(); }
+        catch (err) { if (err.name !== "AbortError") say(L("No se pudo compartir", "Couldn't share")); }
+        return;
+      }
+      // Sin hoja del sistema para imágenes (ordenador): se descarga la imagen y se copia el texto del pie
+      const copied = await copyText(`${text}\n${shared.url}`);
+      const a = Object.assign(document.createElement("a"), { href: shared.image, download: `ai-news-${shared.id}.png` });
+      menu.append(a); a.click(); a.remove();
+      say(copied ? L("Imagen descargada y texto copiado: súbela a Instagram", "Image downloaded and caption copied: upload it to Instagram")
+                 : L("Imagen descargada: súbela a Instagram", "Image downloaded: upload it to Instagram"), 3500);
+      return closeShare();
+    }
+    if (to === "image") { say(L("Imagen descargada", "Image downloaded")); return closeShare(); }
+    setTimeout(closeShare, 300);  // los enlaces a las apps se abren solos (nueva pestaña o la app)
   });
+  // En pantallas táctiles se abre al levantar el dedo, como el botón de cerrar; el clic queda para ratón y teclado
+  let touched = 0;
+  shareBtn.addEventListener("pointerup", e => { if (e.pointerType !== "mouse" && currentId) { touched = Date.now(); openShare(currentId); } });
+  shareBtn.addEventListener("click", () => { if (Date.now() - touched > 800 && currentId) openShare(currentId); });
 
   // Gestos en la hoja: hacia abajo desde la cabecera cierra; a los lados, cambia de noticia.
   // Los botones de la cabecera quedan fuera del gesto para que sus clics lleguen.

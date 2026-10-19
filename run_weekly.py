@@ -1,19 +1,22 @@
-"""Punto de entrada de la edición semanal. La Fase 1 no usa APIs de pago: la clasificación y los
+"""Punto de entrada de la actualización diaria. La Fase 1 no usa APIs de pago: la clasificación y los
 resúmenes los escribe Claude Code entre los pasos, siguiendo docs/instrucciones-claude-code.md.
 
     python run_weekly.py ingest [--date AAAA-MM-DD] [--reuse-raw]
-        Descarga las fuentes de los 7 días previos y escribe data/raw/<fecha>/para_claude.md.
+        Descarga las fuentes de ese día y escribe data/raw/<fecha>/para_claude.md.
         -> Claude Code escribe data/raw/<fecha>/candidatos.json
 
     python run_weekly.py select [--date ...]
-        Puntúa los candidatos (sección 2.1), elige los de la semana y escribe para_resumir.md.
+        Puntúa los candidatos (sección 2.1), elige los del día y escribe para_resumir.md.
         -> Claude Code escribe data/raw/<fecha>/resumenes.json
 
     python run_weekly.py render [--date ...]
-        Guarda history/<fecha>.json y genera output/<fecha>.html.
+        Guarda history/<fecha>.json y genera la edición de los 7 días que terminan en <fecha>
+        (output/index.html), con una página y una imagen para compartir cada noticia.
 
-<fecha> es el último día de la semana (la fecha de cierre). Sin --date se usa ayer, de modo que la
-edición cubre los 7 días naturales previos a hoy.
+    python run_weekly.py pending
+        Los días que faltan en history/ hasta ayer (como mucho, los 7 de la ventana), uno por línea.
+
+<fecha> es el día de las noticias. Sin --date se usa ayer: cada mañana entra el día anterior.
 """
 from __future__ import annotations
 
@@ -32,11 +35,11 @@ from src.classify import load_candidates, write_brief
 from src.cluster import Cluster, possible_duplicates
 from src.common import LOGS, RAW, ROOT, load_config, log
 from src.embeddings import embed
-from src.history import save_day
+from src.history import list_days, load_window, save_day, window_days
 from src.ingest import hackernews, labs, rss, youtube
 from src.ingest.article import enrich
 from src.models import RawItem, SourceRef, Story
-from src.render import render_day
+from src.render import render_edition
 from src.score import allocate_signals, comments, is_confirmed, select
 from src.summarize import Summary, load_selection, load_summaries, write_requests
 from src.transcripts import add_transcripts
@@ -152,8 +155,16 @@ def build_story(day: str, n: int, c: Cluster, score: float, s: Summary) -> Story
     )
 
 
+# Lo que Claude Code escribe a partir de la ingesta: si se vuelve a descargar, se borra para no mezclar versiones
+DERIVED = ["candidatos.json", "seleccion.json", "para_resumir.md", "resumenes.json"]
+
+
+def edition_days(cfg: dict) -> int:
+    return cfg.get("selection", {}).get("window_days", 7)
+
+
 def cmd_ingest(day: str, cfg: dict, reuse: bool) -> int:
-    since, until = window(day, cfg.get("selection", {}).get("window_days", 7))
+    since, until = window(day, 1)
     log.info("Edición %s · ventana %s → %s", day, since.strftime("%d/%m %H:%M"), until.strftime("%d/%m %H:%M"))
     if reuse and (RAW / day / "items.json").exists():
         items, failed = load_raw(day)
@@ -163,11 +174,14 @@ def cmd_ingest(day: str, cfg: dict, reuse: bool) -> int:
         enrich([i for i in items if i.kind != "youtube"])
         add_transcripts(items)
         save_raw(day, items, failed)
+        for name in DERIVED:
+            (RAW / day / name).unlink(missing_ok=True)
     log.info("Ingesta: %d elementos, fuentes caídas: %s", len(items), ", ".join(failed) or "ninguna")
     if not items:
         log.error("No hay elementos para este día.")
         return 1
-    path = write_brief(day, items, cfg.get("frontier_labs", []))
+    recent = load_window((Date.fromisoformat(day) - timedelta(days=1)).isoformat(), edition_days(cfg) - 1)
+    path = write_brief(day, items, cfg.get("frontier_labs", []), recent)
     log.info("Siguiente paso (Claude Code): leer %s y escribir candidatos.json", path)
     return 0
 
@@ -178,7 +192,7 @@ def cmd_select(day: str, cfg: dict) -> int:
     for a, b, sim in possible_duplicates(keyed):
         log.warning("Posible duplicado: %s y %s (similitud %.2f). Revisa candidatos.json.", a, b, sim)
     key_of = {id(c): k for k, c in keyed}
-    _, until = window(day, cfg.get("selection", {}).get("window_days", 7))
+    _, until = window(day, 1)
     chosen = [(key_of[id(c)], c, sc, is_confirmed(c)) for c, sc in select([c for _, c in keyed], cfg, until)]
     path = write_requests(day, chosen)
     log.info("Siguiente paso (Claude Code): leer %s y escribir resumenes.json", path)
@@ -203,22 +217,36 @@ def cmd_render(day: str, cfg: dict) -> int:
     stats = {"items": len(items), "candidates": len(clusters), "selected": len(stories),
              "summarizer": "claude-code"}
     save_day(day, stories, failed, stats)
-    path = render_day(day, stories, failed, stats, cfg.get("site"))
-    log.info("Página generada: %s (%d noticias)", path, len(stories))
+    path = render_edition(day, edition_days(cfg), failed, cfg.get("site"))
+    log.info("Día %s: %d noticias · edición generada: %s", day, len(stories), path)
+    return 0
+
+
+def cmd_pending(cfg: dict) -> int:
+    """Días sin edición desde el último del histórico hasta ayer: si el ordenador estuvo apagado, se recuperan."""
+    yesterday = (datetime.now(MADRID).date() - timedelta(days=1)).isoformat()
+    have = set(list_days())
+    days = window_days(yesterday, edition_days(cfg))
+    last = max(have) if have else None
+    for d in days:
+        if d not in have and (last is None or d > last):
+            print(d)
     return 0
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="Genera la edición semanal de noticias de IA.")
-    ap.add_argument("step", choices=["ingest", "select", "render"])
+    ap.add_argument("step", choices=["ingest", "select", "render", "pending"])
     ap.add_argument("--date", default=(datetime.now(MADRID).date() - timedelta(days=1)).isoformat(),
-                    help="AAAA-MM-DD: último día de la semana (por defecto, ayer)")
+                    help="AAAA-MM-DD: día de las noticias (por defecto, ayer)")
     ap.add_argument("--reuse-raw", action="store_true", help="ingest: reutiliza data/raw/<fecha>/items.json")
     args = ap.parse_args()
 
     load_dotenv(ROOT / ".env")
-    setup_logging(args.date)
     cfg = load_config()
+    if args.step == "pending":
+        return cmd_pending(cfg)
+    setup_logging(args.date)
     if args.step == "ingest":
         return cmd_ingest(args.date, cfg, args.reuse_raw)
     if args.step == "select":

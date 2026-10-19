@@ -95,7 +95,7 @@ footer.wrap { margin-top: 48px; margin-bottom: 56px; color: var(--label-3); font
 
   <ul class="editions" id="editions">
     {% for e in editions %}
-    <li><a class="edition" href="{{ e.date }}.html">
+    <li><a class="edition" href="{{ e.href }}">
       <h2>{{ t(e.label, e.label_en) }}</h2>
       <p class="sub">{{ e.stories|length }} {{ t('noticias', 'stories') }}</p>
       <ul class="top3">{% for s in e.stories[:3] %}<li class="t-{{ s.type }}">{{ t(s.headline, en(s, "headline")) }}</li>{% endfor %}</ul>
@@ -111,7 +111,7 @@ footer.wrap { margin-top: 48px; margin-bottom: 56px; color: var(--label-3); font
 
   <ul class="results" id="results" hidden>
     {% for e in editions %}{% for s in e.stories %}
-    <li class="t-{{ s.type }}" data-text="{{ s | search_text }}"><a href="{{ e.date }}.html#n={{ s.id }}">
+    <li class="t-{{ s.type }}" data-text="{{ s | search_text }}"><a href="{{ e.href }}#n={{ s.id }}">
       <div class="h">{{ t(s.headline, en(s, "headline")) }}</div>
       <div class="m"><b>{{ t(type_singular[s.type], type_singular_en[s.type]) }}</b><span>{{ t(category_labels[s.category], category_labels_en[s.category]) }}</span><span>{{ s.first_seen | short_date }}</span></div>
     </a></li>

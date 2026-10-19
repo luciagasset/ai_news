@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>AI News · {{ s.headline }}</title>
+<style>
+/* Imagen de una noticia: 1080×1080 para Instagram y 1200×630 para la vista previa de WhatsApp, LinkedIn o Telegram.
+   Siempre en claro, sin degradados. */
+* { box-sizing: border-box; margin: 0; }
+html, body { width: {{ w }}px; height: {{ h }}px; overflow: hidden; }
+body {
+  background: #f2f2f7; color: #000; -webkit-font-smoothing: antialiased;
+  font-family: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif;
+  padding: {{ pad }}px;
+}
+.t-avance { --tc: #564ade; } .t-debate { --tc: #00819f; } .t-polemica { --tc: #c55300; } .t-noticia { --tc: #6c6c70; }
+.card { height: 100%; background: #fff; border-radius: {{ (pad * 0.6) | round | int }}px; padding: {{ pad }}px; display: flex; flex-direction: column;
+  box-shadow: 0 2px 4px rgba(0,0,0,.04), 0 18px 40px rgba(0,0,0,.08); }
+.brand { display: flex; align-items: center; gap: {{ (base * 0.6) | int }}px; }
+.brand .lg { border-radius: {{ (base * 0.55) | int }}px; flex: none; }
+.brand span { font-size: {{ base }}px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #1e6ef4; }
+.brand time { margin-left: auto; font-size: {{ base }}px; font-weight: 600; color: rgba(60,60,67,.6); }
+.tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: {{ (base * 1.6) | int }}px; }
+.tag { display: inline-flex; align-items: center; padding: {{ (base * 0.25) | int }}px {{ (base * 0.7) | int }}px; border-radius: 999px;
+  font-size: {{ (base * 0.95) | int }}px; font-weight: 700; color: var(--tc); background: color-mix(in srgb, var(--tc) 12%, transparent); }
+.tag.warn { --tc: #c55300; }
+h1 { font-size: {{ title }}px; line-height: 1.08; font-weight: 800; letter-spacing: -.025em; margin-top: {{ (base * 0.9) | int }}px;
+  display: -webkit-box; -webkit-line-clamp: {{ lines }}; -webkit-box-orient: vertical; overflow: hidden; }
+.lead { font-size: {{ (base * 1.25) | int }}px; line-height: 1.35; color: rgba(60,60,67,.82); margin-top: {{ base }}px;
+  display: -webkit-box; -webkit-line-clamp: {{ lead_lines }}; -webkit-box-orient: vertical; overflow: hidden; }
+.foot { margin-top: auto; padding-top: {{ (base * 0.8) | int }}px; border-top: 2px solid rgba(60,60,67,.12);
+  display: flex; justify-content: space-between; gap: 24px; font-size: {{ (base * 0.9) | int }}px; color: rgba(60,60,67,.7); }
+.foot b { font-weight: 600; color: rgba(60,60,67,.85); }
+</style>
+</head>
+<body class="t-{{ s.type }}">
+{%- from "partials/logo.html" import logo_mark %}
+<div class="card">
+  <p class="brand">{{ logo_mark((base * 2) | int, "lg") }}<span>AI News</span><time>{{ s.first_seen | short_date }}</time></p>
+  <p class="tags"><span class="tag">{{ type_singular[s.type] }}</span>{% if s.official %}<span class="tag">Fuente oficial</span>{% endif %}{% if s.unconfirmed %}<span class="tag warn">Sin confirmar</span>{% endif %}</p>
+  <h1>{{ s.headline }}</h1>
+  {% if lead_lines %}<p class="lead">{{ s.summary_short }}</p>{% endif %}
+  {% set names = s.sources | source_names %}
+  <p class="foot"><span><b>{{ names[:3] | join(" · ") }}</b>{% if names|length > 3 %} +{{ names|length - 3 }}{% endif %}</span>{% if site_host %}<span>{{ site_host }}</span>{% endif %}</p>
+</div>
+</body>
+</html>

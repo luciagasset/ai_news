@@ -1,7 +1,7 @@
 """Clasificación sin API de pago: el script prepara las fuentes y Claude Code clasifica.
 
-1. `write_brief` vuelca todas las fuentes del día (con transcripciones marcadas por minuto) en
-   data/raw/<fecha>/para_claude.md.
+1. `write_brief` vuelca todas las fuentes del día (con transcripciones marcadas por minuto) y las
+   noticias ya publicadas en los días anteriores en data/raw/<fecha>/para_claude.md.
 2. Claude Code lo lee y escribe data/raw/<fecha>/candidatos.json: las noticias del día, ya agrupadas
    y clasificadas, siguiendo docs/instrucciones-claude-code.md.
 3. `load_candidates` valida ese fichero y lo convierte en grupos que el script puntúa.
@@ -17,7 +17,7 @@ from pydantic import BaseModel, Field
 
 from .cluster import Cluster
 from .common import RAW, log
-from .models import Mention, RawItem
+from .models import Mention, RawItem, Story
 from .transcripts import timestamped_text
 
 BRIEF_FILE = "para_claude.md"
@@ -70,7 +70,17 @@ def _describe(item: RawItem) -> str:
     return "\n".join(lines)
 
 
-def write_brief(day: str, items: list[RawItem], frontier_labs: list[str]) -> Path:
+def _published(recent: list[Story]) -> str:
+    """Las noticias ya publicadas en la ventana, para no repetirlas (salvo que haya un hecho nuevo)."""
+    if not recent:
+        return ""
+    lines = [f"- {s.first_seen} · {s.type} · {s.headline} ({', '.join(s.entities[:4])})" for s in recent]
+    return ("\n## Ya publicadas en los días anteriores\n\n"
+            "No las repitas. Solo entra un seguimiento con un hecho nuevo, y su titular cuenta lo nuevo.\n\n"
+            + "\n".join(lines) + "\n")
+
+
+def write_brief(day: str, items: list[RawItem], frontier_labs: list[str], recent: list[Story] = ()) -> Path:
     folder = RAW / day
     folder.mkdir(parents=True, exist_ok=True)
     order = {"lab": 0, "rss": 1, "hackernews": 2, "youtube": 3}
@@ -78,6 +88,7 @@ def write_brief(day: str, items: list[RawItem], frontier_labs: list[str]) -> Pat
         f"# Fuentes del {day}\n\n"
         f"{len(items)} elementos. Laboratorios frontera: {', '.join(frontier_labs)}.\n"
         f"Sigue `docs/instrucciones-claude-code.md` (paso 1) y escribe `{CANDIDATES_FILE}` en esta carpeta.\n"
+        + _published(list(recent))
     )
     body = "\n\n---\n\n".join(_describe(i) for i in sorted(items, key=lambda i: (order[i.kind], i.source_name)))
     path = folder / BRIEF_FILE

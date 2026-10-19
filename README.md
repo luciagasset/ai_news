@@ -2,9 +2,10 @@
 
 **Edición en vivo:** https://luciagasset.github.io/ai_news/
 
-Resumen semanal, en español, de lo que se mueve en inteligencia artificial: **avances en modelos frontera,
-debates, polémicas y noticias**. Cada semana genera una edición con 12–15 elementos de los 7 días previos, en tarjetas
-que se amplían al pulsarlas, y guarda un histórico para enlazar historias que continúan.
+Resumen, en español, de lo que se mueve en inteligencia artificial: **avances en modelos frontera,
+debates, polémicas y noticias**. **Se actualiza cada mañana** con las noticias del día anterior y muestra siempre los
+7 últimos días (unas 15 noticias), en tarjetas que se amplían al pulsarlas. Guarda un histórico por días y archiva una
+edición cada semana en `ediciones.html`.
 
 La edición se abre en la semana:
 
@@ -21,6 +22,13 @@ Cada edición genera además dos piezas para compartir en LinkedIn: una **imagen
 (`output/og/<fecha>.png`, con etiquetas Open Graph) y un **carrusel PDF** de 1080×1350
 (`output/carrusel/<fecha>.pdf`).
 
+**Compartir una noticia**: el botón de la hoja de cada noticia abre un menú con WhatsApp, Instagram, Telegram,
+LinkedIn, X, correo, copiar enlace y (en el móvil) el resto de apps del sistema. Cada noticia tiene su propia
+página, `output/noticias/<id>.html`, con su titular e imagen (`output/og/noticias/<id>.png`), para que el enlace
+muestre esa noticia y no la edición entera. Instagram no admite enlaces desde la web: en el móvil se comparte la
+imagen cuadrada de la noticia (`output/instagram/<id>.png`) con la hoja del sistema; en el ordenador se descarga
+y se copia el texto del pie.
+
 El criterio no es lo primero que sale en un buscador, sino lo que genera conversación real: cuántas
 fuentes distintas lo cuentan y cuánto se discute en Hacker News y en los comentarios de YouTube.
 
@@ -35,7 +43,7 @@ fuentes distintas lo cuentan y cuánto se discute en Hacker News y en los coment
               2. select (puntuación) ─► para_resumir.md ─► resumenes.json             │
                                                        │  (resume en dos niveles)       │
                                                        └────────────────────────────────┘
-              3. render ─► history/AAAA-MM-DD.json + output/AAAA-MM-DD.html
+              3. render ─► history/AAAA-MM-DD.json + output/index.html (los 7 últimos días)
 ```
 
 La Fase 1 **no usa ninguna API de pago**. El script hace todo lo mecánico (descargar, transcribir,
@@ -43,7 +51,7 @@ puntuar, guardar y maquetar) y deja los textos listos en ficheros; la parte edit
 clasificar y resumir) la hace Claude Code leyendo esos ficheros, con las reglas de
 [`docs/instrucciones-claude-code.md`](docs/instrucciones-claude-code.md).
 
-1. **Ingesta**: vídeos de los últimos 7 días de los canales configurados (YouTube Data API v3) con su
+1. **Ingesta**: vídeos del día de los canales configurados (YouTube Data API v3) con su
    transcripción, feeds RSS, páginas de novedades de OpenAI, Anthropic y Google DeepMind, e historias de
    IA de Hacker News. Todo queda en `data/raw/<fecha>/`.
 2. **Agrupación y clasificación** (Claude Code): un vídeo de noticias repasa varias noticias, así que se
@@ -76,8 +84,23 @@ pip install -r requirements.txt
 copy .env.example .env          # y rellena YOUTUBE_API_KEY
 ```
 
-Para generar un día, abre Claude Code en la carpeta del proyecto y pídele "genera la edición de hoy"
-(o de una fecha): `CLAUDE.md` le indica los pasos. A mano son:
+### Actualización diaria automática
+
+`scripts/daily.py` hace todo el proceso para los días que falten (normalmente, ayer) y publica en GitHub Pages.
+Los dos pasos editoriales los escribe Claude Code en modo no interactivo (`claude -p`) con tu sesión, sin API de
+pago y sin acceso a terminal ni a la web. Para programarlo cada día a las 07:07:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\programar-tarea.ps1
+```
+
+La tarea despierta el ordenador si está en suspensión; si estaba apagado, se ejecuta al encenderlo y recupera
+los días que falten (hasta 7). El registro queda en `logs/diario.log`. Para quitarla, añade `-Quitar`.
+
+### A mano
+
+Abre Claude Code en la carpeta del proyecto y pídele «genera el día» (o una fecha): `CLAUDE.md` le indica los
+pasos. Son:
 
 | Paso | Comando | Resultado |
 | --- | --- | --- |
@@ -85,10 +108,11 @@ Para generar un día, abre Claude Code en la carpeta del proyecto y pídele "gen
 | — | Claude Code escribe `candidatos.json` | |
 | 2 | `python run_weekly.py select --date 2026-10-15` | `data/raw/<fecha>/para_resumir.md` |
 | — | Claude Code escribe `resumenes.json` | |
-| 3 | `python run_weekly.py render --date 2026-10-15` | `output/<fecha>.html`, `output/ediciones.html` y la portada `output/index.html` (la última edición) |
+| 3 | `python run_weekly.py render --date 2026-10-15` | `history/<fecha>.json`, la portada `output/index.html` (los 7 días que terminan en `<fecha>`), `output/ediciones.html` y las páginas de cada noticia |
 
-`--date` es el último día de la semana (la fecha de cierre); la edición cubre ese día y los 6 anteriores,
-completos. Sin `--date` se usa ayer. `ingest --reuse-raw` reutiliza la descarga guardada. Las transcripciones se cachean en `data/cache/`.
+`--date` es el día de las noticias; sin `--date` se usa ayer. Cada 7 días (contando desde la primera edición
+archivada) la portada se archiva también como `output/<fecha>.html`. `run_weekly.py pending` lista los días que
+faltan. `ingest --reuse-raw` reutiliza la descarga guardada. Las transcripciones se cachean en `data/cache/`.
 
 ## Configuración
 
@@ -108,15 +132,18 @@ src/score.py            puntuación y selección
 src/summarize.py        prepara para_resumir.md y valida resumenes.json
 docs/instrucciones-claude-code.md   reglas editoriales de clasificación y resumen
 src/history.py          persistencia en history/
-src/render.py           edición (templates/week.html) e índice (templates/index.html)
-run_weekly.py            punto de entrada
+src/render.py           edición (templates/week.html), índice (templates/index.html) y página e imágenes
+                        de cada noticia (templates/story.html, templates/card.html)
+run_weekly.py           punto de entrada (un paso, un día)
+scripts/daily.py        actualización diaria automática; scripts/programar-tarea.ps1 la programa
 ```
 
 ## Límites conocidos
 
 - **X no se lee directamente** (su API es de pago): su debate llega a través de vídeos, Hacker News y medios.
-- **Feeds RSS**: muchos solo guardan sus últimas entradas, así que una edición semanal puede perder
-  artículos del principio de la semana. En la Fase 3 la ingesta se hará a diario y se acumulará.
+- **Señales del día**: la ingesta se hace a la mañana siguiente, así que los puntos y comentarios de Hacker News
+  de una noticia de última hora aún son pocos.
+- **Ordenador encendido**: la tarea diaria corre en el PC; si está apagado varios días, recupera hasta 7 al encenderlo.
 - **Transcripciones**: si un vídeo no tiene subtítulos, se resume con título y descripción y se marca como parcial.
 - **Calidad**: los resúmenes los escribe un modelo de IA y pueden equivocarse; cada noticia enlaza a sus fuentes.
 
@@ -125,6 +152,5 @@ run_weekly.py            punto de entrada
 - **Fase 1** (actual): pipeline completo con 3 canales, 2 medios, 3 laboratorios y Hacker News.
 - **Fase 2**: todas las fuentes (Reddit, arXiv, más laboratorios) y noticias relacionadas entre
   ediciones (Seguimiento, Relacionada, Contradicción).
-- **Fase 3**: ejecución semanal automática (propuesta: lunes a las 07:07, hora de Madrid) y publicación en GitHub Pages. El sistema de
-  resumen (agente programado de Claude, API con un modelo ligero o modelo local) se decidirá con datos
-  reales de coste y calidad.
+- **Fase 3** (en marcha): actualización diaria a las 07:07 en el PC con Claude Code (`claude -p`, con la
+  suscripción, sin API de pago) y publicación automática en GitHub Pages.

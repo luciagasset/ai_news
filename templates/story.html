@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>{{ s.headline }} · AI News</title>
+<meta name="description" content="{{ s.summary_short }}">
+{#- Cada noticia tiene su página para que WhatsApp, LinkedIn o Telegram muestren esa noticia al compartirla -#}
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="AI News">
+<meta property="og:title" content="{{ s.headline }}">
+<meta property="og:description" content="{% if s.unconfirmed %}Sin confirmar. {% endif %}{{ s.summary_short }}">
+{%- if og_image %}
+<meta property="og:image" content="{{ og_image }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+{%- endif %}
+{% if page_url %}<meta property="og:url" content="{{ page_url }}">
+<link rel="canonical" href="{{ page_url }}">{% endif %}
+<meta property="article:published_time" content="{{ s.first_seen }}">
+<link rel="icon" type="image/svg+xml" href="../icons/logo.svg">
+<link rel="apple-touch-icon" href="../icons/icon-180.png">
+<script>
+(() => {
+  let lang = null;
+  try { lang = localStorage.getItem("ai-news-lang"); } catch {}
+  if (lang !== "es" && lang !== "en") lang = (navigator.language || "es").toLowerCase().startsWith("es") ? "es" : "en";
+  document.documentElement.lang = lang;
+})();
+</script>
+<style>
+{% include "partials/base.css" %}
+html[lang="en"] .l-es, html:not([lang="en"]) .l-en { display: none !important; }
+.wrap { max-width: 720px; }
+header.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: calc(16px + env(safe-area-inset-top)); padding-bottom: 8px; }
+.wordmark { display: inline-flex; align-items: center; gap: 10px; color: var(--label); font-weight: 700; font-size: 17px; }
+.wordmark .logo-mark { border-radius: 7px; }
+.lang { display: inline-flex; padding: 2px; border-radius: 17px; background: var(--fill); }
+.lang button { min-width: 40px; min-height: 30px; padding: 0 10px; border: 0; border-radius: 15px; background: none; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--label-2); }
+.lang button[aria-pressed="true"] { background: var(--label); color: var(--bg); }
+article { margin-top: 16px; padding: 24px 22px 28px; border-radius: 22px; background: var(--card); box-shadow: var(--shadow); }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; font-size: 12px; }
+.tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; font-weight: 600; color: var(--tc, var(--label-2)); background: color-mix(in srgb, var(--tc, var(--label-2)) var(--tint), transparent); }
+.tag.unconfirmed { --tc: var(--t-polemica); }
+.tag.official { --tc: var(--accent); }
+h1 { font-size: 28px; line-height: 1.2; font-weight: 700; letter-spacing: -.02em; margin: 14px 0 0; }
+.lead { font-size: 19px; line-height: 1.45; font-weight: 500; margin: 12px 0 0; }
+.info { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 12px; font-size: 13px; color: var(--label-3); }
+.long p { margin: 16px 0 0; }
+h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--label-3); margin: 26px 0 6px; font-weight: 600; }
+ul { margin: 0; padding: 0; list-style: none; }
+li { font-size: 15px; padding: 9px 0; border-bottom: 0.5px solid var(--separator); display: flex; gap: 10px; align-items: baseline; }
+li:last-child { border-bottom: 0; }
+.kind { font-size: 12px; color: var(--label-3); min-width: 60px; flex: none; }
+.claims li { color: var(--label-2); }
+.more { display: flex; align-items: center; justify-content: center; min-height: 50px; margin: 20px 0 0; border-radius: 14px; background: var(--accent); color: #fff; font-weight: 600; }
+.more:hover { text-decoration: none; filter: brightness(1.06); }
+footer { margin: 28px auto 48px; color: var(--label-3); font-size: 13px; }
+</style>
+</head>
+<body class="t-{{ s.type }}">
+{%- from "partials/logo.html" import logo_mark %}
+{%- macro t(es, en_text) -%}<span class="l-es">{{ es }}</span><span class="l-en">{{ en_text or es }}</span>{%- endmacro -%}
+<header class="top wrap">
+  <a class="wordmark" href="../">{{ logo_mark(28, "logo-mark") }}AI News</a>
+  <div class="lang" role="group" aria-label="Idioma"><button type="button" data-lang="es" lang="es">ES</button><button type="button" data-lang="en" lang="en">EN</button></div>
+</header>
+<main class="wrap">
+  <article>
+    <div class="tags">
+      <span class="tag">{{ t(type_singular[s.type], type_singular_en[s.type]) }}</span>
+      <span class="tag t-noticia">{{ t(category_labels[s.category], category_labels_en[s.category]) }}</span>
+      {% if s.official %}<span class="tag official">{{ t("Fuente oficial", "Official source") }}</span>{% endif %}
+      {% if s.unconfirmed %}<span class="tag unconfirmed">{{ t("Sin confirmar", "Unconfirmed") }}</span>{% endif %}
+      {% if s.partial %}<span class="tag">{{ t("Resumen parcial", "Partial summary") }}</span>{% endif %}
+    </div>
+    <h1>{{ t(s.headline, en(s, "headline")) }}</h1>
+    <p class="lead">{{ t(s.summary_short, en(s, "summary_short")) }}</p>
+    <p class="info"><span>{{ t(long_date, long_date_en) }}</span><span>{{ s.reading_minutes }} {{ t("min de lectura", "min read") }}</span></p>
+    <div class="long l-es">{% for para in s.summary_long.split("\n\n") if para.strip() %}<p>{{ para.strip() }}</p>{% endfor %}</div>
+    <div class="long l-en">{% for para in en(s, "summary_long").split("\n\n") if para.strip() %}<p>{{ para.strip() }}</p>{% endfor %}</div>
+    {% if s.unconfirmed_claims %}
+    <h2>{{ t("Sin confirmar", "Unconfirmed") }}</h2>
+    <ul class="claims l-es">{% for c in s.unconfirmed_claims %}<li>{{ c }}</li>{% endfor %}</ul>
+    <ul class="claims l-en">{% for c in en(s, "unconfirmed_claims") %}<li>{{ c }}</li>{% endfor %}</ul>
+    {% endif %}
+    <h2>{{ t("Fuentes", "Sources") }}</h2>
+    <ul>
+      {% set kinds = {"youtube": ("Vídeo", "Video"), "rss": ("Artículo", "Article"), "lab": ("Oficial", "Official"), "hackernews": ("HN", "HN")} %}
+      {% for src in s.sources %}
+      <li><span class="kind">{{ t(kinds[src.kind][0], kinds[src.kind][1]) }}</span>
+        <span><a href="{{ src | source_link }}" target="_blank" rel="noopener">{{ src.name }}</a>{% if src.timestamp %} · min {{ src.timestamp | mmss }}{% endif %}</span></li>
+      {% endfor %}
+    </ul>
+  </article>
+  <a class="more" href="{{ edition_link }}">{{ t("Ver todas las noticias de la semana", "See all of this week’s stories") }}</a>
+</main>
+<footer class="wrap"><p>{{ t("Resumen generado con IA a partir de las fuentes enlazadas; puede contener errores.", "Summary written with AI from the linked sources; it may contain errors.") }}</p></footer>
+<script>
+(() => {
+  const apply = lang => {
+    document.documentElement.lang = lang;
+    document.querySelectorAll(".lang [data-lang]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
+  };
+  document.querySelectorAll(".lang [data-lang]").forEach(b => b.addEventListener("click", () => {
+    try { localStorage.setItem("ai-news-lang", b.dataset.lang); } catch {}
+    apply(b.dataset.lang);
+  }));
+  apply(document.documentElement.lang === "en" ? "en" : "es");
+})();
+</script>
+</body>
+</html>

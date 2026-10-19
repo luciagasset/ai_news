@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>OpenCode 2.0 rehace su agente de programación en torno a un servicio central y «modo código» · AI News</title>
+<meta name="description" content="El agente de programación de código abierto OpenCode lanza su versión 2.0, que según sus autores usan millones de personas al día. Un único servicio en segundo plano conecta terminal, web y escritorio, y los agentes pueden encadenar herramientas escribiendo pequeños programas."><meta property="og:type" content="article">
+<meta property="og:site_name" content="AI News">
+<meta property="og:title" content="OpenCode 2.0 rehace su agente de programación en torno a un servicio central y «modo código»">
+<meta property="og:description" content="El agente de programación de código abierto OpenCode lanza su versión 2.0, que según sus autores usan millones de personas al día. Un único servicio en segundo plano conecta terminal, web y escritorio, y los agentes pueden encadenar herramientas escribiendo pequeños programas.">
+<meta property="og:image" content="https://luciagasset.github.io/ai_news/og/noticias/2026-10-15-15.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:url" content="https://luciagasset.github.io/ai_news/noticias/2026-10-15-15.html">
+<link rel="canonical" href="https://luciagasset.github.io/ai_news/noticias/2026-10-15-15.html">
+<meta property="article:published_time" content="2026-10-14">
+<link rel="icon" type="image/svg+xml" href="../icons/logo.svg">
+<link rel="apple-touch-icon" href="../icons/icon-180.png">
+<script>
+(() => {
+  let lang = null;
+  try { lang = localStorage.getItem("ai-news-lang"); } catch {}
+  if (lang !== "es" && lang !== "en") lang = (navigator.language || "es").toLowerCase().startsWith("es") ? "es" : "en";
+  document.documentElement.lang = lang;
+})();
+</script>
+<style>
+/* Paleta basada en los colores de sistema de Apple (HIG · Color), con las variantes de contraste
+   accesible para el texto de color. Claro y oscuro siguen la preferencia del sistema. */
+:root {
+  color-scheme: light dark;
+  --bg: #f2f2f7; --card: #ffffff; --sheet: #ffffff;
+  --fill: rgba(120,120,128,.12); --fill-2: rgba(120,120,128,.2);
+  --label: #000000; --label-2: rgba(60,60,67,.74); --label-3: rgba(60,60,67,.52);
+  --separator: rgba(60,60,67,.18);
+  --accent: #1e6ef4;
+  --t-avance: #564ade; --t-debate: #00819f; --t-polemica: #c55300; --t-noticia: #6c6c70;
+  --r-seguimiento: #1e6ef4; --r-relacionada: #6c6c70; --r-contradiccion: #e9152d;
+  --shadow: 0 1px 2px rgba(0,0,0,.04), 0 6px 20px rgba(0,0,0,.06);
+  --shadow-hover: 0 2px 4px rgba(0,0,0,.05), 0 14px 34px rgba(0,0,0,.10);
+  --scrim: rgba(0,0,0,.32); --bar: rgba(242,242,247,.82); --tint: 12%;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #000000; --card: #1c1c1e; --sheet: #1c1c1e; --fill: rgba(118,118,128,.24); --fill-2: rgba(118,118,128,.36);
+    --label: #ffffff; --label-2: rgba(235,235,245,.72); --label-3: rgba(235,235,245,.48); --separator: rgba(84,84,88,.6);
+    --accent: #5cb8ff; --t-avance: #a7aaff; --t-debate: #3bdded; --t-polemica: #ffa056; --t-noticia: #aeaeb2;
+    --r-seguimiento: #5cb8ff; --r-relacionada: #aeaeb2; --r-contradiccion: #ff6165;
+    --shadow: none; --shadow-hover: 0 0 0 1px rgba(255,255,255,.10); --scrim: rgba(0,0,0,.55); --bar: rgba(0,0,0,.74); --tint: 22%;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #000000; --card: #1c1c1e; --sheet: #1c1c1e; --fill: rgba(118,118,128,.24); --fill-2: rgba(118,118,128,.36);
+  --label: #ffffff; --label-2: rgba(235,235,245,.72); --label-3: rgba(235,235,245,.48); --separator: rgba(84,84,88,.6);
+  --accent: #5cb8ff; --t-avance: #a7aaff; --t-debate: #3bdded; --t-polemica: #ffa056; --t-noticia: #aeaeb2;
+  --r-seguimiento: #5cb8ff; --r-relacionada: #aeaeb2; --r-contradiccion: #ff6165;
+  --shadow: none; --shadow-hover: 0 0 0 1px rgba(255,255,255,.10); --scrim: rgba(0,0,0,.55); --bar: rgba(0,0,0,.74); --tint: 22%;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--label);
+  font: 17px/1.47 -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+body.locked { overflow: hidden; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+button { font: inherit; color: inherit; }
+.wrap { max-width: 1040px; margin: 0 auto; padding-left: 16px; padding-right: 16px; }
+.t-avance { --tc: var(--t-avance); } .t-debate { --tc: var(--t-debate); }
+.t-polemica { --tc: var(--t-polemica); } .t-noticia { --tc: var(--t-noticia); }
+.icon { width: 1em; height: 1em; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+[hidden] { display: none !important; }
+html[lang="en"] .l-es, html:not([lang="en"]) .l-en { display: none !important; }
+.wrap { max-width: 720px; }
+header.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: calc(16px + env(safe-area-inset-top)); padding-bottom: 8px; }
+.wordmark { display: inline-flex; align-items: center; gap: 10px; color: var(--label); font-weight: 700; font-size: 17px; }
+.wordmark .logo-mark { border-radius: 7px; }
+.lang { display: inline-flex; padding: 2px; border-radius: 17px; background: var(--fill); }
+.lang button { min-width: 40px; min-height: 30px; padding: 0 10px; border: 0; border-radius: 15px; background: none; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--label-2); }
+.lang button[aria-pressed="true"] { background: var(--label); color: var(--bg); }
+article { margin-top: 16px; padding: 24px 22px 28px; border-radius: 22px; background: var(--card); box-shadow: var(--shadow); }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; font-size: 12px; }
+.tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; font-weight: 600; color: var(--tc, var(--label-2)); background: color-mix(in srgb, var(--tc, var(--label-2)) var(--tint), transparent); }
+.tag.unconfirmed { --tc: var(--t-polemica); }
+.tag.official { --tc: var(--accent); }
+h1 { font-size: 28px; line-height: 1.2; font-weight: 700; letter-spacing: -.02em; margin: 14px 0 0; }
+.lead { font-size: 19px; line-height: 1.45; font-weight: 500; margin: 12px 0 0; }
+.info { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 12px; font-size: 13px; color: var(--label-3); }
+.long p { margin: 16px 0 0; }
+h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--label-3); margin: 26px 0 6px; font-weight: 600; }
+ul { margin: 0; padding: 0; list-style: none; }
+li { font-size: 15px; padding: 9px 0; border-bottom: 0.5px solid var(--separator); display: flex; gap: 10px; align-items: baseline; }
+li:last-child { border-bottom: 0; }
+.kind { font-size: 12px; color: var(--label-3); min-width: 60px; flex: none; }
+.claims li { color: var(--label-2); }
+.more { display: flex; align-items: center; justify-content: center; min-height: 50px; margin: 20px 0 0; border-radius: 14px; background: var(--accent); color: #fff; font-weight: 600; }
+.more:hover { text-decoration: none; filter: brightness(1.06); }
+footer { margin: 28px auto 48px; color: var(--label-3); font-size: 13px; }
+</style>
+</head>
+<body class="t-noticia"><header class="top wrap">
+  <a class="wordmark" href="../"><svg xmlns="http://www.w3.org/2000/svg" class="logo-mark" width="28" height="28" viewBox="0 0 64 64" role="img" aria-label="AI News">
+  <rect width="64" height="64" rx="15" fill="#0b0b0f"/>
+  <rect x="0.5" y="0.5" width="63" height="63" rx="14.5" fill="none" stroke="rgba(255,255,255,.12)"/>
+  <path d="M10 54.5H54" stroke="rgba(255,255,255,.28)" stroke-width="1.6" stroke-linecap="round"/>
+  <circle class="lm lm1" cx="15" cy="47" r="4" fill="#aeaeb2"/>
+  <circle class="lm lm2" cx="26" cy="40" r="5.5" fill="#3bdded"/>
+  <circle class="lm lm3" cx="38.5" cy="30.5" r="7" fill="#ffa056"/>
+  <circle class="lm lm4" cx="51" cy="18" r="8.5" fill="#a7aaff"/>
+</svg>AI News</a>
+  <div class="lang" role="group" aria-label="Idioma"><button type="button" data-lang="es" lang="es">ES</button><button type="button" data-lang="en" lang="en">EN</button></div>
+</header>
+<main class="wrap">
+  <article>
+    <div class="tags">
+      <span class="tag"><span class="l-es">Noticia</span><span class="l-en">News</span></span>
+      <span class="tag t-noticia"><span class="l-es">Herramientas</span><span class="l-en">Tools</span></span>
+      
+      
+      
+    </div>
+    <h1><span class="l-es">OpenCode 2.0 rehace su agente de programación en torno a un servicio central y «modo código»</span><span class="l-en">OpenCode 2.0 rebuilds its coding agent around a central service and “code mode”</span></h1>
+    <p class="lead"><span class="l-es">El agente de programación de código abierto OpenCode lanza su versión 2.0, que según sus autores usan millones de personas al día. Un único servicio en segundo plano conecta terminal, web y escritorio, y los agentes pueden encadenar herramientas escribiendo pequeños programas.</span><span class="l-en">The open-source coding agent OpenCode releases version 2.0, which its authors say millions of people use every day. A single background service connects the terminal, the web and the desktop, and agents can chain tools by writing small programs.</span></p>
+    <p class="info"><span><span class="l-es">Miércoles, 14 de octubre de 2026</span><span class="l-en">Wednesday, October 14, 2026</span></span><span>1 <span class="l-es">min de lectura</span><span class="l-en">min read</span></span></p>
+    <div class="long l-es"><p>El cambio de fondo es la arquitectura: el servidor de OpenCode arranca solo como un proceso en segundo plano y todas las interfaces (terminal, web, app de escritorio y scripts propios) hablan con él, lo que facilita tareas programadas o conectarlo con otros equipos. Sus autores reconocen que la API anterior «era mala» y la han rehecho desde cero; el propio agente la usa, por ejemplo, para mover una sesión a otra rama de trabajo de git.</p><p>La novedad más técnica es el «modo código»: un intérprete mínimo de JavaScript que convierte servidores MCP y APIs en funciones que el agente combina en un solo script, en lugar de llamarlas una a una, de modo que se pueden añadir «mil» servidores sin saturar el contexto. Llegan también subagentes y comandos en segundo plano, más de 80 plugins internos con recarga en caliente y un SDK para usar OpenCode como librería. Hay cambios incompatibles: los plugins de la versión 1.0 no funcionan y la API del servidor es distinta. El anuncio sumó 886 puntos y 392 comentarios en Hacker News.</p></div>
+    <div class="long l-en"><p>The core change is the architecture: the OpenCode server starts on its own as a background process and every interface (terminal, web, desktop app and your own scripts) talks to it, which makes scheduled tasks or connecting it to other machines easier. Its authors admit the previous API “was bad” and have rebuilt it from scratch; the agent itself uses it, for example, to move a session to another git worktree.</p><p>The most technical novelty is “code mode”: a minimal JavaScript interpreter that turns MCP servers and APIs into functions the agent combines in a single script, instead of calling them one by one, so that “a thousand” servers can be added without flooding the context. Background subagents and commands also arrive, along with more than 80 internal plugins with hot reload and an SDK for using OpenCode as a library. There are breaking changes: version 1.0 plugins do not work and the server API is different. The announcement drew 886 points and 392 comments on Hacker News.</p></div>
+    
+    <h2><span class="l-es">Fuentes</span><span class="l-en">Sources</span></h2>
+    <ul>
+      
+      
+      <li><span class="kind"><span class="l-es">Artículo</span><span class="l-en">Article</span></span>
+        <span><a href="https://anoma.ly/notes/opencode-2-0/" target="_blank" rel="noopener">anoma.ly — OpenCode 2.0</a></span></li>
+      
+      <li><span class="kind"><span class="l-es">HN</span><span class="l-en">HN</span></span>
+        <span><a href="https://news.ycombinator.com/item?id=50094994" target="_blank" rel="noopener">Hacker News · 886 puntos, 392 comentarios</a></span></li>
+      
+    </ul>
+  </article>
+  <a class="more" href="../#n=2026-10-15-15"><span class="l-es">Ver todas las noticias de la semana</span><span class="l-en">See all of this week’s stories</span></a>
+</main>
+<footer class="wrap"><p><span class="l-es">Resumen generado con IA a partir de las fuentes enlazadas; puede contener errores.</span><span class="l-en">Summary written with AI from the linked sources; it may contain errors.</span></p></footer>
+<script>
+(() => {
+  const apply = lang => {
+    document.documentElement.lang = lang;
+    document.querySelectorAll(".lang [data-lang]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
+  };
+  document.querySelectorAll(".lang [data-lang]").forEach(b => b.addEventListener("click", () => {
+    try { localStorage.setItem("ai-news-lang", b.dataset.lang); } catch {}
+    apply(b.dataset.lang);
+  }));
+  apply(document.documentElement.lang === "en" ? "en" : "es");
+})();
+</script>
+</body>
+</html>

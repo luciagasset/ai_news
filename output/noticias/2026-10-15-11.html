@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Karpathy: crece la brecha entre lo que la gente cree que hace la IA y lo que realmente hace · AI News</title>
+<meta name="description" content="Andrej Karpathy advierte de que se amplía la distancia entre la percepción de la mayoría sobre la IA y la de quienes la usan a fondo. Su mensaje abrió uno de los hilos más largos de la semana en Hacker News, con más de 1.000 comentarios."><meta property="og:type" content="article">
+<meta property="og:site_name" content="AI News">
+<meta property="og:title" content="Karpathy: crece la brecha entre lo que la gente cree que hace la IA y lo que realmente hace">
+<meta property="og:description" content="Andrej Karpathy advierte de que se amplía la distancia entre la percepción de la mayoría sobre la IA y la de quienes la usan a fondo. Su mensaje abrió uno de los hilos más largos de la semana en Hacker News, con más de 1.000 comentarios.">
+<meta property="og:image" content="https://luciagasset.github.io/ai_news/og/noticias/2026-10-15-11.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:url" content="https://luciagasset.github.io/ai_news/noticias/2026-10-15-11.html">
+<link rel="canonical" href="https://luciagasset.github.io/ai_news/noticias/2026-10-15-11.html">
+<meta property="article:published_time" content="2026-10-11">
+<link rel="icon" type="image/svg+xml" href="../icons/logo.svg">
+<link rel="apple-touch-icon" href="../icons/icon-180.png">
+<script>
+(() => {
+  let lang = null;
+  try { lang = localStorage.getItem("ai-news-lang"); } catch {}
+  if (lang !== "es" && lang !== "en") lang = (navigator.language || "es").toLowerCase().startsWith("es") ? "es" : "en";
+  document.documentElement.lang = lang;
+})();
+</script>
+<style>
+/* Paleta basada en los colores de sistema de Apple (HIG · Color), con las variantes de contraste
+   accesible para el texto de color. Claro y oscuro siguen la preferencia del sistema. */
+:root {
+  color-scheme: light dark;
+  --bg: #f2f2f7; --card: #ffffff; --sheet: #ffffff;
+  --fill: rgba(120,120,128,.12); --fill-2: rgba(120,120,128,.2);
+  --label: #000000; --label-2: rgba(60,60,67,.74); --label-3: rgba(60,60,67,.52);
+  --separator: rgba(60,60,67,.18);
+  --accent: #1e6ef4;
+  --t-avance: #564ade; --t-debate: #00819f; --t-polemica: #c55300; --t-noticia: #6c6c70;
+  --r-seguimiento: #1e6ef4; --r-relacionada: #6c6c70; --r-contradiccion: #e9152d;
+  --shadow: 0 1px 2px rgba(0,0,0,.04), 0 6px 20px rgba(0,0,0,.06);
+  --shadow-hover: 0 2px 4px rgba(0,0,0,.05), 0 14px 34px rgba(0,0,0,.10);
+  --scrim: rgba(0,0,0,.32); --bar: rgba(242,242,247,.82); --tint: 12%;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #000000; --card: #1c1c1e; --sheet: #1c1c1e; --fill: rgba(118,118,128,.24); --fill-2: rgba(118,118,128,.36);
+    --label: #ffffff; --label-2: rgba(235,235,245,.72); --label-3: rgba(235,235,245,.48); --separator: rgba(84,84,88,.6);
+    --accent: #5cb8ff; --t-avance: #a7aaff; --t-debate: #3bdded; --t-polemica: #ffa056; --t-noticia: #aeaeb2;
+    --r-seguimiento: #5cb8ff; --r-relacionada: #aeaeb2; --r-contradiccion: #ff6165;
+    --shadow: none; --shadow-hover: 0 0 0 1px rgba(255,255,255,.10); --scrim: rgba(0,0,0,.55); --bar: rgba(0,0,0,.74); --tint: 22%;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #000000; --card: #1c1c1e; --sheet: #1c1c1e; --fill: rgba(118,118,128,.24); --fill-2: rgba(118,118,128,.36);
+  --label: #ffffff; --label-2: rgba(235,235,245,.72); --label-3: rgba(235,235,245,.48); --separator: rgba(84,84,88,.6);
+  --accent: #5cb8ff; --t-avance: #a7aaff; --t-debate: #3bdded; --t-polemica: #ffa056; --t-noticia: #aeaeb2;
+  --r-seguimiento: #5cb8ff; --r-relacionada: #aeaeb2; --r-contradiccion: #ff6165;
+  --shadow: none; --shadow-hover: 0 0 0 1px rgba(255,255,255,.10); --scrim: rgba(0,0,0,.55); --bar: rgba(0,0,0,.74); --tint: 22%;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--label);
+  font: 17px/1.47 -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+body.locked { overflow: hidden; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+button { font: inherit; color: inherit; }
+.wrap { max-width: 1040px; margin: 0 auto; padding-left: 16px; padding-right: 16px; }
+.t-avance { --tc: var(--t-avance); } .t-debate { --tc: var(--t-debate); }
+.t-polemica { --tc: var(--t-polemica); } .t-noticia { --tc: var(--t-noticia); }
+.icon { width: 1em; height: 1em; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+[hidden] { display: none !important; }
+html[lang="en"] .l-es, html:not([lang="en"]) .l-en { display: none !important; }
+.wrap { max-width: 720px; }
+header.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: calc(16px + env(safe-area-inset-top)); padding-bottom: 8px; }
+.wordmark { display: inline-flex; align-items: center; gap: 10px; color: var(--label); font-weight: 700; font-size: 17px; }
+.wordmark .logo-mark { border-radius: 7px; }
+.lang { display: inline-flex; padding: 2px; border-radius: 17px; background: var(--fill); }
+.lang button { min-width: 40px; min-height: 30px; padding: 0 10px; border: 0; border-radius: 15px; background: none; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--label-2); }
+.lang button[aria-pressed="true"] { background: var(--label); color: var(--bg); }
+article { margin-top: 16px; padding: 24px 22px 28px; border-radius: 22px; background: var(--card); box-shadow: var(--shadow); }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; font-size: 12px; }
+.tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; font-weight: 600; color: var(--tc, var(--label-2)); background: color-mix(in srgb, var(--tc, var(--label-2)) var(--tint), transparent); }
+.tag.unconfirmed { --tc: var(--t-polemica); }
+.tag.official { --tc: var(--accent); }
+h1 { font-size: 28px; line-height: 1.2; font-weight: 700; letter-spacing: -.02em; margin: 14px 0 0; }
+.lead { font-size: 19px; line-height: 1.45; font-weight: 500; margin: 12px 0 0; }
+.info { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 12px; font-size: 13px; color: var(--label-3); }
+.long p { margin: 16px 0 0; }
+h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--label-3); margin: 26px 0 6px; font-weight: 600; }
+ul { margin: 0; padding: 0; list-style: none; }
+li { font-size: 15px; padding: 9px 0; border-bottom: 0.5px solid var(--separator); display: flex; gap: 10px; align-items: baseline; }
+li:last-child { border-bottom: 0; }
+.kind { font-size: 12px; color: var(--label-3); min-width: 60px; flex: none; }
+.claims li { color: var(--label-2); }
+.more { display: flex; align-items: center; justify-content: center; min-height: 50px; margin: 20px 0 0; border-radius: 14px; background: var(--accent); color: #fff; font-weight: 600; }
+.more:hover { text-decoration: none; filter: brightness(1.06); }
+footer { margin: 28px auto 48px; color: var(--label-3); font-size: 13px; }
+</style>
+</head>
+<body class="t-debate"><header class="top wrap">
+  <a class="wordmark" href="../"><svg xmlns="http://www.w3.org/2000/svg" class="logo-mark" width="28" height="28" viewBox="0 0 64 64" role="img" aria-label="AI News">
+  <rect width="64" height="64" rx="15" fill="#0b0b0f"/>
+  <rect x="0.5" y="0.5" width="63" height="63" rx="14.5" fill="none" stroke="rgba(255,255,255,.12)"/>
+  <path d="M10 54.5H54" stroke="rgba(255,255,255,.28)" stroke-width="1.6" stroke-linecap="round"/>
+  <circle class="lm lm1" cx="15" cy="47" r="4" fill="#aeaeb2"/>
+  <circle class="lm lm2" cx="26" cy="40" r="5.5" fill="#3bdded"/>
+  <circle class="lm lm3" cx="38.5" cy="30.5" r="7" fill="#ffa056"/>
+  <circle class="lm lm4" cx="51" cy="18" r="8.5" fill="#a7aaff"/>
+</svg>AI News</a>
+  <div class="lang" role="group" aria-label="Idioma"><button type="button" data-lang="es" lang="es">ES</button><button type="button" data-lang="en" lang="en">EN</button></div>
+</header>
+<main class="wrap">
+  <article>
+    <div class="tags">
+      <span class="tag"><span class="l-es">Debate</span><span class="l-en">Debate</span></span>
+      <span class="tag t-noticia"><span class="l-es">Modelos</span><span class="l-en">Models</span></span>
+      
+      
+      
+    </div>
+    <h1><span class="l-es">Karpathy: crece la brecha entre lo que la gente cree que hace la IA y lo que realmente hace</span><span class="l-en">Karpathy: the gap between what people think AI does and what it really does is growing</span></h1>
+    <p class="lead"><span class="l-es">Andrej Karpathy advierte de que se amplía la distancia entre la percepción de la mayoría sobre la IA y la de quienes la usan a fondo. Su mensaje abrió uno de los hilos más largos de la semana en Hacker News, con más de 1.000 comentarios.</span><span class="l-en">Andrej Karpathy warns that the distance between how most people perceive AI and how those who use it intensively see it is widening. His post started one of the longest threads of the week on Hacker News, with more than 1,000 comments.</span></p>
+    <p class="info"><span><span class="l-es">Domingo, 11 de octubre de 2026</span><span class="l-en">Sunday, October 11, 2026</span></span><span>1 <span class="l-es">min de lectura</span><span class="l-en">min read</span></span></p>
+    <div class="long l-es"><p>Según lo resume AI Explained, Karpathy describe varios grupos: unos 6.000 millones de personas que no usan IA, entre 1.000 y 2.000 millones que usan chatbots «torpes», un 0,2 % (quizá 20 millones) que crea aplicaciones y sigue de cerca las noticias, y unas 5.000 personas en los laboratorios frontera, en una categoría aparte. Esos últimos, y en parte el grupo anterior, sienten «el vértigo de la curva volviéndose vertical», mientras la mayoría no percibe lo que está pasando.</p><p>El mensaje original en X no está entre las fuentes descargadas, así que el resumen se basa en la explicación de AI Explained. El hilo de Hacker News sumó 727 puntos y 1.072 comentarios.</p></div>
+    <div class="long l-en"><p>As AI Explained summarises it, Karpathy describes several groups: about 6 billion people who do not use AI, between 1 and 2 billion who use “clunky” chatbots, about 0.2% (perhaps 20 million) who build apps and follow the news closely, and some 5,000 people at frontier labs, in a category of their own. That last group, and partly the one before it, feel “the vertigo of the curve going vertical”, while most people do not notice what is happening.</p><p>The original post on X is not among the downloaded sources, so this summary relies on AI Explained&#39;s account. The Hacker News thread drew 727 points and 1,072 comments.</p></div>
+    
+    <h2><span class="l-es">Fuentes</span><span class="l-en">Sources</span></h2>
+    <ul>
+      
+      
+      <li><span class="kind"><span class="l-es">Vídeo</span><span class="l-en">Video</span></span>
+        <span><a href="https://www.youtube.com/watch?v=C4Sq3Rot8FU&amp;t=370s" target="_blank" rel="noopener">AI Explained — AI Labs Warn Race Makes Breach ‘Inevitable’</a> · min 6:10</span></li>
+      
+      <li><span class="kind"><span class="l-es">Artículo</span><span class="l-en">Article</span></span>
+        <span><a href="https://twitter.com/karpathy/status/2109361546505966046" target="_blank" rel="noopener">twitter.com — The gap in shared understanding of LLM capability is widening</a></span></li>
+      
+      <li><span class="kind"><span class="l-es">HN</span><span class="l-en">HN</span></span>
+        <span><a href="https://news.ycombinator.com/item?id=50047422" target="_blank" rel="noopener">Hacker News · 727 puntos, 1072 comentarios</a></span></li>
+      
+    </ul>
+  </article>
+  <a class="more" href="../#n=2026-10-15-11"><span class="l-es">Ver todas las noticias de la semana</span><span class="l-en">See all of this week’s stories</span></a>
+</main>
+<footer class="wrap"><p><span class="l-es">Resumen generado con IA a partir de las fuentes enlazadas; puede contener errores.</span><span class="l-en">Summary written with AI from the linked sources; it may contain errors.</span></p></footer>
+<script>
+(() => {
+  const apply = lang => {
+    document.documentElement.lang = lang;
+    document.querySelectorAll(".lang [data-lang]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
+  };
+  document.querySelectorAll(".lang [data-lang]").forEach(b => b.addEventListener("click", () => {
+    try { localStorage.setItem("ai-news-lang", b.dataset.lang); } catch {}
+    apply(b.dataset.lang);
+  }));
+  apply(document.documentElement.lang === "en" ? "en" : "es");
+})();
+</script>
+</body>
+</html>

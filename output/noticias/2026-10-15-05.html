@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Meta lanza Muse Wonder y se coloca en la frontera de la IA · AI News</title>
+<meta name="description" content="Meta presenta Muse Wonder y Muse Wonder Full, sus modelos más capaces, pensados para agentes personales y profesionales. Las primeras pruebas independientes los sitúan cerca de los mejores modelos, aunque con problemas de cuota y un coste alto por tarea."><meta property="og:type" content="article">
+<meta property="og:site_name" content="AI News">
+<meta property="og:title" content="Meta lanza Muse Wonder y se coloca en la frontera de la IA">
+<meta property="og:description" content="Meta presenta Muse Wonder y Muse Wonder Full, sus modelos más capaces, pensados para agentes personales y profesionales. Las primeras pruebas independientes los sitúan cerca de los mejores modelos, aunque con problemas de cuota y un coste alto por tarea.">
+<meta property="og:image" content="https://luciagasset.github.io/ai_news/og/noticias/2026-10-15-05.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:url" content="https://luciagasset.github.io/ai_news/noticias/2026-10-15-05.html">
+<link rel="canonical" href="https://luciagasset.github.io/ai_news/noticias/2026-10-15-05.html">
+<meta property="article:published_time" content="2026-10-12">
+<link rel="icon" type="image/svg+xml" href="../icons/logo.svg">
+<link rel="apple-touch-icon" href="../icons/icon-180.png">
+<script>
+(() => {
+  let lang = null;
+  try { lang = localStorage.getItem("ai-news-lang"); } catch {}
+  if (lang !== "es" && lang !== "en") lang = (navigator.language || "es").toLowerCase().startsWith("es") ? "es" : "en";
+  document.documentElement.lang = lang;
+})();
+</script>
+<style>
+/* Paleta basada en los colores de sistema de Apple (HIG · Color), con las variantes de contraste
+   accesible para el texto de color. Claro y oscuro siguen la preferencia del sistema. */
+:root {
+  color-scheme: light dark;
+  --bg: #f2f2f7; --card: #ffffff; --sheet: #ffffff;
+  --fill: rgba(120,120,128,.12); --fill-2: rgba(120,120,128,.2);
+  --label: #000000; --label-2: rgba(60,60,67,.74); --label-3: rgba(60,60,67,.52);
+  --separator: rgba(60,60,67,.18);
+  --accent: #1e6ef4;
+  --t-avance: #564ade; --t-debate: #00819f; --t-polemica: #c55300; --t-noticia: #6c6c70;
+  --r-seguimiento: #1e6ef4; --r-relacionada: #6c6c70; --r-contradiccion: #e9152d;
+  --shadow: 0 1px 2px rgba(0,0,0,.04), 0 6px 20px rgba(0,0,0,.06);
+  --shadow-hover: 0 2px 4px rgba(0,0,0,.05), 0 14px 34px rgba(0,0,0,.10);
+  --scrim: rgba(0,0,0,.32); --bar: rgba(242,242,247,.82); --tint: 12%;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #000000; --card: #1c1c1e; --sheet: #1c1c1e; --fill: rgba(118,118,128,.24); --fill-2: rgba(118,118,128,.36);
+    --label: #ffffff; --label-2: rgba(235,235,245,.72); --label-3: rgba(235,235,245,.48); --separator: rgba(84,84,88,.6);
+    --accent: #5cb8ff; --t-avance: #a7aaff; --t-debate: #3bdded; --t-polemica: #ffa056; --t-noticia: #aeaeb2;
+    --r-seguimiento: #5cb8ff; --r-relacionada: #aeaeb2; --r-contradiccion: #ff6165;
+    --shadow: none; --shadow-hover: 0 0 0 1px rgba(255,255,255,.10); --scrim: rgba(0,0,0,.55); --bar: rgba(0,0,0,.74); --tint: 22%;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #000000; --card: #1c1c1e; --sheet: #1c1c1e; --fill: rgba(118,118,128,.24); --fill-2: rgba(118,118,128,.36);
+  --label: #ffffff; --label-2: rgba(235,235,245,.72); --label-3: rgba(235,235,245,.48); --separator: rgba(84,84,88,.6);
+  --accent: #5cb8ff; --t-avance: #a7aaff; --t-debate: #3bdded; --t-polemica: #ffa056; --t-noticia: #aeaeb2;
+  --r-seguimiento: #5cb8ff; --r-relacionada: #aeaeb2; --r-contradiccion: #ff6165;
+  --shadow: none; --shadow-hover: 0 0 0 1px rgba(255,255,255,.10); --scrim: rgba(0,0,0,.55); --bar: rgba(0,0,0,.74); --tint: 22%;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--label);
+  font: 17px/1.47 -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+body.locked { overflow: hidden; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+button { font: inherit; color: inherit; }
+.wrap { max-width: 1040px; margin: 0 auto; padding-left: 16px; padding-right: 16px; }
+.t-avance { --tc: var(--t-avance); } .t-debate { --tc: var(--t-debate); }
+.t-polemica { --tc: var(--t-polemica); } .t-noticia { --tc: var(--t-noticia); }
+.icon { width: 1em; height: 1em; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+[hidden] { display: none !important; }
+html[lang="en"] .l-es, html:not([lang="en"]) .l-en { display: none !important; }
+.wrap { max-width: 720px; }
+header.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: calc(16px + env(safe-area-inset-top)); padding-bottom: 8px; }
+.wordmark { display: inline-flex; align-items: center; gap: 10px; color: var(--label); font-weight: 700; font-size: 17px; }
+.wordmark .logo-mark { border-radius: 7px; }
+.lang { display: inline-flex; padding: 2px; border-radius: 17px; background: var(--fill); }
+.lang button { min-width: 40px; min-height: 30px; padding: 0 10px; border: 0; border-radius: 15px; background: none; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--label-2); }
+.lang button[aria-pressed="true"] { background: var(--label); color: var(--bg); }
+article { margin-top: 16px; padding: 24px 22px 28px; border-radius: 22px; background: var(--card); box-shadow: var(--shadow); }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; font-size: 12px; }
+.tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; font-weight: 600; color: var(--tc, var(--label-2)); background: color-mix(in srgb, var(--tc, var(--label-2)) var(--tint), transparent); }
+.tag.unconfirmed { --tc: var(--t-polemica); }
+.tag.official { --tc: var(--accent); }
+h1 { font-size: 28px; line-height: 1.2; font-weight: 700; letter-spacing: -.02em; margin: 14px 0 0; }
+.lead { font-size: 19px; line-height: 1.45; font-weight: 500; margin: 12px 0 0; }
+.info { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 12px; font-size: 13px; color: var(--label-3); }
+.long p { margin: 16px 0 0; }
+h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--label-3); margin: 26px 0 6px; font-weight: 600; }
+ul { margin: 0; padding: 0; list-style: none; }
+li { font-size: 15px; padding: 9px 0; border-bottom: 0.5px solid var(--separator); display: flex; gap: 10px; align-items: baseline; }
+li:last-child { border-bottom: 0; }
+.kind { font-size: 12px; color: var(--label-3); min-width: 60px; flex: none; }
+.claims li { color: var(--label-2); }
+.more { display: flex; align-items: center; justify-content: center; min-height: 50px; margin: 20px 0 0; border-radius: 14px; background: var(--accent); color: #fff; font-weight: 600; }
+.more:hover { text-decoration: none; filter: brightness(1.06); }
+footer { margin: 28px auto 48px; color: var(--label-3); font-size: 13px; }
+</style>
+</head>
+<body class="t-avance"><header class="top wrap">
+  <a class="wordmark" href="../"><svg xmlns="http://www.w3.org/2000/svg" class="logo-mark" width="28" height="28" viewBox="0 0 64 64" role="img" aria-label="AI News">
+  <rect width="64" height="64" rx="15" fill="#0b0b0f"/>
+  <rect x="0.5" y="0.5" width="63" height="63" rx="14.5" fill="none" stroke="rgba(255,255,255,.12)"/>
+  <path d="M10 54.5H54" stroke="rgba(255,255,255,.28)" stroke-width="1.6" stroke-linecap="round"/>
+  <circle class="lm lm1" cx="15" cy="47" r="4" fill="#aeaeb2"/>
+  <circle class="lm lm2" cx="26" cy="40" r="5.5" fill="#3bdded"/>
+  <circle class="lm lm3" cx="38.5" cy="30.5" r="7" fill="#ffa056"/>
+  <circle class="lm lm4" cx="51" cy="18" r="8.5" fill="#a7aaff"/>
+</svg>AI News</a>
+  <div class="lang" role="group" aria-label="Idioma"><button type="button" data-lang="es" lang="es">ES</button><button type="button" data-lang="en" lang="en">EN</button></div>
+</header>
+<main class="wrap">
+  <article>
+    <div class="tags">
+      <span class="tag"><span class="l-es">Avance</span><span class="l-en">Release</span></span>
+      <span class="tag t-noticia"><span class="l-es">Modelos</span><span class="l-en">Models</span></span>
+      
+      
+      
+    </div>
+    <h1><span class="l-es">Meta lanza Muse Wonder y se coloca en la frontera de la IA</span><span class="l-en">Meta launches Muse Wonder and joins the AI frontier</span></h1>
+    <p class="lead"><span class="l-es">Meta presenta Muse Wonder y Muse Wonder Full, sus modelos más capaces, pensados para agentes personales y profesionales. Las primeras pruebas independientes los sitúan cerca de los mejores modelos, aunque con problemas de cuota y un coste alto por tarea.</span><span class="l-en">Meta unveils Muse Wonder and Muse Wonder Full, its most capable models, built for personal and professional agents. Early independent tests place them close to the best models, despite quota problems and a high cost per task.</span></p>
+    <p class="info"><span><span class="l-es">Lunes, 12 de octubre de 2026</span><span class="l-en">Monday, October 12, 2026</span></span><span>1 <span class="l-es">min de lectura</span><span class="l-en">min read</span></span></p>
+    <div class="long l-es"><p>Según Meta, Muse Wonder está disponible en su API y en Muse Code, y la versión Full solo para suscriptores de Muse Code. La compañía destaca dos capacidades, Active Memory (recordar el contexto del usuario entre conversaciones) y Active Focus (insistir en tareas largas y pedir confirmación antes de acciones importantes), y dice que lo entrenó en su centro de datos Prometheus, a escala de gigavatios, catorce meses después de rehacer desde cero su apuesta de IA. Afirma que tiene sus salvaguardas más fuertes contra usos químicos, biológicos, nucleares y de ciberataque; el informe completo de seguridad llegará más adelante.</p><p>Matthew Berman cuenta que cuesta 4 $ y 20 $ por millón de tokens, como Opus 5.5, y repasa las cifras publicadas por Meta: primer puesto en DeepSWE (79), 78,4 en OSWorld frente a 81 de Opus 5.5 y 56 en el índice de Artificial Analysis frente a 58 de Opus 5.5. En sus pruebas topó con errores de cuota incluso en el plan de 200 $ al mes (Alexandr Wang, responsable de IA de Meta, le respondió que lo estaban arreglando), con resultados flojos en 3D y con un mensaje extraño al final de una tarea. AI Explained lo sitúa cerca de GPT-6 Astra y recoge que Wang admitió que no saben alinear sus modelos a la perfección.</p></div>
+    <div class="long l-en"><p>According to Meta, Muse Wonder is available in its API and in Muse Code, and the Full version only to Muse Code subscribers. The company highlights two capabilities, Active Memory (remembering the user&#39;s context across conversations) and Active Focus (persisting on long tasks and asking for confirmation before important actions), and says it trained the model in its gigawatt-scale Prometheus data centre, fourteen months after rebuilding its AI effort from scratch. It claims its strongest safeguards yet against chemical, biological, nuclear and cyberattack misuse; the full safety report will come later.</p><p>Matthew Berman reports that it costs $4 and $20 per million tokens, the same as Opus 5.5, and goes through the figures published by Meta: first place on DeepSWE (79), 78.4 on OSWorld against 81 for Opus 5.5, and 56 on the Artificial Analysis index against 58 for Opus 5.5. In his tests he ran into quota errors even on the $200-a-month plan (Alexandr Wang, Meta&#39;s head of AI, replied that they were fixing it), weak results in 3D and a strange message at the end of a task. AI Explained places it close to GPT-6 Astra and notes that Wang admitted they do not know how to align their models perfectly.</p></div>
+    
+    <h2><span class="l-es">Sin confirmar</span><span class="l-en">Unconfirmed</span></h2>
+    <ul class="claims l-es"><li>Las puntuaciones en benchmarks proceden de Meta y de tablas recopiladas por Matthew Berman.</li></ul>
+    <ul class="claims l-en"><li>The benchmark scores come from Meta and from tables compiled by Matthew Berman.</li></ul>
+    
+    <h2><span class="l-es">Fuentes</span><span class="l-en">Sources</span></h2>
+    <ul>
+      
+      
+      <li><span class="kind"><span class="l-es">Vídeo</span><span class="l-en">Video</span></span>
+        <span><a href="https://www.youtube.com/watch?v=rpLrkJ5NNEI" target="_blank" rel="noopener">Matthew Berman — Meta just dropped something insane... (Muse Wonder)</a></span></li>
+      
+      <li><span class="kind"><span class="l-es">Vídeo</span><span class="l-en">Video</span></span>
+        <span><a href="https://www.youtube.com/watch?v=M8iqahFogtA&amp;t=92s" target="_blank" rel="noopener">Matthew Berman — Google just went FRONTIER (Gemini 4 Argon)</a> · min 1:32</span></li>
+      
+      <li><span class="kind"><span class="l-es">Vídeo</span><span class="l-en">Video</span></span>
+        <span><a href="https://www.youtube.com/watch?v=C4Sq3Rot8FU&amp;t=801s" target="_blank" rel="noopener">AI Explained — AI Labs Warn Race Makes Breach ‘Inevitable’</a> · min 13:21</span></li>
+      
+      <li><span class="kind"><span class="l-es">Artículo</span><span class="l-en">Article</span></span>
+        <span><a href="https://research.meta.ai/blog/muse-wonder" target="_blank" rel="noopener">research.meta.ai — Muse Wonder</a></span></li>
+      
+      <li><span class="kind"><span class="l-es">HN</span><span class="l-en">HN</span></span>
+        <span><a href="https://news.ycombinator.com/item?id=50059115" target="_blank" rel="noopener">Hacker News · 672 puntos, 382 comentarios</a></span></li>
+      
+    </ul>
+  </article>
+  <a class="more" href="../#n=2026-10-15-05"><span class="l-es">Ver todas las noticias de la semana</span><span class="l-en">See all of this week’s stories</span></a>
+</main>
+<footer class="wrap"><p><span class="l-es">Resumen generado con IA a partir de las fuentes enlazadas; puede contener errores.</span><span class="l-en">Summary written with AI from the linked sources; it may contain errors.</span></p></footer>
+<script>
+(() => {
+  const apply = lang => {
+    document.documentElement.lang = lang;
+    document.querySelectorAll(".lang [data-lang]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
+  };
+  document.querySelectorAll(".lang [data-lang]").forEach(b => b.addEventListener("click", () => {
+    try { localStorage.setItem("ai-news-lang", b.dataset.lang); } catch {}
+    apply(b.dataset.lang);
+  }));
+  apply(document.documentElement.lang === "en" ? "en" : "es");
+})();
+</script>
+</body>
+</html>

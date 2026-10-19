@@ -65,7 +65,7 @@ def score(c: Cluster, now: datetime, priority_topics: list[str]) -> float:
     intensity = math.log1p(discussion)
 
     age_h = min((now - it.published).total_seconds() / 3600 for it in items)
-    # Edición semanal: lo de los últimos días pesa algo más, sin hundir lo del principio de la semana.
+    # Lo de los últimos días pesa algo más, sin hundir lo del principio de la ventana.
     freshness = 1.0 if age_h <= 48 else 0.9 if age_h <= 96 else 0.8
 
     s = (1.5 * n_sources + intensity) * TYPE_WEIGHT.get(c.type, 1.0) * freshness
@@ -87,13 +87,15 @@ def day_of(c: Cluster) -> str:
 
 
 def select(clusters: list[Cluster], cfg: dict, now: datetime) -> list[tuple[Cluster, float]]:
-    """Las 12-15 de la semana: por puntuación, con mínimos por tipo y por día y topes para que nada acapare."""
+    """Las noticias del día (2-3; unas 15 en la semana): por puntuación, con mínimos por tipo y por día,
+    topes para que nada acapare y un suelo (`min_share` de la mejor) para no rellenar los días flojos."""
     sel_cfg = cfg.get("selection", {})
     max_items = sel_cfg.get("max_items", 12)
     min_per_type = sel_cfg.get("min_per_type", 1)
     max_per_type = sel_cfg.get("max_per_type", max_items)
     min_per_day = sel_cfg.get("min_per_day", 1)
     max_per_day = sel_cfg.get("max_per_day", max_items)
+    min_share = sel_cfg.get("min_share", 0.0)
     topics = cfg.get("priority_topics", [])
 
     allocate_signals(clusters)
@@ -129,9 +131,10 @@ def select(clusters: list[Cluster], cfg: dict, now: datetime) -> list[tuple[Clus
             if have >= min_per_day:
                 break
             have += take(x)
-    # 3. El resto, por puntuación.
+    # 3. El resto, por puntuación, sin bajar del suelo.
     for x in scored:
-        take(x)
+        if x[1] >= min_share * top:
+            take(x)
 
     chosen.sort(key=lambda x: x[1], reverse=True)
     log.info("Selección: %d de %d noticias (puntuación %.1f–%.1f) · por día: %s",

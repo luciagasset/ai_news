@@ -1,4 +1,5 @@
-"""Piezas para compartir cada edición: imagen de vista previa (Open Graph) y carrusel PDF para LinkedIn.
+"""Piezas para compartir: imagen de vista previa (Open Graph) y carrusel PDF de cada edición para LinkedIn,
+e imágenes de cada noticia (vista previa 1200×630 y cuadrada 1080×1080 para Instagram).
 
 Las dos se maquetan con plantillas HTML y se convierten con Chrome en modo headless, que ya está
 instalado en el ordenador (y en los runners de GitHub Actions). Si no se encuentra Chrome, la edición
@@ -9,6 +10,7 @@ from __future__ import annotations
 import os
 import shutil
 import subprocess
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from .common import DATA, OUTPUT, log
@@ -71,6 +73,29 @@ def export_assets(date: str, og_html: str, carousel_html: str) -> dict[str, str]
     if out:
         log.info("Para compartir: %s", ", ".join(out.values()))
     return out
+
+
+def export_images(jobs: list[tuple[str, int, int, Path]]) -> int:
+    """Capturas (html, ancho, alto, destino) con Chrome en paralelo. Devuelve cuántas se generaron."""
+    chrome = find_chrome()
+    if not chrome or not jobs:
+        return 0
+    TMP.mkdir(parents=True, exist_ok=True)
+
+    def one(job) -> bool:
+        html, w, h, dest = job
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        page = TMP / f"img-{dest.parent.name}-{dest.stem}.html"
+        page.write_text(html, encoding="utf-8")
+        try:
+            _run(chrome, [f"--window-size={w},{h}", f"--screenshot={dest}"], page)
+            return True
+        except (subprocess.SubprocessError, OSError) as e:
+            log.warning("No se pudo generar %s: %s", dest.name, e)
+            return False
+
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        return sum(pool.map(one, jobs))
 
 
 def export_icons(svg: str) -> None:
