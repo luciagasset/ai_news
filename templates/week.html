@@ -417,11 +417,11 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 .intro-brand { font-size: 34px; font-weight: 800; letter-spacing: -.03em; margin: 16px 0 0; }
 .intro.leaving { animation: intro-out .4s cubic-bezier(.4,0,.2,1) forwards; pointer-events: none; }
 @keyframes intro-out { to { opacity: 0; transform: scale(1.04); } }
-.js .intro-logo { animation: logo-in .6s cubic-bezier(.2,.8,.2,1.2) both; }
+.js .intro-logo { animation: logo-in .8s cubic-bezier(.2,.8,.2,1.2) both; }
 .js .intro-logo .lm { transform-box: fill-box; transform-origin: center; animation: pop .45s cubic-bezier(.3,1.6,.5,1) both; }
-.js .intro-logo .lm1 { animation-delay: .2s; } .js .intro-logo .lm2 { animation-delay: .28s; }
-.js .intro-logo .lm3 { animation-delay: .36s; } .js .intro-logo .lm4 { animation-delay: .44s; }
-.js .intro-brand { animation: rise .5s cubic-bezier(.2,.8,.2,1) both; animation-delay: .3s; }
+.js .intro-logo .lm1 { animation-delay: .3s; } .js .intro-logo .lm2 { animation-delay: .45s; }
+.js .intro-logo .lm3 { animation-delay: .6s; } .js .intro-logo .lm4 { animation-delay: .75s; }
+.js .intro-brand { animation: rise .6s cubic-bezier(.2,.8,.2,1) both; animation-delay: .5s; }
 @keyframes logo-in { from { opacity: 0; transform: scale(.6) rotate(-8deg); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .intro.leaving { animation: none; opacity: 0; } }
 </style>
@@ -810,7 +810,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
       intro.classList.add("leaving");
       setTimeout(end, 380);
     };
-    setTimeout(leave, reduce ? 300 : 1100);
+    setTimeout(leave, reduce ? 300 : 2000);
     intro.addEventListener("click", leave);
   } else if (intro) intro.remove();
 
