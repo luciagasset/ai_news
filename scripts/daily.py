@@ -58,12 +58,12 @@ def say(msg: str) -> None:
         print(line, flush=True)
 
 
-def run(cmd: list[str], timeout: int = 1800) -> subprocess.CompletedProcess:
+def run(cmd: list[str], timeout: int = 1800, check: bool = True) -> subprocess.CompletedProcess:
     p = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, encoding="utf-8", errors="replace",
                        timeout=timeout, creationflags=NO_WINDOW,
                        env={**os.environ, "PYTHONIOENCODING": "utf-8"})
     out = (p.stdout + p.stderr).strip()
-    if p.returncode:
+    if p.returncode and check:
         say(f"  ✗ {' '.join(cmd[:3])} (código {p.returncode})\n{out[-3000:]}")
     return p
 
@@ -101,7 +101,7 @@ def do_day(day: str) -> bool:
 
 def publish(days: list[str]) -> bool:
     run(["git", "add", "output", "history"])
-    if run(["git", "diff", "--cached", "--quiet"]).returncode == 0:
+    if run(["git", "diff", "--cached", "--quiet"], check=False).returncode == 0:  # 1 = hay cambios
         say("Sin cambios que publicar")
         return True
     label = days[0] if len(days) == 1 else f"{days[0]} a {days[-1]}"
@@ -116,6 +116,8 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="Actualización diaria de AI News.")
     ap.add_argument("--no-push", action="store_true", help="genera los días pendientes, pero no publica")
     args = ap.parse_args()
+    if sys.stdout and hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")  # la consola de Windows no es UTF-8
 
     if LOCK.exists() and time.time() - LOCK.stat().st_mtime < 3 * 3600:
         say("Ya hay una actualización en marcha: no se lanza otra")
