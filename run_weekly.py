@@ -180,10 +180,14 @@ def cmd_ingest(day: str, cfg: dict, reuse: bool) -> int:
     if not items:
         log.error("No hay elementos para este día.")
         return 1
-    recent = load_window((Date.fromisoformat(day) - timedelta(days=1)).isoformat(), edition_days(cfg) - 1)
-    path = write_brief(day, items, cfg.get("frontier_labs", []), recent)
+    path = write_brief(day, items, cfg.get("frontier_labs", []), recent_stories(day, cfg))
     log.info("Siguiente paso (Claude Code): leer %s y escribir candidatos.json", path)
     return 0
+
+
+def recent_stories(day: str, cfg: dict) -> list[Story]:
+    """Lo publicado en los días anteriores, para no repetirlo."""
+    return load_window((Date.fromisoformat(day) - timedelta(days=1)).isoformat(), edition_days(cfg) - 1)
 
 
 def cmd_select(day: str, cfg: dict) -> int:
@@ -194,7 +198,7 @@ def cmd_select(day: str, cfg: dict) -> int:
     key_of = {id(c): k for k, c in keyed}
     _, until = window(day, 1)
     chosen = [(key_of[id(c)], c, sc, is_confirmed(c)) for c, sc in select([c for _, c in keyed], cfg, until)]
-    path = write_requests(day, chosen)
+    path = write_requests(day, chosen, recent_stories(day, cfg))
     log.info("Siguiente paso (Claude Code): leer %s y escribir resumenes.json", path)
     return 0
 
@@ -203,10 +207,13 @@ def cmd_render(day: str, cfg: dict) -> int:
     items, failed = load_raw(day)
     clusters = dict(load_candidates(day, items))
     allocate_signals(list(clusters.values()))
-    summaries = load_summaries(day)
+    data = load_summaries(day)
+    summaries = data.summaries
     stories: list[Story] = []
     for entry in load_selection(day):
         key = entry["key"]
+        if key in data.skip:
+            continue
         if key not in summaries:
             log.warning("Sin resumen para %s: se omite", key)
             continue

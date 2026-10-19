@@ -10,7 +10,7 @@
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="AI News">
 <meta property="og:title" content="{{ s.headline }}">
-<meta property="og:description" content="{% if s.unconfirmed %}Sin confirmar. {% endif %}{{ s.summary_short }}">
+<meta property="og:description" content="{{ s.summary_short }}">
 {%- if og_image %}
 <meta property="og:image" content="{{ og_image }}">
 <meta property="og:image:width" content="1200">
@@ -29,6 +29,7 @@
   if (lang !== "es" && lang !== "en") lang = (navigator.language || "es").toLowerCase().startsWith("es") ? "es" : "en";
   document.documentElement.lang = lang;
 })();
+{% include "partials/theme.js" %}
 </script>
 <style>
 {% include "partials/base.css" %}
@@ -43,7 +44,6 @@ header.top { display: flex; align-items: center; justify-content: space-between;
 article { margin-top: 16px; padding: 24px 22px 28px; border-radius: 22px; background: var(--card); box-shadow: var(--shadow); }
 .tags { display: flex; flex-wrap: wrap; gap: 6px; font-size: 12px; }
 .tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; font-weight: 600; color: var(--tc, var(--label-2)); background: color-mix(in srgb, var(--tc, var(--label-2)) var(--tint), transparent); }
-.tag.unconfirmed { --tc: var(--t-polemica); }
 .tag.official { --tc: var(--accent); }
 h1 { font-size: 28px; line-height: 1.2; font-weight: 700; letter-spacing: -.02em; margin: 14px 0 0; }
 .lead { font-size: 19px; line-height: 1.45; font-weight: 500; margin: 12px 0 0; }
@@ -54,7 +54,6 @@ ul { margin: 0; padding: 0; list-style: none; }
 li { font-size: 15px; padding: 9px 0; border-bottom: 0.5px solid var(--separator); display: flex; gap: 10px; align-items: baseline; }
 li:last-child { border-bottom: 0; }
 .kind { font-size: 12px; color: var(--label-3); min-width: 60px; flex: none; }
-.claims li { color: var(--label-2); }
 .more { display: flex; align-items: center; justify-content: center; min-height: 50px; margin: 20px 0 0; border-radius: 14px; background: var(--accent); color: #fff; font-weight: 600; }
 .more:hover { text-decoration: none; filter: brightness(1.06); }
 footer { margin: 28px auto 48px; color: var(--label-3); font-size: 13px; }
@@ -62,10 +61,12 @@ footer { margin: 28px auto 48px; color: var(--label-3); font-size: 13px; }
 </head>
 <body class="t-{{ s.type }}">
 {%- from "partials/logo.html" import logo_mark %}
+{%- from "partials/theme.html" import theme_button %}
+<div class="statusbar" aria-hidden="true"></div>
 {%- macro t(es, en_text) -%}<span class="l-es">{{ es }}</span><span class="l-en">{{ en_text or es }}</span>{%- endmacro -%}
 <header class="top wrap">
   <a class="wordmark" href="../">{{ logo_mark(28, "logo-mark") }}AI News</a>
-  <div class="lang" role="group" aria-label="Idioma"><button type="button" data-lang="es" lang="es">ES</button><button type="button" data-lang="en" lang="en">EN</button></div>
+  <div class="lang" role="group" aria-label="Idioma"><button type="button" data-lang="es" lang="es">ES</button><button type="button" data-lang="en" lang="en">EN</button>{{ theme_button() }}</div>
 </header>
 <main class="wrap">
   <article>
@@ -73,7 +74,6 @@ footer { margin: 28px auto 48px; color: var(--label-3); font-size: 13px; }
       <span class="tag">{{ t(type_singular[s.type], type_singular_en[s.type]) }}</span>
       <span class="tag t-noticia">{{ t(category_labels[s.category], category_labels_en[s.category]) }}</span>
       {% if s.official %}<span class="tag official">{{ t("Fuente oficial", "Official source") }}</span>{% endif %}
-      {% if s.unconfirmed %}<span class="tag unconfirmed">{{ t("Sin confirmar", "Unconfirmed") }}</span>{% endif %}
       {% if s.partial %}<span class="tag">{{ t("Resumen parcial", "Partial summary") }}</span>{% endif %}
     </div>
     <h1>{{ t(s.headline, en(s, "headline")) }}</h1>
@@ -81,11 +81,6 @@ footer { margin: 28px auto 48px; color: var(--label-3); font-size: 13px; }
     <p class="info"><span>{{ t(long_date, long_date_en) }}</span><span>{{ s.reading_minutes }} {{ t("min de lectura", "min read") }}</span></p>
     <div class="long l-es">{% for para in s.summary_long.split("\n\n") if para.strip() %}<p>{{ para.strip() }}</p>{% endfor %}</div>
     <div class="long l-en">{% for para in en(s, "summary_long").split("\n\n") if para.strip() %}<p>{{ para.strip() }}</p>{% endfor %}</div>
-    {% if s.unconfirmed_claims %}
-    <h2>{{ t("Sin confirmar", "Unconfirmed") }}</h2>
-    <ul class="claims l-es">{% for c in s.unconfirmed_claims %}<li>{{ c }}</li>{% endfor %}</ul>
-    <ul class="claims l-en">{% for c in en(s, "unconfirmed_claims") %}<li>{{ c }}</li>{% endfor %}</ul>
-    {% endif %}
     <h2>{{ t("Fuentes", "Sources") }}</h2>
     <ul>
       {% set kinds = {"youtube": ("Vídeo", "Video"), "rss": ("Artículo", "Article"), "lab": ("Oficial", "Official"), "hackernews": ("HN", "HN")} %}

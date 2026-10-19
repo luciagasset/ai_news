@@ -3,7 +3,8 @@
 - `write_requests` deja en data/raw/<fecha>/para_resumir.md, por cada noticia seleccionada, el
   fragmento relevante de cada fuente: el artículo o, en los vídeos, la ventana de transcripción
   alrededor del minuto en que se trata el tema. Y en seleccion.json, el orden y la puntuación.
-- Claude Code escribe resumenes.json siguiendo docs/instrucciones-claude-code.md (paso 2).
+- Claude Code escribe resumenes.json siguiendo docs/instrucciones-claude-code.md (paso 2). Si una noticia
+  repite otra (ya publicada o del mismo día), la deja en `skip` y no se publica.
 - `load_summaries` lo valida.
 """
 from __future__ import annotations
@@ -16,7 +17,7 @@ from pydantic import BaseModel
 
 from .cluster import Cluster
 from .common import RAW, log
-from .models import Mention
+from .models import Mention, Story
 
 REQUESTS_FILE = "para_resumir.md"
 SELECTION_FILE = "seleccion.json"
@@ -45,6 +46,7 @@ class Summary(BaseModel):
 
 class Summaries(BaseModel):
     summaries: dict[str, Summary]
+    skip: dict[str, str] = {}  # clave → motivo (p. ej. «repite 2026-10-13-01»): no se publica
 
 
 def mmss(seconds: float | None) -> str:
@@ -85,11 +87,23 @@ def _request(key: str, c: Cluster, score: float, confirmed: bool) -> str:
     return "\n".join(parts)
 
 
-def write_requests(day: str, chosen: list[tuple[str, Cluster, float, bool]]) -> Path:
+def _published(recent: list[Story]) -> str:
+    """Lo ya publicado esa semana, para que ninguna noticia del día lo repita."""
+    if not recent:
+        return ""
+    lines = [f"- `{s.id}` · {s.first_seen} · {s.headline}: {s.summary_short}" for s in recent]
+    return ("## Ya publicadas en los días anteriores\n\n"
+            "Si una noticia de abajo cuenta lo mismo que una de estas (o que otra de hoy), no la resumas: ponla en "
+            "`skip`. Un seguimiento solo vale si aporta un hecho nuevo, y entonces se resume solo lo nuevo.\n\n"
+            + "\n".join(lines) + "\n\n")
+
+
+def write_requests(day: str, chosen: list[tuple[str, Cluster, float, bool]], recent: list[Story] = ()) -> Path:
     folder = RAW / day
     header = (f"# Noticias seleccionadas del {day}\n\n"
               f"Sigue `docs/instrucciones-claude-code.md` (paso 2) y escribe `{SUMMARIES_FILE}` en esta carpeta, "
-              f"con una entrada por cada clave ({', '.join(k for k, *_ in chosen)}).\n\n---\n\n")
+              f"con una entrada por cada clave ({', '.join(k for k, *_ in chosen)}) en `summaries` o en `skip`.\n\n"
+              + _published(list(recent)) + "---\n\n")
     body = "\n---\n\n".join(_request(k, c, s, conf) for k, c, s, conf in chosen)
     path = folder / REQUESTS_FILE
     path.write_text(header + body, encoding="utf-8")
@@ -105,10 +119,12 @@ def load_selection(day: str) -> list[dict]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def load_summaries(day: str) -> dict[str, Summary]:
+def load_summaries(day: str) -> Summaries:
     path = RAW / day / SUMMARIES_FILE
     if not path.exists():
         raise FileNotFoundError(f"Falta {path}: Claude Code debe escribirlo a partir de {REQUESTS_FILE}")
     data = Summaries.model_validate(json.loads(path.read_text(encoding="utf-8")))
     log.info("Resúmenes: %d", len(data.summaries))
-    return data.summaries
+    for key, why in data.skip.items():
+        log.info("Descartada %s por repetida: %s", key, why)
+    return data

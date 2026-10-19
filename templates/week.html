@@ -9,7 +9,7 @@
 {%- if og_image %}
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="AI News">
-<meta property="og:title" content="AI News · {{ 'Las noticias de IA de los últimos 7 días' if rolling else week_label }}">
+<meta property="og:title" content="AI News · {{ 'Las noticias de IA de esta semana' if rolling else week_label }}">
 <meta property="og:description" content="Las noticias de IA que generan conversación: avances, debates, polémicas y noticias, resumidas en español cada mañana.">
 <meta property="og:image" content="{{ og_image }}">
 <meta property="og:image:width" content="1200">
@@ -35,6 +35,7 @@ document.documentElement.classList.add("js");
   if (lang !== "es" && lang !== "en") lang = (navigator.language || "es").toLowerCase().startsWith("es") ? "es" : "en";
   document.documentElement.lang = lang;
 })();
+{% include "partials/theme.js" %}
 const L = (es, en) => (document.documentElement.lang === "en" ? en : es);
 // Pantalla de carga: solo al abrir la web o la app; no al pasar de una página propia a otra (p. ej. «Semana
 // anterior») ni con un enlace directo a una noticia (#n=…)
@@ -96,7 +97,6 @@ h2.block { font-size: 22px; font-weight: 700; letter-spacing: -.01em; margin: 36
 .tag { color: var(--tc); background: color-mix(in srgb, var(--tc) var(--tint), transparent); padding: 3px 7px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px; }
 .tag .icon { font-size: 12px; }
 .tag.official { --tc: var(--accent); }
-.tag.unconfirmed { --tc: var(--t-polemica); }
 .tag.partial { --tc: var(--t-noticia); }
 .tile h3 {
   font-size: 17px; line-height: 1.28; font-weight: 600; letter-spacing: -.01em; margin: 12px 0 0;
@@ -152,7 +152,6 @@ dialog.sheet.closing::backdrop { animation: fade-out .22s ease-in forwards; }
 .sheet-body li { font-size: 15px; padding: 9px 0; border-bottom: 0.5px solid var(--separator); display: flex; gap: 10px; align-items: baseline; }
 .sheet-body li:last-child { border-bottom: 0; }
 .kind { font-size: 12px; color: var(--label-3); min-width: 60px; flex: none; }
-.claims li { color: var(--label-2); }
 .related .rel { font-size: 12px; font-weight: 600; color: var(--rc); flex: none; }
 .sheet-body > * { animation: rise .4s cubic-bezier(.2,.8,.2,1) both; }
 .sheet-body > *:nth-child(2) { animation-delay: .03s; } .sheet-body > *:nth-child(3) { animation-delay: .06s; }
@@ -186,6 +185,9 @@ dialog.sheet.closing::backdrop { animation: fade-out .22s ease-in forwards; }
 .day.quiet .day-label b { color: var(--label-3); font-weight: 500; }
 .pulse-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 12px 0 0; font-size: 12px; color: var(--label-2); }
 .pulse-legend > span::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--tc); margin-right: 5px; }
+.pulse-legend > .read-key { color: var(--label-3); }
+.pulse-legend > .read-key::before { background: none; box-shadow: inset 0 0 0 1.5px var(--label-3); }
+html:not(.js) .read-key { display: none; }
 .js .pulse .dot::before { animation: pop .55s cubic-bezier(.3,1.5,.5,1) both; animation-delay: var(--d, 0s); }
 @keyframes pop { from { transform: scale(0); } }
 
@@ -391,8 +393,8 @@ html[lang="en"] .l-es, html:not([lang="en"]) .l-en { display: none !important; }
 .lang button[aria-pressed="true"] { background: var(--label); color: var(--bg); }
 .lang button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 /* La cabecera deja sitio al selector */
-header.top .brand-row, .title-row { padding-right: 104px; }
-.bar .row { padding-right: 104px; }
+header.top .brand-row, .title-row { padding-right: 148px; }
+.bar .row { padding-right: 148px; }
 
 /* ---------- Marca ---------- */
 .wordmark { display: inline-flex; align-items: center; gap: 8px; }
@@ -428,6 +430,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 </head>
 <body>
 {%- from "partials/logo.html" import logo_mark, wordmark %}
+{%- from "partials/theme.html" import theme_button %}
 {#- Texto en los dos idiomas: el CSS muestra solo el activo (html[lang]) -#}
 {%- macro t(es, en_text) -%}<span class="l-es">{{ es }}</span><span class="l-en">{{ en_text or es }}</span>{%- endmacro -%}
 {%- macro plural(n, es1, esn, en1, enn) -%}{{ t(es1 if n == 1 else esn, en1 if n == 1 else enn) }}{%- endmacro -%}
@@ -468,7 +471,6 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     <span class="tag">{{ icon(s.type) }}{{ t(type_singular[s.type], type_singular_en[s.type]) }}</span>
     {% if new %}<span class="tag new">{{ t("Nuevo", "New") }}</span>{% endif %}
     {% if s.official %}<span class="tag official">{{ t("Oficial", "Official") }}</span>{% endif %}
-    {% if s.unconfirmed %}<span class="tag unconfirmed">{{ t("Sin confirmar", "Unconfirmed") }}</span>{% endif %}
     <span class="tag done">{{ icon("check") }}{{ t("Leída", "Read") }}</span>
   </span>
   <h3>{{ t(s.headline, en(s, "headline")) }}</h3>
@@ -485,7 +487,9 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 <div class="lang" role="group" aria-label="Idioma" data-en-aria-label="Language">
   <button type="button" data-lang="es" aria-pressed="true" lang="es">ES</button>
   <button type="button" data-lang="en" aria-pressed="false" lang="en">EN</button>
+  {{ theme_button() }}
 </div>
+<div class="statusbar" aria-hidden="true"></div>
 
 <div class="intro" id="intro" aria-hidden="true">
   <div class="intro-inner">{{ logo_mark(84, "intro-logo", true) }}<p class="intro-brand">AI News</p></div>
@@ -537,7 +541,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
         </div>
         {%- endfor %}
       </div>
-      <p class="pulse-legend" aria-hidden="true">{% for tp, label, desc, items in types if items %}<span class="t-{{ tp }}">{{ t(label, type_labels_en[tp]) }}</span>{% endfor %}</p>
+      <p class="pulse-legend" aria-hidden="true">{% for tp, label, desc, items in types if items %}<span class="t-{{ tp }}">{{ t(label, type_labels_en[tp]) }}</span>{% endfor %}<span class="read-key">{{ t("Hueco: ya leída", "Hollow: already read") }}</span></p>
     </section>
 
     {% set top = ranked | rejectattr("id", "in", last_ids) | list %}
@@ -671,7 +675,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 <template id="d-help">
   <div class="help">
     <h2 id="sheet-title">{{ t("Cómo leer esta página", "How to read this page") }}</h2>
-    <p class="lead">{{ t("Cada mañana se añaden las noticias de IA del día anterior que más conversación real generan, no lo que sale primero en un buscador. La página muestra siempre los 7 últimos días; la vista día a día las coloca el día en que surgieron.", "Every morning, the previous day’s AI stories that generate the most real conversation are added, not what ranks first on a search engine. The page always shows the last 7 days; the day-by-day view places each story on the day it broke.") }}</p>
+    <p class="lead">{{ t("Cada mañana se añaden las noticias de IA del día anterior que más conversación real generan, no lo que sale primero en un buscador. La portada es la semana en curso, de lunes a domingo; la vista día a día las coloca el día en que surgieron.", "Every morning, the previous day’s AI stories that generate the most real conversation are added, not what ranks first on a search engine. The front page is the current week, Monday to Sunday; the day-by-day view places each story on the day it broke.") }}</p>
     <h4>{{ t("Tipos", "Types") }}</h4>
     <dl>
       {% for tp, label, desc, items in types %}<dt class="t-{{ tp }}"><span class="tag">{{ icon(tp) }}{{ t(type_singular[tp], type_singular_en[tp]) }}</span></dt><dd>{{ t(desc, type_desc_en[tp]) }}.</dd>{% endfor %}
@@ -679,7 +683,6 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     <h4>{{ t("Etiquetas", "Labels") }}</h4>
     <dl>
       <dt><span class="tag official">{{ t("Fuente oficial", "Official source") }}</span></dt><dd>{{ t("El anuncio viene de la propia empresa o laboratorio.", "The announcement comes from the company or lab itself.") }}</dd>
-      <dt><span class="tag unconfirmed">{{ t("Sin confirmar", "Unconfirmed") }}</span></dt><dd>{{ t("Polémica con una sola fuente no oficial: tómala con cautela. Dentro de cada noticia, el apartado «Sin confirmar» lista las afirmaciones concretas que no están verificadas.", "A controversy backed by a single unofficial source: treat it with caution. Inside each story, the “Unconfirmed” section lists the specific claims that have not been verified.") }}</dd>
       <dt><span class="tag partial">{{ t("Resumen parcial", "Partial summary") }}</span></dt><dd>{{ t("El vídeo no tenía subtítulos y el resumen se basa solo en su título y descripción.", "The video had no captions, so the summary relies only on its title and description.") }}</dd>
     </dl>
     <h4>{{ t("Intensidad del debate", "Debate intensity") }}</h4>
@@ -716,12 +719,11 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 {# Detalle de cada noticia: se copia a la hoja al abrirla #}
 {% for s in ranked %}
 <template id="d-{{ s.id }}" data-h="{{ s.headline }}" data-h-en="{{ en(s, 'headline') }}"
-  data-c="{{ s.summary_short | first_sentence }}" data-c-en="{{ en(s, 'summary_short') | first_sentence }}"{% if s.unconfirmed %} data-unconfirmed{% endif %}>
+  data-c="{{ s.summary_short | first_sentence }}" data-c-en="{{ en(s, 'summary_short') | first_sentence }}">
   <div class="tags">
     <span class="tag t-{{ s.type }}">{{ icon(s.type) }}{{ t(type_singular[s.type], type_singular_en[s.type]) }}</span>
     <span class="tag t-noticia">{{ t(category_labels[s.category], category_labels_en[s.category]) }}</span>
     {% if s.official %}<span class="tag official">{{ t("Fuente oficial", "Official source") }}</span>{% endif %}
-    {% if s.unconfirmed %}<span class="tag unconfirmed">{{ t("Sin confirmar", "Unconfirmed") }}</span>{% endif %}
     {% if s.partial %}<span class="tag partial">{{ t("Resumen parcial", "Partial summary") }}</span>{% endif %}
   </div>
   <h2 id="sheet-title">{{ t(s.headline, en(s, "headline")) }}</h2>
@@ -733,11 +735,6 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
   </div>
   <div class="long l-es">{% for para in s.summary_long.split("\n\n") if para.strip() %}<p>{{ para.strip() }}</p>{% endfor %}</div>
   <div class="long l-en">{% for para in en(s, "summary_long").split("\n\n") if para.strip() %}<p>{{ para.strip() }}</p>{% endfor %}</div>
-  {% if s.unconfirmed_claims %}
-  <h4>{{ t("Sin confirmar", "Unconfirmed") }}</h4>
-  <ul class="claims l-es">{% for c in s.unconfirmed_claims %}<li>{{ c }}</li>{% endfor %}</ul>
-  <ul class="claims l-en">{% for c in (en(s, "unconfirmed_claims")) %}<li>{{ c }}</li>{% endfor %}</ul>
-  {% endif %}
   <h4>{{ t("Fuentes", "Sources") }}</h4>
   <ul>
     {% for src in s.sources %}
@@ -1120,8 +1117,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     const tpl = document.getElementById("d-" + id);
     const headline = L(tpl.dataset.h, tpl.dataset.hEn);
     const context = L(tpl.dataset.c, tpl.dataset.cEn);
-    const flag = tpl.hasAttribute("data-unconfirmed") ? L("Sin confirmar. ", "Unconfirmed. ") : "";
-    return { id, headline, text: `${headline}\n${flag}${context}`,
+    return { id, headline, text: `${headline}\n${context}`,
              url: new URL(`noticias/${id}.html`, SITE || location.href).href,
              image: new URL(`instagram/${id}.png`, location.href).href, file: null };
   };

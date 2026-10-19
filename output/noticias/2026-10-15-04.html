@@ -25,10 +25,48 @@
   if (lang !== "es" && lang !== "en") lang = (navigator.language || "es").toLowerCase().startsWith("es") ? "es" : "en";
   document.documentElement.lang = lang;
 })();
+// Modo claro u oscuro: el elegido con el botón (si se guardó) o el del sistema
+(() => {
+  const KEY = "ai-news-theme";
+  const root = document.documentElement;
+  const system = matchMedia("(prefers-color-scheme: dark)");
+  const saved = () => { let t = null; try { t = localStorage.getItem(KEY); } catch {} return t === "light" || t === "dark" ? t : null; };
+  const apply = () => {
+    const t = saved();
+    if (t) root.dataset.theme = t; else delete root.dataset.theme;
+    const mode = t || (system.matches ? "dark" : "light");
+    root.dataset.mode = mode;
+    // Color de la barra del navegador y de la app instalada
+    document.querySelectorAll('meta[name="theme-color"]').forEach(m => {
+      if (!m.dataset.media) m.dataset.media = m.media || "";
+      m.media = t ? "" : m.dataset.media;
+      if (t) m.content = t === "dark" ? "#000000" : "#f2f2f7";
+      else m.content = m.dataset.media.includes("dark") ? "#000000" : "#f2f2f7";
+    });
+    document.querySelectorAll("[data-theme-toggle]").forEach(b => {
+      const en = root.lang === "en";
+      b.setAttribute("aria-label", mode === "dark" ? (en ? "Switch to light mode" : "Cambiar a modo día")
+                                                   : (en ? "Switch to dark mode" : "Cambiar a modo noche"));
+    });
+  };
+  apply();
+  system.addEventListener?.("change", apply);
+  document.addEventListener("click", e => {
+    const b = e.target.closest?.("[data-theme-toggle]");
+    if (!b) return;
+    e.stopPropagation();
+    try { localStorage.setItem(KEY, root.dataset.mode === "dark" ? "light" : "dark"); } catch {}
+    apply();
+  }, true);
+  addEventListener("DOMContentLoaded", apply);
+  // La etiqueta del botón sigue al idioma
+  new MutationObserver(apply).observe(root, { attributes: true, attributeFilter: ["lang"] });
+})();
 </script>
 <style>
 /* Paleta basada en los colores de sistema de Apple (HIG · Color), con las variantes de contraste
-   accesible para el texto de color. Claro y oscuro siguen la preferencia del sistema. */
+   accesible para el texto de color. Claro y oscuro siguen la preferencia del sistema, salvo que se elija
+   otro con el botón de modo noche/día (data-theme, ver partials/theme.js). */
 :root {
   color-scheme: light dark;
   --bg: #f2f2f7; --card: #ffffff; --sheet: #ffffff;
@@ -76,6 +114,19 @@ button { font: inherit; color: inherit; }
 .t-polemica { --tc: var(--t-polemica); } .t-noticia { --tc: var(--t-noticia); }
 .icon { width: 1em; height: 1em; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 [hidden] { display: none !important; }
+
+/* Botón de modo noche/día: muestra la luna de día y el sol de noche */
+.theme-btn .icon { font-size: 16px; display: block; margin: auto; }
+.theme-btn .i-sun, html[data-mode="dark"] .theme-btn .i-moon { display: none; }
+html[data-mode="dark"] .theme-btn .i-sun { display: block; }
+
+/* App instalada en iPhone: la hora y la batería quedan sobre una franja translúcida, como en WhatsApp,
+   para que el texto no se les cruce al hacer scroll (en el navegador mide 0) */
+.statusbar { position: fixed; top: 0; left: 0; right: 0; z-index: 115; height: env(safe-area-inset-top); pointer-events: none;
+  background: var(--bar); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); }
+
+/* Pie de página justificado */
+footer p { text-align: justify; -webkit-hyphens: auto; hyphens: auto; }
 html[lang="en"] .l-es, html:not([lang="en"]) .l-en { display: none !important; }
 .wrap { max-width: 720px; }
 header.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: calc(16px + env(safe-area-inset-top)); padding-bottom: 8px; }
@@ -87,7 +138,6 @@ header.top { display: flex; align-items: center; justify-content: space-between;
 article { margin-top: 16px; padding: 24px 22px 28px; border-radius: 22px; background: var(--card); box-shadow: var(--shadow); }
 .tags { display: flex; flex-wrap: wrap; gap: 6px; font-size: 12px; }
 .tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; font-weight: 600; color: var(--tc, var(--label-2)); background: color-mix(in srgb, var(--tc, var(--label-2)) var(--tint), transparent); }
-.tag.unconfirmed { --tc: var(--t-polemica); }
 .tag.official { --tc: var(--accent); }
 h1 { font-size: 28px; line-height: 1.2; font-weight: 700; letter-spacing: -.02em; margin: 14px 0 0; }
 .lead { font-size: 19px; line-height: 1.45; font-weight: 500; margin: 12px 0 0; }
@@ -98,13 +148,13 @@ ul { margin: 0; padding: 0; list-style: none; }
 li { font-size: 15px; padding: 9px 0; border-bottom: 0.5px solid var(--separator); display: flex; gap: 10px; align-items: baseline; }
 li:last-child { border-bottom: 0; }
 .kind { font-size: 12px; color: var(--label-3); min-width: 60px; flex: none; }
-.claims li { color: var(--label-2); }
 .more { display: flex; align-items: center; justify-content: center; min-height: 50px; margin: 20px 0 0; border-radius: 14px; background: var(--accent); color: #fff; font-weight: 600; }
 .more:hover { text-decoration: none; filter: brightness(1.06); }
 footer { margin: 28px auto 48px; color: var(--label-3); font-size: 13px; }
 </style>
 </head>
-<body class="t-noticia"><header class="top wrap">
+<body class="t-noticia">
+<div class="statusbar" aria-hidden="true"></div><header class="top wrap">
   <a class="wordmark" href="../"><svg xmlns="http://www.w3.org/2000/svg" class="logo-mark" width="28" height="28" viewBox="0 0 64 64" role="img" aria-label="AI News">
   <rect width="64" height="64" rx="15" fill="#0b0b0f"/>
   <rect x="0.5" y="0.5" width="63" height="63" rx="14.5" fill="none" stroke="rgba(255,255,255,.12)"/>
@@ -112,9 +162,9 @@ footer { margin: 28px auto 48px; color: var(--label-3); font-size: 13px; }
   <circle class="lm lm1" cx="15" cy="47" r="4" fill="#aeaeb2"/>
   <circle class="lm lm2" cx="26" cy="40" r="5.5" fill="#3bdded"/>
   <circle class="lm lm3" cx="38.5" cy="30.5" r="7" fill="#ffa056"/>
-  <circle class="lm lm4" cx="51" cy="18" r="8.5" fill="#a7aaff"/>
+  <path class="lm lm4" d="M50 9Q51.8 17.2 60 19Q51.8 20.8 50 29Q48.2 20.8 40 19Q48.2 17.2 50 9Z" fill="#a7aaff"/>
 </svg>AI News</a>
-  <div class="lang" role="group" aria-label="Idioma"><button type="button" data-lang="es" lang="es">ES</button><button type="button" data-lang="en" lang="en">EN</button></div>
+  <div class="lang" role="group" aria-label="Idioma"><button type="button" data-lang="es" lang="es">ES</button><button type="button" data-lang="en" lang="en">EN</button><button type="button" class="theme-btn" data-theme-toggle aria-label="Cambiar a modo noche"><svg class="icon i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><svg class="icon i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button></div>
 </header>
 <main class="wrap">
   <article>
@@ -123,18 +173,12 @@ footer { margin: 28px auto 48px; color: var(--label-3); font-size: 13px; }
       <span class="tag t-noticia"><span class="l-es">Herramientas</span><span class="l-en">Tools</span></span>
       
       
-      
     </div>
     <h1><span class="l-es">REA y la ola de ingeniería inversa con IA: de descompilar juegos a clonar Photoshop</span><span class="l-en">REA and the wave of AI reverse engineering: from decompiling games to cloning Photoshop</span></h1>
     <p class="lead"><span class="l-es">REA («Reverse-Engineer Anything»), una herramienta que conecta los agentes de programación con utilidades de ingeniería inversa, fue uno de los proyectos más comentados de la semana. Llega en plena oleada de juegos descompilados y programas clonados con IA.</span><span class="l-en">REA (“Reverse-Engineer Anything”), a tool that connects coding agents to reverse-engineering utilities, was one of the most talked-about projects of the week. It arrives in the middle of a wave of games decompiled and programs cloned with AI.</span></p>
     <p class="info"><span><span class="l-es">Sábado, 10 de octubre de 2026</span><span class="l-en">Saturday, October 10, 2026</span></span><span>2 <span class="l-es">min de lectura</span><span class="l-en">min read</span></span></p>
     <div class="long l-es"><p>REA se instala pidiéndoselo al propio agente de programación y, según su web y los comentarios, sirve para analizar desde apps de Android hasta ejecutables de juegos antiguos; su web muestra, por ejemplo, cómo rastrear el código de inicio de sesión de una app de Android a partir de su APK. Un comentarista de Hacker News calcula que el repositorio pasó de unas 4.200 estrellas en GitHub el 5 de octubre a 54.600 el día 10. En el hilo (808 puntos, 339 comentarios) hay de todo: quien pregunta qué aporta frente a pedirle a Claude que instale Ghidra, quien cuenta que los modelos de Anthropic y OpenAI bloquean este trabajo como riesgo de ciberseguridad, quien avisa de demandas y quien lamenta que las descompilaciones automáticas acaben con la afición del modding retro.</p><p>REA es solo una pieza del fenómeno. Matthew Berman explica en vídeo cómo juegos que tardaban años en descompilarse ahora se hacen en semanas, cita un clon de Photoshop publicado como código abierto y concluye que «el software está resuelto» si su única ventaja es el código. Un desarrollador relata tres meses descompilando un shooter con agentes y unos 600.000-700.000 millones de tokens: el primer mes el código era legible pero incorrecto, y solo funcionó al exigir que cada función coincidiera byte a byte con el original (99 % de las funciones presentes, 83 % idénticas). Otro escribió con Claude un driver de Linux para su escáner capturando el tráfico USB del driver de Windows. AI Explained resume la semana como aquella en que «el software se sometió a ingeniería inversa».</p></div>
     <div class="long l-en"><p>REA is installed by asking the coding agent itself to do it and, according to its website and the comments, can analyse anything from Android apps to old game executables; its site shows, for example, how to trace an Android app&#39;s login code from its APK. A Hacker News commenter estimates that the repository went from about 4,200 GitHub stars on 5 October to 54,600 on the 10th. The thread (808 points, 339 comments) has a bit of everything: people asking what it adds over asking Claude to install Ghidra, others saying Anthropic and OpenAI models block this work as a cybersecurity risk, warnings about lawsuits, and complaints that automated decompilations are killing the retro modding hobby.</p><p>REA is only one piece of the phenomenon. Matthew Berman explains in a video how games that took years to decompile are now done in weeks, cites a Photoshop clone released as open source and concludes that “software is solved” if its only advantage is the code. One developer describes three months decompiling a shooter with agents and some 600 to 700 billion tokens: in the first month the code was readable but wrong, and it only worked once every function had to match the original byte for byte (99% of functions present, 83% identical). Another wrote a Linux driver for his scanner with Claude by capturing the USB traffic of the Windows driver. AI Explained sums up the week as the one in which “software got reverse engineered”.</p></div>
-    
-    <h2><span class="l-es">Sin confirmar</span><span class="l-en">Unconfirmed</span></h2>
-    <ul class="claims l-es"><li>La evolución de estrellas y forks de REA la calcula un comentarista de Hacker News.</li></ul>
-    <ul class="claims l-en"><li>The evolution of REA&#39;s stars and forks was calculated by a Hacker News commenter.</li></ul>
-    
     <h2><span class="l-es">Fuentes</span><span class="l-en">Sources</span></h2>
     <ul>
       

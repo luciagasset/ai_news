@@ -25,10 +25,48 @@
   if (lang !== "es" && lang !== "en") lang = (navigator.language || "es").toLowerCase().startsWith("es") ? "es" : "en";
   document.documentElement.lang = lang;
 })();
+// Modo claro u oscuro: el elegido con el botón (si se guardó) o el del sistema
+(() => {
+  const KEY = "ai-news-theme";
+  const root = document.documentElement;
+  const system = matchMedia("(prefers-color-scheme: dark)");
+  const saved = () => { let t = null; try { t = localStorage.getItem(KEY); } catch {} return t === "light" || t === "dark" ? t : null; };
+  const apply = () => {
+    const t = saved();
+    if (t) root.dataset.theme = t; else delete root.dataset.theme;
+    const mode = t || (system.matches ? "dark" : "light");
+    root.dataset.mode = mode;
+    // Color de la barra del navegador y de la app instalada
+    document.querySelectorAll('meta[name="theme-color"]').forEach(m => {
+      if (!m.dataset.media) m.dataset.media = m.media || "";
+      m.media = t ? "" : m.dataset.media;
+      if (t) m.content = t === "dark" ? "#000000" : "#f2f2f7";
+      else m.content = m.dataset.media.includes("dark") ? "#000000" : "#f2f2f7";
+    });
+    document.querySelectorAll("[data-theme-toggle]").forEach(b => {
+      const en = root.lang === "en";
+      b.setAttribute("aria-label", mode === "dark" ? (en ? "Switch to light mode" : "Cambiar a modo día")
+                                                   : (en ? "Switch to dark mode" : "Cambiar a modo noche"));
+    });
+  };
+  apply();
+  system.addEventListener?.("change", apply);
+  document.addEventListener("click", e => {
+    const b = e.target.closest?.("[data-theme-toggle]");
+    if (!b) return;
+    e.stopPropagation();
+    try { localStorage.setItem(KEY, root.dataset.mode === "dark" ? "light" : "dark"); } catch {}
+    apply();
+  }, true);
+  addEventListener("DOMContentLoaded", apply);
+  // La etiqueta del botón sigue al idioma
+  new MutationObserver(apply).observe(root, { attributes: true, attributeFilter: ["lang"] });
+})();
 </script>
 <style>
 /* Paleta basada en los colores de sistema de Apple (HIG · Color), con las variantes de contraste
-   accesible para el texto de color. Claro y oscuro siguen la preferencia del sistema. */
+   accesible para el texto de color. Claro y oscuro siguen la preferencia del sistema, salvo que se elija
+   otro con el botón de modo noche/día (data-theme, ver partials/theme.js). */
 :root {
   color-scheme: light dark;
   --bg: #f2f2f7; --card: #ffffff; --sheet: #ffffff;
@@ -76,6 +114,19 @@ button { font: inherit; color: inherit; }
 .t-polemica { --tc: var(--t-polemica); } .t-noticia { --tc: var(--t-noticia); }
 .icon { width: 1em; height: 1em; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 [hidden] { display: none !important; }
+
+/* Botón de modo noche/día: muestra la luna de día y el sol de noche */
+.theme-btn .icon { font-size: 16px; display: block; margin: auto; }
+.theme-btn .i-sun, html[data-mode="dark"] .theme-btn .i-moon { display: none; }
+html[data-mode="dark"] .theme-btn .i-sun { display: block; }
+
+/* App instalada en iPhone: la hora y la batería quedan sobre una franja translúcida, como en WhatsApp,
+   para que el texto no se les cruce al hacer scroll (en el navegador mide 0) */
+.statusbar { position: fixed; top: 0; left: 0; right: 0; z-index: 115; height: env(safe-area-inset-top); pointer-events: none;
+  background: var(--bar); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); }
+
+/* Pie de página justificado */
+footer p { text-align: justify; -webkit-hyphens: auto; hyphens: auto; }
 html[lang="en"] .l-es, html:not([lang="en"]) .l-en { display: none !important; }
 .wrap { max-width: 720px; }
 header.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: calc(16px + env(safe-area-inset-top)); padding-bottom: 8px; }
@@ -87,7 +138,6 @@ header.top { display: flex; align-items: center; justify-content: space-between;
 article { margin-top: 16px; padding: 24px 22px 28px; border-radius: 22px; background: var(--card); box-shadow: var(--shadow); }
 .tags { display: flex; flex-wrap: wrap; gap: 6px; font-size: 12px; }
 .tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; font-weight: 600; color: var(--tc, var(--label-2)); background: color-mix(in srgb, var(--tc, var(--label-2)) var(--tint), transparent); }
-.tag.unconfirmed { --tc: var(--t-polemica); }
 .tag.official { --tc: var(--accent); }
 h1 { font-size: 28px; line-height: 1.2; font-weight: 700; letter-spacing: -.02em; margin: 14px 0 0; }
 .lead { font-size: 19px; line-height: 1.45; font-weight: 500; margin: 12px 0 0; }
@@ -98,13 +148,13 @@ ul { margin: 0; padding: 0; list-style: none; }
 li { font-size: 15px; padding: 9px 0; border-bottom: 0.5px solid var(--separator); display: flex; gap: 10px; align-items: baseline; }
 li:last-child { border-bottom: 0; }
 .kind { font-size: 12px; color: var(--label-3); min-width: 60px; flex: none; }
-.claims li { color: var(--label-2); }
 .more { display: flex; align-items: center; justify-content: center; min-height: 50px; margin: 20px 0 0; border-radius: 14px; background: var(--accent); color: #fff; font-weight: 600; }
 .more:hover { text-decoration: none; filter: brightness(1.06); }
 footer { margin: 28px auto 48px; color: var(--label-3); font-size: 13px; }
 </style>
 </head>
-<body class="t-polemica"><header class="top wrap">
+<body class="t-polemica">
+<div class="statusbar" aria-hidden="true"></div><header class="top wrap">
   <a class="wordmark" href="../"><svg xmlns="http://www.w3.org/2000/svg" class="logo-mark" width="28" height="28" viewBox="0 0 64 64" role="img" aria-label="AI News">
   <rect width="64" height="64" rx="15" fill="#0b0b0f"/>
   <rect x="0.5" y="0.5" width="63" height="63" rx="14.5" fill="none" stroke="rgba(255,255,255,.12)"/>
@@ -112,9 +162,9 @@ footer { margin: 28px auto 48px; color: var(--label-3); font-size: 13px; }
   <circle class="lm lm1" cx="15" cy="47" r="4" fill="#aeaeb2"/>
   <circle class="lm lm2" cx="26" cy="40" r="5.5" fill="#3bdded"/>
   <circle class="lm lm3" cx="38.5" cy="30.5" r="7" fill="#ffa056"/>
-  <circle class="lm lm4" cx="51" cy="18" r="8.5" fill="#a7aaff"/>
+  <path class="lm lm4" d="M50 9Q51.8 17.2 60 19Q51.8 20.8 50 29Q48.2 20.8 40 19Q48.2 17.2 50 9Z" fill="#a7aaff"/>
 </svg>AI News</a>
-  <div class="lang" role="group" aria-label="Idioma"><button type="button" data-lang="es" lang="es">ES</button><button type="button" data-lang="en" lang="en">EN</button></div>
+  <div class="lang" role="group" aria-label="Idioma"><button type="button" data-lang="es" lang="es">ES</button><button type="button" data-lang="en" lang="en">EN</button><button type="button" class="theme-btn" data-theme-toggle aria-label="Cambiar a modo noche"><svg class="icon i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><svg class="icon i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button></div>
 </header>
 <main class="wrap">
   <article>
@@ -123,18 +173,12 @@ footer { margin: 28px auto 48px; color: var(--label-3); font-size: 13px; }
       <span class="tag t-noticia"><span class="l-es">Herramientas</span><span class="l-en">Tools</span></span>
       
       
-      
     </div>
     <h1><span class="l-es">Acusan a Anthropic de copiar Mononoke, de Meta, en su control de versiones Scion</span><span class="l-en">Anthropic accused of copying Meta&#39;s Mononoke in its Scion version control system</span></h1>
     <p class="lead"><span class="l-es">Un ingeniero que trabajó en el control de versiones de Meta acusa a Anthropic de copiar el diseño de Mononoke en Scion sin citarlo. Tras la polémica, Anthropic respondió en Hacker News y añadió la atribución a su artículo.</span><span class="l-en">An engineer who worked on Meta&#39;s version control accuses Anthropic of copying Mononoke&#39;s design in Scion without credit. After the controversy, Anthropic responded on Hacker News and added the attribution to its post.</span></p>
     <p class="info"><span><span class="l-es">Martes, 13 de octubre de 2026</span><span class="l-en">Tuesday, October 13, 2026</span></span><span>1 <span class="l-es">min de lectura</span><span class="l-en">min read</span></span></p>
     <div class="long l-es"><p>Anthropic explicó el 13 de octubre que había sustituido git por Scion, un sistema propio construido y migrado en cinco meses, porque los cambios fusionados al día pasaron de unos 2.500 en mayo a más de 30.000 en septiembre por el código que escribe Claude. El artículo citaba Piper, de Google, y Sapling, de Meta, por sus «lecciones aprendidas», y reunió 892 puntos y 1.010 comentarios en Hacker News.</p><p>Al día siguiente, el autor del blog sunshowers.io, que ayudó a construir Mononoke en Meta, señaló que conceptos clave como los «datos derivados» eran idénticos y que no mencionar Mononoke «roza el plagio». En una segunda entrada afirma haber recibido confirmación privada de que la copia fue intencionada y de que hubo personal en común, y compara los «changesets» de Scion con los «Bonsai changesets» de Mononoke. Insiste en que el problema es la atribución, no la copia, y reconoce que reconstruirlo en cinco meses sigue siendo un logro. Según su propia actualización, un ingeniero de Anthropic respondió en Hacker News y el artículo de Anthropic ya incluye la atribución; el autor mantiene lo que escribió.</p></div>
     <div class="long l-en"><p>On 13 October Anthropic explained that it had replaced git with Scion, an in-house system built and migrated in five months, because the changes merged per day had grown from about 2,500 in May to more than 30,000 in September thanks to the code Claude writes. The post credited Google&#39;s Piper and Meta&#39;s Sapling for their “hard-won lessons”, and drew 892 points and 1,010 comments on Hacker News.</p><p>The next day, the author of the sunshowers.io blog, who helped build Mononoke at Meta, pointed out that key concepts such as “derived data” were identical and that not mentioning Mononoke “borders on plagiarism”. In a second post, the author says they received private confirmation that the copying was intentional and that staff overlapped, and compares Scion&#39;s “changesets” with Mononoke&#39;s “Bonsai changesets”. The author insists that the problem is attribution, not copying, and acknowledges that rebuilding it in five months is still an achievement. According to the author&#39;s own update, an Anthropic engineer responded on Hacker News and Anthropic&#39;s post now includes the attribution; the author stands by what they wrote.</p></div>
-    
-    <h2><span class="l-es">Sin confirmar</span><span class="l-en">Unconfirmed</span></h2>
-    <ul class="claims l-es"><li>Que la copia fuera intencionada y que hubiera personal en común lo afirma el autor a partir de una confirmación privada que no se ha hecho pública.</li></ul>
-    <ul class="claims l-en"><li>That the copying was intentional and that staff overlapped is claimed by the author based on a private confirmation that has not been made public.</li></ul>
-    
     <h2><span class="l-es">Fuentes</span><span class="l-en">Sources</span></h2>
     <ul>
       

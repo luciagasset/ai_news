@@ -44,7 +44,9 @@ PROMPTS = {
     "resumenes": (
         "Actualización diaria automática de AI News, día {day}. Sigue docs/instrucciones-claude-code.md, paso 2: "
         "lee entero data/raw/{day}/para_resumir.md y escribe data/raw/{day}/resumenes.json, con la traducción "
-        "al inglés en `en`. Solo a partir de las fuentes. No hagas nada más ni preguntes: nadie va a contestar."
+        "al inglés en `en`. Solo a partir de las fuentes. Antes de escribir, descarta en `skip` lo que repita "
+        "una noticia ya publicada o de hoy, y entiende la idea central de cada noticia: resúmenes claros, con "
+        "frases cortas y pocas atribuciones. No hagas nada más ni preguntes: nadie va a contestar."
     ),
 }
 

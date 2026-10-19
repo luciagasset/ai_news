@@ -25,10 +25,48 @@
   if (lang !== "es" && lang !== "en") lang = (navigator.language || "es").toLowerCase().startsWith("es") ? "es" : "en";
   document.documentElement.lang = lang;
 })();
+// Modo claro u oscuro: el elegido con el botón (si se guardó) o el del sistema
+(() => {
+  const KEY = "ai-news-theme";
+  const root = document.documentElement;
+  const system = matchMedia("(prefers-color-scheme: dark)");
+  const saved = () => { let t = null; try { t = localStorage.getItem(KEY); } catch {} return t === "light" || t === "dark" ? t : null; };
+  const apply = () => {
+    const t = saved();
+    if (t) root.dataset.theme = t; else delete root.dataset.theme;
+    const mode = t || (system.matches ? "dark" : "light");
+    root.dataset.mode = mode;
+    // Color de la barra del navegador y de la app instalada
+    document.querySelectorAll('meta[name="theme-color"]').forEach(m => {
+      if (!m.dataset.media) m.dataset.media = m.media || "";
+      m.media = t ? "" : m.dataset.media;
+      if (t) m.content = t === "dark" ? "#000000" : "#f2f2f7";
+      else m.content = m.dataset.media.includes("dark") ? "#000000" : "#f2f2f7";
+    });
+    document.querySelectorAll("[data-theme-toggle]").forEach(b => {
+      const en = root.lang === "en";
+      b.setAttribute("aria-label", mode === "dark" ? (en ? "Switch to light mode" : "Cambiar a modo día")
+                                                   : (en ? "Switch to dark mode" : "Cambiar a modo noche"));
+    });
+  };
+  apply();
+  system.addEventListener?.("change", apply);
+  document.addEventListener("click", e => {
+    const b = e.target.closest?.("[data-theme-toggle]");
+    if (!b) return;
+    e.stopPropagation();
+    try { localStorage.setItem(KEY, root.dataset.mode === "dark" ? "light" : "dark"); } catch {}
+    apply();
+  }, true);
+  addEventListener("DOMContentLoaded", apply);
+  // La etiqueta del botón sigue al idioma
+  new MutationObserver(apply).observe(root, { attributes: true, attributeFilter: ["lang"] });
+})();
 </script>
 <style>
 /* Paleta basada en los colores de sistema de Apple (HIG · Color), con las variantes de contraste
-   accesible para el texto de color. Claro y oscuro siguen la preferencia del sistema. */
+   accesible para el texto de color. Claro y oscuro siguen la preferencia del sistema, salvo que se elija
+   otro con el botón de modo noche/día (data-theme, ver partials/theme.js). */
 :root {
   color-scheme: light dark;
   --bg: #f2f2f7; --card: #ffffff; --sheet: #ffffff;
@@ -76,6 +114,19 @@ button { font: inherit; color: inherit; }
 .t-polemica { --tc: var(--t-polemica); } .t-noticia { --tc: var(--t-noticia); }
 .icon { width: 1em; height: 1em; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 [hidden] { display: none !important; }
+
+/* Botón de modo noche/día: muestra la luna de día y el sol de noche */
+.theme-btn .icon { font-size: 16px; display: block; margin: auto; }
+.theme-btn .i-sun, html[data-mode="dark"] .theme-btn .i-moon { display: none; }
+html[data-mode="dark"] .theme-btn .i-sun { display: block; }
+
+/* App instalada en iPhone: la hora y la batería quedan sobre una franja translúcida, como en WhatsApp,
+   para que el texto no se les cruce al hacer scroll (en el navegador mide 0) */
+.statusbar { position: fixed; top: 0; left: 0; right: 0; z-index: 115; height: env(safe-area-inset-top); pointer-events: none;
+  background: var(--bar); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); }
+
+/* Pie de página justificado */
+footer p { text-align: justify; -webkit-hyphens: auto; hyphens: auto; }
 html[lang="en"] .l-es, html:not([lang="en"]) .l-en { display: none !important; }
 .wrap { max-width: 720px; }
 header.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: calc(16px + env(safe-area-inset-top)); padding-bottom: 8px; }
@@ -87,7 +138,6 @@ header.top { display: flex; align-items: center; justify-content: space-between;
 article { margin-top: 16px; padding: 24px 22px 28px; border-radius: 22px; background: var(--card); box-shadow: var(--shadow); }
 .tags { display: flex; flex-wrap: wrap; gap: 6px; font-size: 12px; }
 .tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; font-weight: 600; color: var(--tc, var(--label-2)); background: color-mix(in srgb, var(--tc, var(--label-2)) var(--tint), transparent); }
-.tag.unconfirmed { --tc: var(--t-polemica); }
 .tag.official { --tc: var(--accent); }
 h1 { font-size: 28px; line-height: 1.2; font-weight: 700; letter-spacing: -.02em; margin: 14px 0 0; }
 .lead { font-size: 19px; line-height: 1.45; font-weight: 500; margin: 12px 0 0; }
@@ -98,13 +148,13 @@ ul { margin: 0; padding: 0; list-style: none; }
 li { font-size: 15px; padding: 9px 0; border-bottom: 0.5px solid var(--separator); display: flex; gap: 10px; align-items: baseline; }
 li:last-child { border-bottom: 0; }
 .kind { font-size: 12px; color: var(--label-3); min-width: 60px; flex: none; }
-.claims li { color: var(--label-2); }
 .more { display: flex; align-items: center; justify-content: center; min-height: 50px; margin: 20px 0 0; border-radius: 14px; background: var(--accent); color: #fff; font-weight: 600; }
 .more:hover { text-decoration: none; filter: brightness(1.06); }
 footer { margin: 28px auto 48px; color: var(--label-3); font-size: 13px; }
 </style>
 </head>
-<body class="t-noticia"><header class="top wrap">
+<body class="t-noticia">
+<div class="statusbar" aria-hidden="true"></div><header class="top wrap">
   <a class="wordmark" href="../"><svg xmlns="http://www.w3.org/2000/svg" class="logo-mark" width="28" height="28" viewBox="0 0 64 64" role="img" aria-label="AI News">
   <rect width="64" height="64" rx="15" fill="#0b0b0f"/>
   <rect x="0.5" y="0.5" width="63" height="63" rx="14.5" fill="none" stroke="rgba(255,255,255,.12)"/>
@@ -112,9 +162,9 @@ footer { margin: 28px auto 48px; color: var(--label-3); font-size: 13px; }
   <circle class="lm lm1" cx="15" cy="47" r="4" fill="#aeaeb2"/>
   <circle class="lm lm2" cx="26" cy="40" r="5.5" fill="#3bdded"/>
   <circle class="lm lm3" cx="38.5" cy="30.5" r="7" fill="#ffa056"/>
-  <circle class="lm lm4" cx="51" cy="18" r="8.5" fill="#a7aaff"/>
+  <path class="lm lm4" d="M50 9Q51.8 17.2 60 19Q51.8 20.8 50 29Q48.2 20.8 40 19Q48.2 17.2 50 9Z" fill="#a7aaff"/>
 </svg>AI News</a>
-  <div class="lang" role="group" aria-label="Idioma"><button type="button" data-lang="es" lang="es">ES</button><button type="button" data-lang="en" lang="en">EN</button></div>
+  <div class="lang" role="group" aria-label="Idioma"><button type="button" data-lang="es" lang="es">ES</button><button type="button" data-lang="en" lang="en">EN</button><button type="button" class="theme-btn" data-theme-toggle aria-label="Cambiar a modo noche"><svg class="icon i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><svg class="icon i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button></div>
 </header>
 <main class="wrap">
   <article>
@@ -123,18 +173,12 @@ footer { margin: 28px auto 48px; color: var(--label-3); font-size: 13px; }
       <span class="tag t-noticia"><span class="l-es">Investigación</span><span class="l-en">Research</span></span>
       
       
-      
     </div>
     <h1><span class="l-es">Mercor calcula que el 90 % de las horas de trabajo en EE. UU. apenas está cubierto por benchmarks de IA</span><span class="l-en">Mercor estimates 90% of US working hours are barely covered by AI benchmarks</span></h1>
     <p class="lead"><span class="l-es">Mercor ha publicado un mapa que cruza 29 benchmarks de IA con las 923 ocupaciones de EE. UU. Según su estimación provisional, el 90 % de las horas de trabajo se dedica a tareas que los benchmarks casi no miden.</span><span class="l-en">Mercor has published a map that matches 29 AI benchmarks against the 923 occupations in the US. By its provisional estimate, 90% of working hours go to tasks that benchmarks barely measure.</span></p>
     <p class="info"><span><span class="l-es">Viernes, 16 de octubre de 2026</span><span class="l-en">Friday, October 16, 2026</span></span><span>2 <span class="l-es">min de lectura</span><span class="l-en">min read</span></span></p>
     <div class="long l-es"><p>Mercor, la empresa detrás de los benchmarks APEX, ha publicado un «Benchmark Map» que relaciona 29 benchmarks agénticos, elegidos por su calidad y relevancia económica, con la taxonomía O*NET del Departamento de Trabajo de EE. UU.: 923 ocupaciones y 18.797 tareas. Un juez LLM asigna cada prompt a tareas O*NET, y una tarea cuenta como cubierta si tiene al menos 5 prompts. Con ese criterio, solo 208 de las 923 ocupaciones tienen alguna tarea cubierta y 6 de las 22 familias profesionales no tienen ninguna. Según Mercor, el 90 % de las horas de trabajo se dedica a tareas con poca o ninguna cobertura, lo que hace muy difícil saber lo buenos que son los modelos en el trabajo real. La cobertura no es aleatoria: las tareas expuestas a la IA tienen unas 6 veces más probabilidad de aparecer en benchmarks, las de ocupaciones con mayor masa salarial están sobrerrepresentadas y las tareas más importantes de cada ocupación lo están entre 6 y 10 veces más que las menos importantes. Por ejemplo, las tareas de los abogados están muy cubiertas y las de secretarios judiciales casi nada.</p><p>La propia empresa subraya que los resultados son provisionales: la lista de 29 benchmarks es incompleta, lo que sesga a la baja la cobertura, y criterios como el «realismo económico» son subjetivos. Como primer paso, Mercor ponderó por tareas O*NET las puntuaciones de sus benchmarks APEX en banca de inversión, derecho, contabilidad e ingeniería de software, con resultados muy parecidos a la media simple (en banca de inversión, Claude Opus 5.5 Max obtiene un 73,3 % sin ponderar y un 70,2 % ponderado). Pero menos de un tercio de las tareas de esas cuatro ocupaciones tiene cobertura suficiente. Entre los retos pendientes cita la escasa potencia estadística, la distinta calidad de los benchmarks, medir cómo la IA aumenta (y no solo automatiza) el trabajo humano y las tareas físicas: citando a Dingel y Neiman, solo el 37 % de los empleos podría hacerse por completo desde casa.</p></div>
     <div class="long l-en"><p>Mercor, the company behind the APEX benchmarks, has published a &#34;Benchmark Map&#34; that links 29 agentic benchmarks, chosen for their quality and economic relevance, to the US Department of Labor&#39;s O*NET taxonomy: 923 occupations and 18,797 tasks. An LLM judge assigns each prompt to O*NET tasks, and a task counts as covered if it has at least 5 prompts. On that criterion, only 208 of the 923 occupations have any covered task and 6 of the 22 job families have none. According to Mercor, 90% of working hours are spent on tasks with little or no coverage, which makes it very hard to know how good models are at real work. Coverage is not random: AI-exposed tasks are about 6 times more likely to appear in benchmarks, tasks from occupations with larger wage bills are overrepresented, and the most important tasks within each occupation are 6 to 10 times more represented than the least important ones. For example, lawyers&#39; tasks are heavily covered while court clerks&#39; tasks are barely covered at all.</p><p>The company itself stresses that the results are provisional: the list of 29 benchmarks is incomplete, which biases coverage downward, and criteria such as &#34;economic realism&#34; are subjective. As a first step, Mercor weighted the scores of its APEX benchmarks by O*NET task in investment banking, law, accounting and software engineering, with results very close to the simple average (in investment banking, Claude Opus 5.5 Max scores 73.3% unweighted and 70.2% weighted). But fewer than a third of the tasks in those four occupations have enough coverage. Among the open challenges it lists low statistical power, the varying quality of benchmarks, measuring how AI augments (not just automates) human work, and physical tasks: citing Dingel and Neiman, only 37% of jobs could be done entirely from home.</p></div>
-    
-    <h2><span class="l-es">Sin confirmar</span><span class="l-en">Unconfirmed</span></h2>
-    <ul class="claims l-es"><li>La cifra del 90 % de horas de trabajo poco cubiertas es una estimación provisional de Mercor, basada en su selección de 29 benchmarks e incluida en sus propios benchmarks APEX; no hay verificación independiente.</li></ul>
-    <ul class="claims l-en"><li>The 90% figure for poorly covered working hours is a provisional Mercor estimate, based on its own selection of 29 benchmarks that includes its own APEX benchmarks; there is no independent verification.</li></ul>
-    
     <h2><span class="l-es">Fuentes</span><span class="l-en">Sources</span></h2>
     <ul>
       

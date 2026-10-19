@@ -1,5 +1,6 @@
 /* Paleta basada en los colores de sistema de Apple (HIG · Color), con las variantes de contraste
-   accesible para el texto de color. Claro y oscuro siguen la preferencia del sistema. */
+   accesible para el texto de color. Claro y oscuro siguen la preferencia del sistema, salvo que se elija
+   otro con el botón de modo noche/día (data-theme, ver partials/theme.js). */
 :root {
   color-scheme: light dark;
   --bg: #f2f2f7; --card: #ffffff; --sheet: #ffffff;
@@ -47,3 +48,16 @@ button { font: inherit; color: inherit; }
 .t-polemica { --tc: var(--t-polemica); } .t-noticia { --tc: var(--t-noticia); }
 .icon { width: 1em; height: 1em; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 [hidden] { display: none !important; }
+
+/* Botón de modo noche/día: muestra la luna de día y el sol de noche */
+.theme-btn .icon { font-size: 16px; display: block; margin: auto; }
+.theme-btn .i-sun, html[data-mode="dark"] .theme-btn .i-moon { display: none; }
+html[data-mode="dark"] .theme-btn .i-sun { display: block; }
+
+/* App instalada en iPhone: la hora y la batería quedan sobre una franja translúcida, como en WhatsApp,
+   para que el texto no se les cruce al hacer scroll (en el navegador mide 0) */
+.statusbar { position: fixed; top: 0; left: 0; right: 0; z-index: 115; height: env(safe-area-inset-top); pointer-events: none;
+  background: var(--bar); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); }
+
+/* Pie de página justificado */
+footer p { text-align: justify; -webkit-hyphens: auto; hyphens: auto; }

@@ -37,7 +37,7 @@ h1 { font-size: {{ title }}px; line-height: 1.08; font-weight: 800; letter-spaci
 {%- from "partials/logo.html" import logo_mark %}
 <div class="card">
   <p class="brand">{{ logo_mark((base * 2) | int, "lg") }}<span>AI News</span><time>{{ s.first_seen | short_date }}</time></p>
-  <p class="tags"><span class="tag">{{ type_singular[s.type] }}</span>{% if s.official %}<span class="tag">Fuente oficial</span>{% endif %}{% if s.unconfirmed %}<span class="tag warn">Sin confirmar</span>{% endif %}</p>
+  <p class="tags"><span class="tag">{{ type_singular[s.type] }}</span>{% if s.official %}<span class="tag">Fuente oficial</span>{% endif %}</p>
   <h1>{{ s.headline }}</h1>
   {% if lead_lines %}<p class="lead">{{ s.summary_short }}</p>{% endif %}
   {% set names = s.sources | source_names %}

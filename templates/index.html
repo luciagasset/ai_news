@@ -20,6 +20,7 @@
   if (lang !== "es" && lang !== "en") lang = (navigator.language || "es").toLowerCase().startsWith("es") ? "es" : "en";
   document.documentElement.lang = lang;
 })();
+{% include "partials/theme.js" %}
 </script>
 <title>AI News · Ediciones</title>
 <meta name="description" content="Todas las ediciones semanales de AI News, con búsqueda en el histórico.">
@@ -79,8 +80,10 @@ footer.wrap { margin-top: 48px; margin-bottom: 56px; color: var(--label-3); font
 </head>
 <body>
 {%- from "partials/logo.html" import wordmark %}
+{%- from "partials/theme.html" import theme_button %}
 {%- macro t(es, en_text) -%}<span class="l-es">{{ es }}</span><span class="l-en">{{ en_text or es }}</span>{%- endmacro -%}
-<div class="lang" role="group" aria-label="Idioma"><button type="button" data-lang="es" lang="es">ES</button><button type="button" data-lang="en" lang="en">EN</button></div>
+<div class="lang" role="group" aria-label="Idioma"><button type="button" data-lang="es" lang="es">ES</button><button type="button" data-lang="en" lang="en">EN</button>{{ theme_button() }}</div>
+<div class="statusbar" aria-hidden="true"></div>
 <header class="top wrap" style="max-width: 720px">
   <p class="brand-row">{{ wordmark(28) }}</p>
   <h1>{{ t('Todas las ediciones', 'All editions') }}</h1>
