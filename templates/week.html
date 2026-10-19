@@ -92,12 +92,13 @@ h2.block { font-size: 22px; font-weight: 700; letter-spacing: -.01em; margin: 36
 .tile {
   display: flex; flex-direction: column; text-align: left; border: 0; cursor: pointer;
   min-height: 240px; padding: 14px; border-radius: 20px; /* rectángulo vertical que crece si el texto lo necesita */
-  background: var(--card); box-shadow: var(--shadow);
+  background: color-mix(in srgb, var(--tc) var(--wash), var(--card)); box-shadow: var(--shadow);
   transition: transform .15s ease, box-shadow .25s ease;
 }
 @media (hover: hover) { .tile:hover { box-shadow: var(--shadow-hover); transform: translateY(-3px); } }
 .tile:active { transform: scale(.97); }
 .tags { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; font-size: 12px; font-weight: 600; }
+.tile .tags:not(:has(.tag)) { display: none; }
 .tag { color: var(--tc); background: color-mix(in srgb, var(--tc) var(--tint), transparent); padding: 3px 7px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px; }
 .tag .icon { font-size: 12px; }
 .tag.official { --tc: var(--accent); }
@@ -181,15 +182,20 @@ dialog.sheet.closing::backdrop { animation: fade-out .22s ease-in forwards; }
 .day { display: flex; flex-direction: column; align-items: center; min-width: 0; }
 .dots { display: flex; flex-direction: column-reverse; align-items: center; justify-content: flex-start; min-height: 120px; }
 .dot { width: 30px; height: 28px; border: 0; padding: 0; background: none; cursor: pointer; display: grid; place-items: center; flex: none; }
-.dot::before { content: ""; width: var(--s); height: var(--s); border-radius: 50%; background: var(--tc); transition: transform .2s cubic-bezier(.2,.8,.2,1), box-shadow .2s ease; }
+.dot::before { content: ""; width: var(--s); height: var(--s); border-radius: 50%; background: transparent; box-shadow: inset 0 0 0 2px var(--tc);
+  transition: transform .2s cubic-bezier(.2,.8,.2,1), background-color .3s ease; }
+.dot.read::before { background: var(--tc); }
 .dot:hover::before, .dot:focus-visible::before, .dot.hot::before { transform: scale(1.35); }
 .dot:focus-visible { outline: none; }
-.dot:focus-visible::before { box-shadow: 0 0 0 3px var(--card), 0 0 0 5px var(--accent); }
+.dot:focus-visible::before { box-shadow: inset 0 0 0 2px var(--tc), 0 0 0 3px var(--card), 0 0 0 5px var(--accent); }
 .day-label { width: 100%; text-align: center; border-top: 0.5px solid var(--separator); padding-top: 6px; margin-top: 4px; font-size: 12px; color: var(--label-2); line-height: 1.2; }
 .day-label b { display: block; font-size: 14px; font-weight: 600; color: var(--label-2); }
 .day.quiet .day-label b { color: var(--label-3); font-weight: 500; }
 .pulse-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 12px 0 0; font-size: 13px; color: var(--label-2); }
-.pulse-legend > span::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--tc); margin-right: 5px; }
+.pulse-legend > span::before { content: ""; display: inline-block; width: 9px; height: 9px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--tc); margin-right: 5px; vertical-align: -1px; }
+.pulse-legend > .read-key { color: var(--label-2); }
+.pulse-legend > .read-key::before { background: var(--label-2); box-shadow: none; }
+html:not(.js) .read-key { display: none; }
 .js .pulse .dot::before { animation: pop .55s cubic-bezier(.3,1.5,.5,1) both; animation-delay: var(--d, 0s); }
 @keyframes pop { from { transform: scale(0); } }
 
@@ -208,6 +214,7 @@ dialog.sheet.closing::backdrop { animation: fade-out .22s ease-in forwards; }
 .done-demo .icon { font-size: 11px; stroke-width: 3; }
 .tile.read .done { display: grid; }
 .tile.read .tags { padding-right: 28px; }
+.tile.read .tags:not(:has(.tag)) + h3 { padding-right: 26px; }
 .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .tag.done { --tc: var(--label-3); }
 
@@ -359,6 +366,7 @@ h2.sec .count { color: var(--label-3); font-weight: 600; }
 .chip { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border: 0; border-radius: 22px;
   background: var(--card); box-shadow: var(--shadow); font-size: 15px; font-weight: 600; color: var(--label); cursor: pointer; }
 .chip .icon { font-size: 16px; color: var(--tc, var(--accent)); }
+.chips .chip[class*="t-"] { background: color-mix(in srgb, var(--tc) var(--wash), var(--card)); }
 .chip .n { font-weight: 500; color: var(--label-3); font-variant-numeric: tabular-nums; }
 .chip:active { transform: scale(.96); }
 .chip:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
@@ -477,7 +485,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 <button class="tile t-{{ s.type }} reveal" type="button" data-open="{{ s.id }}" data-type="{{ s.type }}" data-day="{{ s.first_seen }}"
   data-cat="{{ s.category }}" data-text="{{ s | search_text }}" aria-haspopup="dialog">
   <span class="tags">
-    <span class="tag">{{ icon(s.type) }}{{ t(type_singular[s.type], type_singular_en[s.type]) }}</span>
+    <span class="vh">{{ t(type_singular[s.type], type_singular_en[s.type]) }}</span>
     {% if new %}<span class="tag new">{{ t("Nuevo", "New") }}</span>{% endif %}
     {% if s.official %}<span class="tag official">{{ t("Oficial", "Official") }}</span>{% endif %}
   </span>
@@ -541,7 +549,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 
     <section class="pulse" aria-labelledby="h-pulse">
       <h2 id="h-pulse">{{ t("El pulso de la semana", "The week's pulse") }}</h2>
-      <p class="pulse-readout" id="pulse-readout" aria-live="polite">{{ t("Cada punto es una noticia, en el día en que surgió; cuanto más grande, más se debatió. Toca un punto para abrirla o un día para verlo entero.", "Each dot is a story, on the day it broke; the bigger it is, the more it was debated. Tap a dot to open it, or a day to see it in full.") }}</p>
+      <p class="pulse-readout" id="pulse-readout" aria-live="polite">{{ t("Cada punto es una noticia, en el día en que surgió; cuanto más grande, más se debatió. Se rellena cuando la lees: toca uno para abrirla.", "Each dot is a story, on the day it broke; the bigger it is, the more it was debated. It fills in once you read it: tap one to open it.") }}</p>
       <div class="days" style="--n: {{ days|length }}">
         {%- set ns = namespace(i=0) %}
         {%- for d in days %}
@@ -560,7 +568,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
         </div>
         {%- endfor %}
       </div>
-      <p class="pulse-legend" aria-hidden="true">{% for tp, label, desc, items in types if items %}<span class="t-{{ tp }}">{{ t(label, type_labels_en[tp]) }}</span>{% endfor %}</p>
+      <p class="pulse-legend" aria-hidden="true">{% for tp, label, desc, items in types if items %}<span class="t-{{ tp }}">{{ t(label, type_labels_en[tp]) }}</span>{% endfor %}<span class="read-key">{{ t("Relleno: ya leída", "Filled: already read") }}</span></p>
     </section>
 
     <h2 class="block">{{ t("Por tipo", "By type") }}</h2>
@@ -940,7 +948,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 
   // ---------- Progreso de lectura ----------
   const paintRead = () => {
-    $$(".tile[data-open]").forEach(el => el.classList.toggle("read", read.has(el.dataset.open)));
+    $$(".tile[data-open], .dot[data-open]").forEach(el => el.classList.toggle("read", read.has(el.dataset.open)));
     const n = ALL.filter(id => read.has(id)).length;
     $$("[data-read-count]").forEach(el => {
       el.textContent = n === 0 ? L("Aún no has abierto ninguna", "You haven't opened any yet")
