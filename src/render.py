@@ -1,8 +1,9 @@
 """Render de la edición (los 7 últimos días), del índice de ediciones y de la página de cada noticia
 (HTML autocontenidos, sin dependencias externas).
 
-La portada (index.html) se actualiza cada mañana. Cada 7 días, contando desde la primera edición archivada,
-la edición queda guardada en output/<fecha>.html: así el índice no repite días entre una semana y la siguiente.
+Las ediciones son semanas de lunes a domingo, sin solaparse. La portada (index.html) es la semana en curso y
+se actualiza cada mañana; cuando la semana se completa (con las noticias del domingo), queda archivada en
+output/<domingo>.html para el índice de ediciones y «Semana anterior».
 """
 from __future__ import annotations
 
@@ -156,22 +157,26 @@ def _env() -> Environment:
     env.globals["en"] = en  # en(s, "headline"): versión en inglés con el español como respaldo
     return env
 
+def week_start(day: str) -> str:
+    d = Date.fromisoformat(day)
+    return (d - timedelta(days=d.weekday())).isoformat()
+
+
+def week_end(day: str) -> str:
+    """El domingo de la semana de ese día: la fecha de la edición archivada."""
+    d = Date.fromisoformat(day)
+    return (d + timedelta(days=6 - d.weekday())).isoformat()
+
+
 def archives() -> list[str]:
-    """Ediciones archivadas: output/AAAA-MM-DD.html, de la más antigua a la más reciente."""
-    return sorted(p.stem for p in OUTPUT.glob("????-??-??.html"))
-
-
-def is_archive(date: str) -> bool:
-    """Se archiva una edición cada 7 días, contando desde la primera archivada."""
-    arch = archives()
-    if not arch or date in arch:
-        return True
-    return (Date.fromisoformat(date) - Date.fromisoformat(arch[0])).days % 7 == 0
+    """Semanas archivadas: output/<domingo>.html, de la más antigua a la más reciente."""
+    return sorted(p.stem for p in OUTPUT.glob("????-??-??.html") if Date.fromisoformat(p.stem).weekday() == 6)
 
 
 def archive_of(day: str) -> str | None:
-    """La edición archivada que contiene ese día, si ya existe."""
-    return next((a for a in archives() if 0 <= (Date.fromisoformat(a) - Date.fromisoformat(day)).days < 7), None)
+    """La semana archivada que contiene ese día, si ya existe."""
+    end = week_end(day)
+    return end if end in archives() else None
 
 
 def _site_url(site: dict | None) -> str:
@@ -179,12 +184,14 @@ def _site_url(site: dict | None) -> str:
     return url.rstrip("/") + "/" if url else ""
 
 
-def render_edition(date: str, n_days: int = 7, failed_sources: list[str] = (), site: dict | None = None) -> str:
-    """La edición de los `n_days` días que terminan en `date` (la semana como pantalla principal y la vista
-    día a día) en un solo HTML, más su imagen de vista previa, el carrusel PDF para LinkedIn y las páginas e
-    imágenes para compartir cada noticia."""
+def render_edition(date: str, failed_sources: list[str] = (), site: dict | None = None, assets: bool = True) -> str:
+    """La semana (de lunes a domingo) que contiene `date`, con sus días hasta `date` (la semana como pantalla
+    principal y la vista día a día) en un solo HTML, más su imagen de vista previa, el carrusel PDF para
+    LinkedIn y las páginas e imágenes para compartir cada noticia (`assets=False`: solo el HTML archivado)."""
     site = site or {}
     site_url = _site_url(site)
+    end = week_end(date)
+    n_days = Date.fromisoformat(date).weekday() + 1  # de lunes a `date`
     stories = load_window(date, n_days)
     stats = {"items": sum(load_day(d)[2].get("items", 0) for d in {s.first_seen for s in stories})}
     ranked = sorted(stories, key=lambda s: s.score, reverse=True)
@@ -192,16 +199,16 @@ def render_edition(date: str, n_days: int = 7, failed_sources: list[str] = (), s
     days = week_days(date, stories, n_days)
     with_news = [d for d in days if d["stories"]]
 
-    archive = is_archive(date)
+    archive = date == end  # la semana está completa
     latest = not any(d > date for d in list_days())
     arch = archives()
-    older = [d for d in arch if d < date]
-    newer = [d for d in arch if d > date]
+    older = [d for d in arch if d < end]
+    newer = [d for d in arch if d > end]
 
     ctx = dict(
         date=date,
-        week_label=week_label(date, n_days),
-        week_label_en=week_label_en(date, n_days),
+        week_label=week_label(end),
+        week_label_en=week_label_en(end),
         days=days,
         default_day=(with_news[-1] if with_news else days[-1])["iso"],
         types=types,
@@ -232,7 +239,11 @@ def render_edition(date: str, n_days: int = 7, failed_sources: list[str] = (), s
     if archive:  # la edición archivada lleva sus fechas
         path = OUTPUT / f"{date}.html"
         path.write_text(week.render(**ctx, rolling=False), encoding="utf-8")
-    if latest:  # la portada del sitio es siempre la edición más reciente: «Últimos 7 días», sin fechas fijas
+    if not assets:
+        return str(path)
+    if archive and older and not newer:  # la semana anterior gana su enlace «Semana siguiente»
+        render_edition(older[-1], site=site, assets=False)
+    if latest:  # la portada del sitio es siempre la edición más reciente: «Esta semana», sin fechas fijas
         now = datetime.now()
         (OUTPUT / "index.html").write_text(week.render(
             **{**ctx, "page_url": site_url}, rolling=True,
@@ -318,15 +329,16 @@ def render_index(site_url: str = "") -> str:
     if saved and (not arch or saved[0] > arch[-1]):
         dates.insert(0, saved[0])  # la portada, mientras no quede archivada
     for date in dates:
-        stories = load_window(date)
-        editions.append({"date": date, "href": f"{date}.html" if date in arch else "./",
-                         "label": week_label(date), "label_en": week_label_en(date),
+        end = week_end(date)
+        stories = load_window(end)
+        editions.append({"date": end, "href": f"{end}.html" if end in arch else "./",
+                         "label": week_label(end), "label_en": week_label_en(end),
                          "stories": sorted(stories, key=lambda s: s.score, reverse=True),
-                         "days": week_days(date, stories)})
+                         "days": week_days(end, stories)})
     html = _env().get_template("index.html").render(
         editions=editions, type_singular=TYPE_SINGULAR, category_labels=CATEGORY_LABELS,
         type_singular_en=TYPE_SINGULAR_EN, category_labels_en=CATEGORY_LABELS_EN,
-        site_url=site_url, og_image=f"{site_url}og/{editions[0]['date']}.png" if site_url and editions else "",
+        site_url=site_url, og_image=f"{site_url}og/{dates[0]}.png" if site_url and editions else "",
         generated=datetime.now().strftime("%d/%m/%Y a las %H:%M"),
     )
     OUTPUT.mkdir(parents=True, exist_ok=True)

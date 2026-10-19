@@ -36,8 +36,13 @@ document.documentElement.classList.add("js");
   document.documentElement.lang = lang;
 })();
 const L = (es, en) => (document.documentElement.lang === "en" ? en : es);
-// La entrada se muestra siempre al abrir la edición, salvo con un enlace directo a una noticia (#n=…)
-if (!location.hash.startsWith("#n=")) document.documentElement.classList.add("show-intro");
+// Pantalla de carga: solo al abrir la web o la app; no al pasar de una página propia a otra (p. ej. «Semana
+// anterior») ni con un enlace directo a una noticia (#n=…)
+(() => {
+  let internal = false;
+  try { internal = !!document.referrer && new URL(document.referrer).origin === location.origin; } catch {}
+  if (!internal && !location.hash.startsWith("#n=")) document.documentElement.classList.add("show-intro");
+})();
 </script>
 <style>
 {% include "partials/base.css" %}
@@ -394,8 +399,6 @@ header.top .brand-row, .title-row { padding-right: 104px; }
 .wordmark .logo-mark { border-radius: 8px; flex: none; }
 .wm-text { font-size: 17px; font-weight: 800; letter-spacing: -.01em; color: var(--label); }
 .brand-row { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; }
-.replay { border: 0; background: none; padding: 0; cursor: pointer; border-radius: 10px; }
-.replay:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 .brand-row .sub { font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); }
 
 /* ---------- Pulsación: todo lo que se toca responde ---------- */
@@ -403,86 +406,28 @@ button, .ed-link { -webkit-tap-highlight-color: transparent; }
 button:not([disabled]), .ed-link { transition: transform .16s cubic-bezier(.2,.8,.2,1), box-shadow .25s ease, background-color .2s ease, color .2s ease, opacity .2s ease; }
 button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 
-/* ---------- Entrada ---------- */
+/* ---------- Pantalla de carga ---------- */
 .intro { display: none; position: fixed; inset: 0; z-index: 100; background: var(--bg); color: var(--label);
-  align-items: flex-start; justify-content: center; padding: max(24px, calc(12px + env(safe-area-inset-top))) 20px calc(24px + env(safe-area-inset-bottom));
-  overflow-y: auto; overscroll-behavior: contain; cursor: pointer; }
+  align-items: center; justify-content: center; cursor: pointer; }
 .show-intro .intro { display: flex; }
+.show-intro .lang { visibility: hidden; }
 .show-intro body { overflow: hidden; }
-.intro-inner { margin: auto 0; width: 100%; max-width: 460px; display: flex; flex-direction: column; align-items: center; text-align: center; }
-.intro-col { display: contents; }
+.intro-inner { display: flex; flex-direction: column; align-items: center; }
 .intro-logo { width: 84px; height: 84px; border-radius: 20px; box-shadow: 0 14px 40px rgba(0,0,0,.22); }
-.intro-brand { font-size: 40px; font-weight: 800; letter-spacing: -.03em; margin: 18px 0 0; }
-.intro-tag { font-size: 16px; color: var(--label-2); margin: 4px 0 0; }
-.intro-pulse { width: 100%; margin-top: 30px; display: grid; grid-template-columns: repeat(var(--n), 1fr); }
-.intro-day { display: flex; flex-direction: column; align-items: center; }
-.intro-dots { height: 150px; display: flex; flex-direction: column-reverse; align-items: center; justify-content: flex-start; gap: 6px; }
-.intro-dot { width: var(--s); height: var(--s); border-radius: 50%; background: var(--tc); flex: none; }
-.intro-day b { width: 100%; padding-top: 8px; margin-top: 4px; border-top: 1px solid var(--separator); font-size: 12px; font-weight: 600; color: var(--label-3); }
-.intro-top { margin: 22px 0 0; font-size: 17px; line-height: 1.35; font-weight: 600; max-width: 400px; }
-.intro-top .k { display: block; font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
-.intro-go { margin-top: 28px; min-height: 52px; padding: 0 26px; border: 0; border-radius: 26px; background: var(--label); color: var(--bg);
-  font-size: 17px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; position: relative; }
-.intro-go .icon { font-size: 18px; stroke-width: 2.4; }
-.intro-go::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: 0 0 0 0 var(--label); opacity: .25; }
-.intro-skip { margin: 14px 0 0; font-size: 13px; color: var(--label-3); }
-.intro.leaving { animation: intro-out .5s cubic-bezier(.4,0,.2,1) forwards; pointer-events: none; }
+.intro-brand { font-size: 34px; font-weight: 800; letter-spacing: -.03em; margin: 16px 0 0; }
+.intro.leaving { animation: intro-out .4s cubic-bezier(.4,0,.2,1) forwards; pointer-events: none; }
 @keyframes intro-out { to { opacity: 0; transform: scale(1.04); } }
-
-/* Coreografía: logo → marca → los puntos caen en sus días → titular → botón */
-.js .intro-logo { animation: logo-in .7s cubic-bezier(.2,.8,.2,1.2) both; }
-.js .intro-logo .lm { transform-box: fill-box; transform-origin: center; animation: pop .5s cubic-bezier(.3,1.6,.5,1) both; }
-.js .intro-logo .lm1 { animation-delay: .25s; } .js .intro-logo .lm2 { animation-delay: .35s; }
-.js .intro-logo .lm3 { animation-delay: .45s; } .js .intro-logo .lm4 { animation-delay: .55s; }
-.js .intro-brand, .js .intro-tag { animation: rise .55s cubic-bezier(.2,.8,.2,1) both; }
-.js .intro-brand { animation-delay: .35s; } .js .intro-tag { animation-delay: .5s; }
-.js .intro-day b { animation: rise .4s ease both; animation-delay: .7s; }
-.js .intro-dot { animation: drop .7s cubic-bezier(.3,1.35,.55,1) both; animation-delay: var(--d); }
-.js .intro-top { animation: rise .6s cubic-bezier(.2,.8,.2,1) both; animation-delay: var(--t, 2.1s); }
-.js .intro-go { animation: rise .6s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--t, 2.1s) + .3s); }
-.js .intro-go::after { animation: breathe 2.2s ease-out infinite; animation-delay: calc(var(--t, 2.1s) + 1s); }
-.js .intro-skip { animation: rise .5s ease both; animation-delay: calc(var(--t, 2.1s) + .6s); }
+.js .intro-logo { animation: logo-in .6s cubic-bezier(.2,.8,.2,1.2) both; }
+.js .intro-logo .lm { transform-box: fill-box; transform-origin: center; animation: pop .45s cubic-bezier(.3,1.6,.5,1) both; }
+.js .intro-logo .lm1 { animation-delay: .2s; } .js .intro-logo .lm2 { animation-delay: .28s; }
+.js .intro-logo .lm3 { animation-delay: .36s; } .js .intro-logo .lm4 { animation-delay: .44s; }
+.js .intro-brand { animation: rise .5s cubic-bezier(.2,.8,.2,1) both; animation-delay: .3s; }
 @keyframes logo-in { from { opacity: 0; transform: scale(.6) rotate(-8deg); } to { opacity: 1; transform: none; } }
-@keyframes drop { 0% { opacity: 0; transform: translateY(-160px) scale(.6); } 60% { opacity: 1; } 100% { opacity: 1; transform: none; } }
-@keyframes breathe { 0% { box-shadow: 0 0 0 0 var(--label); opacity: .28; } 100% { box-shadow: 0 0 0 16px var(--label); opacity: 0; } }
-/* Seguro: si el navegador no ejecuta las animaciones (pestaña en segundo plano, navegadores internos de apps),
-   a los pocos segundos todo queda en su estado final */
-.intro.settled * { animation: none !important; }
-@media (max-height: 860px) and (orientation: portrait) {
-  .intro-logo { width: 68px; height: 68px; border-radius: 17px; }
-  .intro-brand { font-size: 34px; margin-top: 14px; }
-  .intro-tag { font-size: 15px; }
-  .intro-pulse { margin-top: 22px; }
-  .intro-dots { height: 120px; gap: 5px; }
-  .intro-top { margin-top: 16px; font-size: 16px; }
-  .intro-go { margin-top: 20px; }
-  .intro-skip { margin-top: 10px; }
-}
-/* Pantallas bajas (móvil en horizontal): la entrada se reparte en dos columnas para caber sin cortarse */
-@media (max-height: 620px) {
-  .intro { overflow-y: auto; padding-top: max(16px, env(safe-area-inset-top)); padding-left: max(20px, env(safe-area-inset-left)); padding-right: max(20px, env(safe-area-inset-right)); }
-  .intro-logo { width: 52px; height: 52px; border-radius: 13px; }
-  .intro-brand { font-size: 28px; margin-top: 8px; }
-  .intro-tag { font-size: 14px; }
-  .intro-pulse { margin-top: 14px; }
-  .intro-dots { height: 96px; gap: 3px; }
-  .intro-dot { width: calc(var(--s) * .75); height: calc(var(--s) * .75); }
-  .intro-top { margin-top: 14px; font-size: 15px; }
-  .intro-go { margin-top: 16px; min-height: 46px; }
-  .intro-skip { margin-top: 10px; }
-  header.top { padding-top: calc(28px + env(safe-area-inset-top)); }
-}
-@media (max-height: 620px) and (orientation: landscape) {
-  .intro-inner { max-width: 800px; flex-direction: row; align-items: center; gap: 48px; }
-  .intro-col { flex: 1; display: flex; flex-direction: column; align-items: center; }
-  .intro-pulse { margin-top: 12px; }
-}
 @media (prefers-reduced-motion: reduce) { .intro.leaving { animation: none; opacity: 0; } }
 </style>
 </head>
 <body>
 {%- from "partials/logo.html" import logo_mark, wordmark %}
-{%- set ni = namespace(i=0) %}
 {#- Texto en los dos idiomas: el CSS muestra solo el activo (html[lang]) -#}
 {%- macro t(es, en_text) -%}<span class="l-es">{{ es }}</span><span class="l-en">{{ en_text or es }}</span>{%- endmacro -%}
 {%- macro plural(n, es1, esn, en1, enn) -%}{{ t(es1 if n == 1 else esn, en1 if n == 1 else enn) }}{%- endmacro -%}
@@ -542,35 +487,16 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
   <button type="button" data-lang="en" aria-pressed="false" lang="en">EN</button>
 </div>
 
-<div class="intro" id="intro" role="dialog" aria-modal="true" aria-label="Bienvenida a AI News" data-en-aria-label="Welcome to AI News">
-  <div class="intro-inner">
-   <div class="intro-col">
-    {{ logo_mark(84, "intro-logo", true) }}
-    <p class="intro-brand">AI News</p>
-    <p class="intro-tag">{{ t("Lo que se habla de IA, cada mañana", "What people are saying about AI, every morning") if rolling else t(week_label, week_label_en) }}</p>
-    <div class="intro-pulse" style="--n: {{ days|length }}" aria-hidden="true">
-      {%- for d in days %}
-      <div class="intro-day">
-        <div class="intro-dots">{% for s in d.stories %}{% set ni.i = ni.i + 1 %}<i class="intro-dot t-{{ s.type }}" style="--s: {{ 12 + 3 * (s.comments | heat_level) }}px; --d: {{ (0.8 + ni.i * 0.07) | round(2) }}s"></i>{% endfor %}</div>
-        <b>{{ t(d.initial, d.initial_en) }}</b>
-      </div>
-      {%- endfor %}
-    </div>
-   </div>
-   <div class="intro-col">
-    {% if ranked %}<p class="intro-top" style="--t: {{ (1.1 + ni.i * 0.07) | round(2) }}s"><span class="k">{{ t("Lo más destacado", "Top story") }}</span>{{ t(ranked[0].headline, en(ranked[0], "headline")) }}</p>{% endif %}
-    <button class="intro-go" id="intro-go" type="button" style="--t: {{ (1.1 + ni.i * 0.07) | round(2) }}s">{{ t("Ver la semana", "See the week") }}{{ icon("next") }}</button>
-    <p class="intro-skip" style="--t: {{ (1.1 + ni.i * 0.07) | round(2) }}s">{{ t("o toca en cualquier parte", "or tap anywhere") }}</p>
-   </div>
-  </div>
+<div class="intro" id="intro" aria-hidden="true">
+  <div class="intro-inner">{{ logo_mark(84, "intro-logo", true) }}<p class="intro-brand">AI News</p></div>
 </div>
 
 {# ================= Pantalla principal: la semana ================= #}
 <div id="view-home" class="view">
   <header class="top wrap">
-    <p class="brand-row"><button class="replay" type="button" data-replay-intro aria-label="Ver de nuevo la entrada" data-en-aria-label="Replay the intro">{{ wordmark(28) }}</button><span class="sub">{{ t("Resumen semanal", "Weekly digest") }}</span></p>
+    <p class="brand-row">{{ wordmark(28) }}<span class="sub">{{ t("Resumen semanal", "Weekly digest") }}</span></p>
     {% if rolling %}
-    <h1>{{ t("Últimos 7 días", "Last 7 days") }}</h1>
+    <h1>{{ t("Esta semana", "This week") }}</h1>
     <p class="meta">{{ t("Actualizado el " ~ updated, "Updated " ~ updated_en) }}</p>
     {% else %}
     <h1>{{ t(week_label, week_label_en) }}</h1>
@@ -870,47 +796,23 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 <div class="toast" id="toast" role="status" popover="manual"></div>
 
 <script>
-// Entrada: contador animado y salida al tocar; se puede volver a ver tocando el logo de la cabecera.
-// Rebote breve en cualquier botón pulsado.
+// Pantalla de carga: el logo se dibuja y se va sola (o al tocar). Rebote breve en cualquier botón pulsado.
 (() => {
   const root = document.documentElement;
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const first = document.getElementById("intro");
-  const introHTML = first ? first.outerHTML : "";
-
-  const runIntro = intro => {
-    root.classList.add("show-intro");
-    // Seguro: si el navegador no ejecuta las animaciones, todo queda visible a los pocos segundos
-    const settle = setTimeout(() => intro.classList.add("settled"), reduce ? 0 : 4200);
-    const go = intro.querySelector("#intro-go");
-    const focus = setTimeout(() => go.focus({ preventScroll: true }), reduce ? 0 : 1200);
+  const intro = document.getElementById("intro");
+  if (intro && root.classList.contains("show-intro")) {
     let done = false;
-    const onKey = e => { if (e.key === "Enter" || e.key === "Escape" || e.key === " ") { e.preventDefault(); leave(); } };
     const leave = () => {
       if (done) return; done = true;
-      clearTimeout(settle); clearTimeout(focus);
-      removeEventListener("keydown", onKey);
       const end = () => { root.classList.remove("show-intro"); intro.remove(); };
       if (reduce) return end();
       intro.classList.add("leaving");
-      setTimeout(end, 480);
+      setTimeout(end, 380);
     };
+    setTimeout(leave, reduce ? 300 : 1100);
     intro.addEventListener("click", leave);
-    addEventListener("keydown", onKey);
-  };
-
-  if (first && root.classList.contains("show-intro")) runIntro(first);
-  else if (first) first.remove();
-
-  // Volver a ver la entrada
-  document.addEventListener("click", e => {
-    if (!e.target.closest("[data-replay-intro]") || !introHTML || document.getElementById("intro")) return;
-    document.body.insertAdjacentHTML("afterbegin", introHTML);
-    const intro = document.getElementById("intro");
-    if (root.lang === "en") intro.setAttribute("aria-label", intro.dataset.enAriaLabel);
-    scrollTo(0, 0);
-    runIntro(intro);
-  });
+  } else if (intro) intro.remove();
 
   if (!reduce && Element.prototype.animate) {
     document.addEventListener("click", e => {

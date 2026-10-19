@@ -3,9 +3,9 @@
 **Edición en vivo:** https://luciagasset.github.io/ai_news/
 
 Resumen, en español, de lo que se mueve en inteligencia artificial: **avances en modelos frontera,
-debates, polémicas y noticias**. **Se actualiza cada mañana** con las noticias del día anterior y muestra siempre los
-7 últimos días (unas 15 noticias), en tarjetas que se amplían al pulsarlas. Guarda un histórico por días y archiva una
-edición cada semana en `ediciones.html`.
+debates, polémicas y noticias**. **Se actualiza cada mañana** con las noticias del día anterior. Las ediciones son semanas
+de lunes a domingo (unas 15 noticias), sin solaparse: la portada es la semana en curso, con «Lo último» arriba, y
+cada semana completa queda en `ediciones.html`. Las noticias van en tarjetas que se amplían al pulsarlas.
 
 La edición se abre en la semana:
 
@@ -43,7 +43,7 @@ fuentes distintas lo cuentan y cuánto se discute en Hacker News y en los coment
               2. select (puntuación) ─► para_resumir.md ─► resumenes.json             │
                                                        │  (resume en dos niveles)       │
                                                        └────────────────────────────────┘
-              3. render ─► history/AAAA-MM-DD.json + output/index.html (los 7 últimos días)
+              3. render ─► history/AAAA-MM-DD.json + output/index.html (la semana en curso)
 ```
 
 La Fase 1 **no usa ninguna API de pago**. El script hace todo lo mecánico (descargar, transcribir,
@@ -108,10 +108,10 @@ pasos. Son:
 | — | Claude Code escribe `candidatos.json` | |
 | 2 | `python run_weekly.py select --date 2026-10-15` | `data/raw/<fecha>/para_resumir.md` |
 | — | Claude Code escribe `resumenes.json` | |
-| 3 | `python run_weekly.py render --date 2026-10-15` | `history/<fecha>.json`, la portada `output/index.html` (los 7 días que terminan en `<fecha>`), `output/ediciones.html` y las páginas de cada noticia |
+| 3 | `python run_weekly.py render --date 2026-10-15` | `history/<fecha>.json`, la portada `output/index.html` (la semana de `<fecha>`), `output/ediciones.html` y las páginas de cada noticia |
 
-`--date` es el día de las noticias; sin `--date` se usa ayer. Cada 7 días (contando desde la primera edición
-archivada) la portada se archiva también como `output/<fecha>.html`. `run_weekly.py pending` lista los días que
+`--date` es el día de las noticias; sin `--date` se usa ayer. Con las noticias del domingo, la semana se archiva
+como `output/<domingo>.html`. `run_weekly.py pending` lista los días que
 faltan. `ingest --reuse-raw` reutiliza la descarga guardada. Las transcripciones se cachean en `data/cache/`.
 
 ## Configuración

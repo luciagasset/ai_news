@@ -10,8 +10,8 @@ resúmenes los escribe Claude Code entre los pasos, siguiendo docs/instrucciones
         -> Claude Code escribe data/raw/<fecha>/resumenes.json
 
     python run_weekly.py render [--date ...]
-        Guarda history/<fecha>.json y genera la edición de los 7 días que terminan en <fecha>
-        (output/index.html), con una página y una imagen para compartir cada noticia.
+        Guarda history/<fecha>.json y genera la edición de su semana (de lunes a domingo; output/index.html),
+        con una página y una imagen para compartir cada noticia.
 
     python run_weekly.py pending
         Los días que faltan en history/ hasta ayer (como mucho, los 7 de la ventana), uno por línea.
@@ -217,7 +217,7 @@ def cmd_render(day: str, cfg: dict) -> int:
     stats = {"items": len(items), "candidates": len(clusters), "selected": len(stories),
              "summarizer": "claude-code"}
     save_day(day, stories, failed, stats)
-    path = render_edition(day, edition_days(cfg), failed, cfg.get("site"))
+    path = render_edition(day, failed, cfg.get("site"))
     log.info("Día %s: %d noticias · edición generada: %s", day, len(stories), path)
     return 0
 

@@ -59,14 +59,14 @@ frontier_labs: [ OpenAI, Anthropic, Google DeepMind, Meta, Mistral, xAI ]
 priority_topics: [ "seguridad de la IA", "agentes", "regulación", "open source", "benchmarks", "razonamiento" ]
 
 selection:
-  # Cada mañana se seleccionan las noticias del día anterior; la edición junta los 7 últimos días (~15 noticias).
+  # Cada mañana se seleccionan las noticias del día anterior; la edición es la semana de lunes a domingo (~15 noticias).
   max_items: 3             # por día
   min_per_type: 0          # en un solo día no se reservan tipos: nunca se rellena
   max_per_type: 2          # ningún tipo acapara el día
   min_per_day: 1           # cada día con material de peso tiene al menos una noticia
   max_per_day: 3
   min_share: 0.5           # en un día flojo no entra lo que no llega a la mitad de la puntuación de la mejor
-  window_days: 7           # días que cubre la edición
+  window_days: 7           # días hacia atrás que se recuperan si el ordenador estuvo apagado
 
 # Publicación. La URL pública se usa para la imagen de vista previa (LinkedIn y otras redes
 # necesitan una dirección absoluta) y para el enlace del carrusel.
