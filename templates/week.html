@@ -327,38 +327,31 @@ h2.sec .count { color: var(--label-3); font-weight: 600; }
 #week-grid { margin-top: 14px; }
 .day-label { border: 0; border-top: 0.5px solid var(--separator); background: none; font: inherit; font-size: 11px; color: var(--label-3); cursor: pointer; border-radius: 0 0 8px 8px; }
 .day-label:hover b { color: var(--accent); }
+/* ---------- Portada ---------- */
+.block-sub { display: block; font-size: 13px; font-weight: 600; color: var(--label-3); letter-spacing: 0; margin-top: 2px; }
+.tag.new { --tc: var(--accent); }
+/* Lo último: en el móvil, una fila que se desliza (asoma la siguiente tarjeta); en pantallas anchas, rejilla */
+.grid.latest { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
+  margin: 12px -16px 0; padding: 4px 16px 16px; scroll-padding-inline: 16px; }
+.grid.latest::-webkit-scrollbar { display: none; }
+.grid.latest .tile { flex: 0 0 min(78%, 300px); min-height: 200px; scroll-snap-align: start; }
+@media (min-width: 760px) {
+  .grid.latest { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); overflow: visible; margin: 12px 0 0; padding: 0; }
+  .grid.latest .tile { min-height: 240px; }
+}
+section + .pulse { margin-top: 24px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border: 0; border-radius: 22px;
+  background: var(--card); box-shadow: var(--shadow); font-size: 15px; font-weight: 600; color: var(--label); cursor: pointer; }
+.chip .icon { font-size: 16px; color: var(--tc, var(--accent)); }
+.chip .n { font-weight: 500; color: var(--label-3); font-variant-numeric: tabular-nums; }
+.chip:active { transform: scale(.96); }
+.chip:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.editions .ed-link { border: 0; cursor: pointer; color: var(--accent); }
 .editions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 12px; margin-top: 36px; }
 .ed-link { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 16px; border-radius: 22px; background: var(--card); box-shadow: var(--shadow); font-size: 15px; font-weight: 600; }
 .ed-link:hover { text-decoration: none; }
 .ed-link .icon { font-size: 17px; }
-.types { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 24px; }
-@media (min-width: 760px) { .types { grid-template-columns: repeat(4, 1fr); } }
-.type-btn {
-  display: flex; flex-direction: column; align-items: flex-start; text-align: left; gap: 0;
-  min-height: 168px; padding: 16px; border: 0; border-radius: 22px; cursor: pointer;
-  background: var(--card); box-shadow: var(--shadow);
-  transition: transform .15s ease, box-shadow .25s ease;
-}
-.type-btn .badge {
-  width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center;
-  background: color-mix(in srgb, var(--tc) var(--tint), var(--card)); color: var(--tc); font-size: 24px;
-}
-.type-btn .name { font-size: 19px; font-weight: 700; letter-spacing: -.01em; margin-top: auto; padding-top: 18px; line-height: 1.2; }
-.type-btn .desc { font-size: 13px; color: var(--label-2); margin-top: 3px; line-height: 1.35; }
-.type-btn .count { font-size: 13px; font-weight: 600; color: var(--tc); margin-top: 8px; }
-.type-btn[disabled] { cursor: default; opacity: .55; box-shadow: none; }
-@media (hover: hover) { .type-btn:not([disabled]):hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); } }
-.type-btn:not([disabled]):active { transform: scale(.97); }
-.type-btn:focus-visible, .tile:focus-visible, .back:focus-visible, .all-btn:focus-visible, .close:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
-.all-btn {
-  width: 100%; margin-top: 12px; min-height: 52px; border: 0; border-radius: 16px; cursor: pointer;
-  background: var(--card); box-shadow: var(--shadow); font-size: 17px; font-weight: 600; color: var(--accent);
-  display: flex; align-items: center; justify-content: center; gap: 6px; transition: transform .15s ease;
-}
-.all-btn:active { transform: scale(.98); }
-.type-btn .rd { color: var(--label-3); font-weight: 500; }
-.home-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
-.home-actions .all-btn { margin-top: 0; font-size: 16px; }
 .view > .day-head { padding-top: 20px; }
 
 /* ---------- Móvil, tablet e instalación como app ---------- */
@@ -523,11 +516,12 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
 </svg>
 {%- endmacro -%}
 
-{%- macro tile(s) -%}
+{%- macro tile(s, new=false) -%}
 <button class="tile t-{{ s.type }} reveal" type="button" data-open="{{ s.id }}" data-type="{{ s.type }}" data-day="{{ s.first_seen }}"
   data-cat="{{ s.category }}" data-text="{{ s | search_text }}" aria-haspopup="dialog">
   <span class="tags">
     <span class="tag">{{ icon(s.type) }}{{ t(type_singular[s.type], type_singular_en[s.type]) }}</span>
+    {% if new %}<span class="tag new">{{ t("Nuevo", "New") }}</span>{% endif %}
     {% if s.official %}<span class="tag official">{{ t("Oficial", "Official") }}</span>{% endif %}
     {% if s.unconfirmed %}<span class="tag unconfirmed">{{ t("Sin confirmar", "Unconfirmed") }}</span>{% endif %}
     <span class="tag done">{{ icon("check") }}{{ t("Leída", "Read") }}</span>
@@ -581,29 +575,20 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     {% else %}
     <h1>{{ t(week_label, week_label_en) }}</h1>
     {% endif %}
-    <div class="head-row">
-      {% if n_stories %}<div class="progress-read"><span class="track"><span class="fill" data-read-fill></span></span><span data-read-count></span></div>{% endif %}
-      <button class="help-btn" type="button" data-help>{{ icon("info") }} {{ t("Cómo leer esta página", "How to read this page") }}</button>
-      <button class="help-btn install-btn" type="button" data-install hidden>{{ icon("download") }} {{ t("Instalar app", "Install app") }}</button>
-    </div>
   </header>
 
   <main class="wrap">
-    <nav class="types" aria-label="Tipos de noticia" data-en-aria-label="Story types">
-      {% for tp, label, desc, items in types %}
-      <button class="type-btn t-{{ tp }}" type="button" data-view="{{ tp }}"{% if not items %} disabled{% endif %}>
-        <span class="badge">{{ icon(tp) }}</span>
-        <span class="name">{{ t(label, type_labels_en[tp]) }}</span>
-        <span class="desc">{{ t(desc, type_desc_en[tp]) }}</span>
-        <span class="count">{% if items %}{{ items|length }} {{ plural(items|length, "noticia", "noticias", "story", "stories") }}<span class="rd" data-type-read="{{ items | map(attribute='id') | join(' ') }}"></span>{% else %}{{ t("Nada esta semana", "Nothing this week") }}{% endif %}</span>
-      </button>
-      {% endfor %}
-    </nav>
     {% if n_stories %}
-    <div class="home-actions">
-      <button class="all-btn" type="button" data-view="todas">{{ icon("grid") }} {{ t("Todas las noticias", "All stories") }}</button>
-      <button class="all-btn" type="button" data-view="day">{{ icon("week") }} {{ t("Día a día", "Day by day") }}</button>
-    </div>
+    {#- Lo último: el día más reciente con noticias (en la portada, lo que entró esta mañana) -#}
+    {% set last = days | selectattr("stories") | list | last %}
+    {% set last_ids = last.stories | map(attribute="id") | list %}
+    <section aria-labelledby="h-latest">
+      <h2 class="block" id="h-latest">{{ t("Lo último", "Latest") }}
+        <span class="block-sub">{% if rolling and last.iso == date %}{{ t("Esta mañana", "This morning") }}{% else %}{{ t(last.label, last.label_en) }}{% endif %}</span></h2>
+      <div class="grid latest">
+        {% for s in last.stories %}{{ tile(s, rolling and last.iso == date) }}{% endfor %}
+      </div>
+    </section>
 
     <section class="pulse" aria-labelledby="h-pulse">
       <h2 id="h-pulse">{{ t("El pulso de la semana", "The week's pulse") }}</h2>
@@ -629,18 +614,31 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
       <p class="pulse-legend" aria-hidden="true">{% for tp, label, desc, items in types if items %}<span class="t-{{ tp }}">{{ t(label, type_labels_en[tp]) }}</span>{% endfor %}</p>
     </section>
 
+    {% set top = ranked | rejectattr("id", "in", last_ids) | list %}
+    {% if top %}
     <h2 class="block">{{ t("Lo más destacado", "Top stories") }}</h2>
     <div class="grid">
-      {% for s in ranked[:4] %}{{ tile(s) }}{% endfor %}
+      {% for s in top[:4] %}{{ tile(s) }}{% endfor %}
     </div>
+    {% endif %}
+
+    <h2 class="block">{{ t("Por tipo", "By type") }}</h2>
+    <nav class="chips" aria-label="Tipos de noticia" data-en-aria-label="Story types">
+      <button class="chip" type="button" data-view="todas">{{ icon("grid") }}{{ t("Todas", "All") }}</button>
+      {% for tp, label, desc, items in types if items %}
+      <button class="chip t-{{ tp }}" type="button" data-view="{{ tp }}">{{ icon(tp) }}{{ t(label, type_labels_en[tp]) }}<span class="n">{{ items|length }}</span></button>
+      {% endfor %}
+    </nav>
     {% else %}
     <p class="empty">{{ t("No hay noticias esta semana.", "No stories this week.") }}</p>
     {% endif %}
 
-    <nav class="editions" aria-label="Otras ediciones" data-en-aria-label="Other editions">
+    <nav class="editions" aria-label="Más" data-en-aria-label="More">
       {% if prev_day %}<a class="ed-link" href="{{ prev_day }}.html">{{ icon("back") }} {{ t("Semana anterior", "Previous week") }}</a>{% endif %}
-      <a class="ed-link" href="ediciones.html">{{ icon("archive") }} {{ t("Todas las ediciones", "All editions") }}</a>
+      <a class="ed-link" href="ediciones.html">{{ icon("archive") }} {{ t("Ediciones", "Editions") }}</a>
       {% if next_day %}<a class="ed-link" href="{{ next_day }}.html">{{ t("Semana siguiente", "Next week") }} {{ icon("next") }}</a>{% endif %}
+      <button class="ed-link" type="button" data-help>{{ icon("info") }} {{ t("Cómo leer esta página", "How to read this page") }}</button>
+      <button class="ed-link install-btn" type="button" data-install hidden>{{ icon("download") }} {{ t("Instalar app", "Install app") }}</button>
     </nav>
   </main>
 </div>
@@ -1142,6 +1140,7 @@ button:not([disabled]):active, .ed-link:active { transform: scale(.95); }
     opener = from || null;
     sheet.classList.remove("closing");
     if (!sheet.open) sheet.showModal();
+    body.scrollTop = 0;  // con la hoja cerrada el navegador ignora el scroll: se vuelve arriba al abrirla
     document.body.classList.add("locked");
     return true;
   };
