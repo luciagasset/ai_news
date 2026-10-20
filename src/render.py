@@ -297,7 +297,7 @@ def render_stories(site_url: str = "", current: set[str] = frozenset()) -> int:
     for day in list_days():
         for s in load_day(day)[0]:
             arch = archive_of(s.first_seen)
-            link = f"../#n={s.id}" if s.id in current or not arch else f"../{arch}.html#n={s.id}"
+            link = f"../index.html#n={s.id}" if s.id in current or not arch else f"../{arch}.html#n={s.id}"
             d = Date.fromisoformat(s.first_seen)
             html = page.render(
                 s=s, type_singular=TYPE_SINGULAR, type_singular_en=TYPE_SINGULAR_EN,
@@ -331,7 +331,7 @@ def render_index(site_url: str = "") -> str:
     for date in dates:
         end = week_end(date)
         stories = load_window(end)
-        editions.append({"date": end, "href": f"{end}.html" if end in arch else "./",
+        editions.append({"date": end, "href": f"{end}.html" if end in arch else "index.html",
                          "label": week_label(end), "label_en": week_label_en(end),
                          "stories": sorted(stories, key=lambda s: s.score, reverse=True),
                          "days": week_days(end, stories)})
