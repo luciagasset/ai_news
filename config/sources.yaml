@@ -9,6 +9,7 @@ youtube:
     - { name: "AI Explained",        handle: "@aiexplained-official", lang: en, enabled: true }
     - { name: "Matthew Berman",      handle: "@matthew_berman",       lang: en, enabled: true }
     - { name: "Dot CSV",             handle: "@DotCSV",               lang: es, enabled: true }
+    - { name: "midudev",             handle: "@midudev",              lang: es, enabled: true }
     - { name: "Wes Roth",            handle: "@WesRoth",              lang: en, enabled: false }
     - { name: "The AI Daily Brief",  handle: "@AIDailyBrief",         lang: en, enabled: false }
     - { name: "Two Minute Papers",   handle: "@TwoMinutePapers",      lang: en, enabled: false }
