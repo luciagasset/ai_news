@@ -114,6 +114,16 @@ def publish(days: list[str]) -> bool:
     return True
 
 
+def keep_awake(on: bool) -> None:
+    """Que Windows no vuelva a dormir el PC a mitad de la actualización (la tarea lo despierta a las 07:07,
+    pero sin esto se volvía a dormir a los pocos minutos y la descarga quedaba parada hasta que se encendía)."""
+    if os.name != "nt":
+        return
+    import ctypes
+    ES_CONTINUOUS, ES_SYSTEM_REQUIRED = 0x80000000, 0x00000001
+    ctypes.windll.kernel32.SetThreadExecutionState(ES_CONTINUOUS | (ES_SYSTEM_REQUIRED if on else 0))
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="Actualización diaria de AI News.")
     ap.add_argument("--no-push", action="store_true", help="genera los días pendientes, pero no publica")
@@ -126,6 +136,7 @@ def main() -> int:
         return 0
     LOCK.parent.mkdir(parents=True, exist_ok=True)
     LOCK.write_text(str(os.getpid()))
+    keep_awake(True)
     try:
         if run(["git", "pull", "--ff-only"], timeout=300).returncode:
             say("Aviso: no se pudo traer lo último de GitHub; se sigue en local")
@@ -148,6 +159,7 @@ def main() -> int:
         say(f"✗ Error inesperado: {type(e).__name__}: {e}")
         return 1
     finally:
+        keep_awake(False)
         LOCK.unlink(missing_ok=True)
 
 
