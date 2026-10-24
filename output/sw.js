@@ -1,5 +1,5 @@
 // AI News · service worker (generado por src/export.py)
-const CACHE = "ai-news-20261023102713";
+const CACHE = "ai-news-20261024112031";
 const CORE = ["./", "./ediciones.html", "./manifest.webmanifest", "./icons/logo.svg",
               "./icons/icon-192.png", "./icons/icon-512.png"];
 
