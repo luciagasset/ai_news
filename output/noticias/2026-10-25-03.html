@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Una red neuronal de 2015 supera a GPT-6 Astra y Claude Fable 5.1 al diagnosticar cáncer de piel · AI News</title>
+<meta name="description" content="Un dermatólogo comparó dos modelos punteros con una red de imagen de 2015 en 200 lesiones de piel. La red antigua, ajustada en veinte minutos, acertó el 62 % de los diagnósticos; los LLM, el 42 %."><meta property="og:type" content="article">
+<meta property="og:site_name" content="AI News">
+<meta property="og:title" content="Una red neuronal de 2015 supera a GPT-6 Astra y Claude Fable 5.1 al diagnosticar cáncer de piel">
+<meta property="og:description" content="Un dermatólogo comparó dos modelos punteros con una red de imagen de 2015 en 200 lesiones de piel. La red antigua, ajustada en veinte minutos, acertó el 62 % de los diagnósticos; los LLM, el 42 %.">
+<meta property="og:image" content="https://luciagasset.github.io/ai_news/og/noticias/2026-10-25-03.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:url" content="https://luciagasset.github.io/ai_news/noticias/2026-10-25-03.html">
+<link rel="canonical" href="https://luciagasset.github.io/ai_news/noticias/2026-10-25-03.html">
+<meta property="article:published_time" content="2026-10-25">
+<link rel="icon" type="image/svg+xml" href="../icons/logo.svg">
+<link rel="apple-touch-icon" href="../icons/icon-180.png">
+<script>
+(() => {
+  let lang = null;
+  try { lang = localStorage.getItem("ai-news-lang"); } catch {}
+  if (lang !== "es" && lang !== "en") lang = (navigator.language || "es").toLowerCase().startsWith("es") ? "es" : "en";
+  document.documentElement.lang = lang;
+})();
+// Modo claro u oscuro: el elegido con el botón (si se guardó) o el del sistema
+(() => {
+  const KEY = "ai-news-theme";
+  const root = document.documentElement;
+  const system = matchMedia("(prefers-color-scheme: dark)");
+  const saved = () => { let t = null; try { t = localStorage.getItem(KEY); } catch {} return t === "light" || t === "dark" ? t : null; };
+  const apply = () => {
+    const t = saved();
+    if (t) root.dataset.theme = t; else delete root.dataset.theme;
+    const mode = t || (system.matches ? "dark" : "light");
+    root.dataset.mode = mode;
+    // Color de la barra del navegador y de la app instalada
+    document.querySelectorAll('meta[name="theme-color"]').forEach(m => {
+      if (!m.dataset.media) m.dataset.media = m.media || "";
+      m.media = t ? "" : m.dataset.media;
+      if (t) m.content = t === "dark" ? "#000000" : "#f2f2f7";
+      else m.content = m.dataset.media.includes("dark") ? "#000000" : "#f2f2f7";
+    });
+    document.querySelectorAll("[data-theme-toggle]").forEach(b => {
+      const en = root.lang === "en";
+      b.setAttribute("aria-label", mode === "dark" ? (en ? "Switch to light mode" : "Cambiar a modo día")
+                                                   : (en ? "Switch to dark mode" : "Cambiar a modo noche"));
+    });
+  };
+  apply();
+  system.addEventListener?.("change", apply);
+  document.addEventListener("click", e => {
+    const b = e.target.closest?.("[data-theme-toggle]");
+    if (!b) return;
+    e.stopPropagation();
+    try { localStorage.setItem(KEY, root.dataset.mode === "dark" ? "light" : "dark"); } catch {}
+    apply();
+  }, true);
+  addEventListener("DOMContentLoaded", apply);
+  // La etiqueta del botón sigue al idioma
+  new MutationObserver(apply).observe(root, { attributes: true, attributeFilter: ["lang"] });
+})();
+</script>
+<style>
+/* Paleta basada en los colores de sistema de Apple (HIG · Color), con las variantes de contraste
+   accesible para el texto de color. Claro y oscuro siguen la preferencia del sistema, salvo que se elija
+   otro con el botón de modo noche/día (data-theme, ver partials/theme.js). */
+:root {
+  color-scheme: light dark;
+  --bg: #f2f2f7; --card: #ffffff; --sheet: #ffffff;
+  --fill: rgba(120,120,128,.12); --fill-2: rgba(120,120,128,.2);
+  --label: #000000; --label-2: rgba(60,60,67,.74); --label-3: rgba(60,60,67,.52);
+  --separator: rgba(60,60,67,.18);
+  --accent: #1e6ef4;
+  --t-avance: #564ade; --t-debate: #00819f; --t-polemica: #c55300; --t-noticia: #6c6c70;
+  --r-seguimiento: #1e6ef4; --r-relacionada: #6c6c70; --r-contradiccion: #e9152d;
+  --shadow: 0 1px 2px rgba(0,0,0,.04), 0 6px 20px rgba(0,0,0,.06);
+  --shadow-hover: 0 2px 4px rgba(0,0,0,.05), 0 14px 34px rgba(0,0,0,.10);
+  --scrim: rgba(0,0,0,.32); --bar: rgba(242,242,247,.82); --tint: 12%; --wash: 13%;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #000000; --card: #1c1c1e; --sheet: #1c1c1e; --fill: rgba(118,118,128,.24); --fill-2: rgba(118,118,128,.36);
+    --label: #ffffff; --label-2: rgba(235,235,245,.72); --label-3: rgba(235,235,245,.48); --separator: rgba(84,84,88,.6);
+    --accent: #5cb8ff; --t-avance: #a7aaff; --t-debate: #3bdded; --t-polemica: #ffa056; --t-noticia: #aeaeb2;
+    --r-seguimiento: #5cb8ff; --r-relacionada: #aeaeb2; --r-contradiccion: #ff6165;
+    --shadow: none; --shadow-hover: 0 0 0 1px rgba(255,255,255,.10); --scrim: rgba(0,0,0,.55); --bar: rgba(0,0,0,.74); --tint: 22%; --wash: 19%;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #000000; --card: #1c1c1e; --sheet: #1c1c1e; --fill: rgba(118,118,128,.24); --fill-2: rgba(118,118,128,.36);
+  --label: #ffffff; --label-2: rgba(235,235,245,.72); --label-3: rgba(235,235,245,.48); --separator: rgba(84,84,88,.6);
+  --accent: #5cb8ff; --t-avance: #a7aaff; --t-debate: #3bdded; --t-polemica: #ffa056; --t-noticia: #aeaeb2;
+  --r-seguimiento: #5cb8ff; --r-relacionada: #aeaeb2; --r-contradiccion: #ff6165;
+  --shadow: none; --shadow-hover: 0 0 0 1px rgba(255,255,255,.10); --scrim: rgba(0,0,0,.55); --bar: rgba(0,0,0,.74); --tint: 22%; --wash: 19%;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--label);
+  font: 17px/1.47 -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+body.locked { overflow: hidden; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+button { font: inherit; color: inherit; }
+.wrap { max-width: 1040px; margin: 0 auto; padding-left: 16px; padding-right: 16px; }
+.t-avance { --tc: var(--t-avance); } .t-debate { --tc: var(--t-debate); }
+.t-polemica { --tc: var(--t-polemica); } .t-noticia { --tc: var(--t-noticia); }
+.icon { width: 1em; height: 1em; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+[hidden] { display: none !important; }
+
+/* Botón de modo noche/día: muestra la luna de día y el sol de noche */
+.theme-btn .icon { font-size: 16px; display: block; margin: auto; }
+.theme-btn .i-sun, html[data-mode="dark"] .theme-btn .i-moon { display: none; }
+html[data-mode="dark"] .theme-btn .i-sun { display: block; }
+
+/* App instalada en iPhone: la hora y la batería quedan sobre una franja translúcida, como en WhatsApp,
+   para que el texto no se les cruce al hacer scroll (en el navegador mide 0) */
+.statusbar { position: fixed; top: 0; left: 0; right: 0; z-index: 115; height: env(safe-area-inset-top); pointer-events: none;
+  background: var(--bar); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); }
+
+/* Pie de página justificado */
+footer p { text-align: justify; -webkit-hyphens: auto; hyphens: auto; }
+html[lang="en"] .l-es, html:not([lang="en"]) .l-en { display: none !important; }
+.wrap { max-width: 720px; }
+header.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: calc(16px + env(safe-area-inset-top)); padding-bottom: 8px; }
+.wordmark { display: inline-flex; align-items: center; gap: 10px; color: var(--label); font-weight: 700; font-size: 17px; }
+.wordmark .logo-mark { border-radius: 7px; }
+.lang { display: inline-flex; padding: 2px; border-radius: 17px; background: var(--fill); }
+.lang button { min-width: 40px; min-height: 30px; padding: 0 10px; border: 0; border-radius: 15px; background: none; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--label-2); }
+.lang button[aria-pressed="true"] { background: var(--label); color: var(--bg); }
+article { margin-top: 16px; padding: 24px 22px 28px; border-radius: 22px; background: var(--card); box-shadow: var(--shadow); }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; font-size: 12px; }
+.tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; font-weight: 600; color: var(--tc, var(--label-2)); background: color-mix(in srgb, var(--tc, var(--label-2)) var(--tint), transparent); }
+.tag.official { --tc: var(--accent); }
+h1 { font-size: 28px; line-height: 1.2; font-weight: 700; letter-spacing: -.02em; margin: 14px 0 0; }
+.lead { font-size: 19px; line-height: 1.45; font-weight: 500; margin: 12px 0 0; }
+.info { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 12px; font-size: 13px; color: var(--label-3); }
+.long p { margin: 16px 0 0; }
+h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--label-3); margin: 26px 0 6px; font-weight: 600; }
+ul { margin: 0; padding: 0; list-style: none; }
+li { font-size: 15px; padding: 9px 0; border-bottom: 0.5px solid var(--separator); display: flex; gap: 10px; align-items: baseline; }
+li:last-child { border-bottom: 0; }
+.kind { font-size: 12px; color: var(--label-3); min-width: 60px; flex: none; }
+.more { display: flex; align-items: center; justify-content: center; min-height: 50px; margin: 20px 0 0; border-radius: 14px; background: var(--accent); color: #fff; font-weight: 600; }
+.more:hover { text-decoration: none; filter: brightness(1.06); }
+footer { margin: 28px auto 48px; color: var(--label-3); font-size: 13px; }
+</style>
+</head>
+<body class="t-debate">
+<div class="statusbar" aria-hidden="true"></div><header class="top wrap">
+  <a class="wordmark" href="../"><svg xmlns="http://www.w3.org/2000/svg" class="logo-mark" width="28" height="28" viewBox="0 0 64 64" role="img" aria-label="AI News">
+  <rect width="64" height="64" rx="15" fill="#0b0b0f"/>
+  <rect x="0.5" y="0.5" width="63" height="63" rx="14.5" fill="none" stroke="rgba(255,255,255,.12)"/>
+  <path d="M10 54.5H54" stroke="rgba(255,255,255,.28)" stroke-width="1.6" stroke-linecap="round"/>
+  <circle class="lm lm1" cx="15" cy="47" r="4" fill="#aeaeb2"/>
+  <circle class="lm lm2" cx="26" cy="40" r="5.5" fill="#3bdded"/>
+  <circle class="lm lm3" cx="38.5" cy="30.5" r="7" fill="#ffa056"/>
+  <path class="lm lm4" d="M50 9Q51.8 17.2 60 19Q51.8 20.8 50 29Q48.2 20.8 40 19Q48.2 17.2 50 9Z" fill="#a7aaff"/>
+</svg>AI News</a>
+  <div class="lang" role="group" aria-label="Idioma"><button type="button" data-lang="es" lang="es">ES</button><button type="button" data-lang="en" lang="en">EN</button><button type="button" class="theme-btn" data-theme-toggle aria-label="Cambiar a modo noche"><svg class="icon i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><svg class="icon i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button></div>
+</header>
+<main class="wrap">
+  <article>
+    <div class="tags">
+      <span class="tag"><span class="l-es">Debate</span><span class="l-en">Debate</span></span>
+      <span class="tag t-noticia"><span class="l-es">Investigación</span><span class="l-en">Research</span></span>
+      
+      
+    </div>
+    <h1><span class="l-es">Una red neuronal de 2015 supera a GPT-6 Astra y Claude Fable 5.1 al diagnosticar cáncer de piel</span><span class="l-en">A 2015 neural network beats GPT-6 Astra and Claude Fable 5.1 at diagnosing skin cancer</span></h1>
+    <p class="lead"><span class="l-es">Un dermatólogo comparó dos modelos punteros con una red de imagen de 2015 en 200 lesiones de piel. La red antigua, ajustada en veinte minutos, acertó el 62 % de los diagnósticos; los LLM, el 42 %.</span><span class="l-en">A dermatologist compared two frontier models with a 2015 image network on 200 skin lesions. The old network, fine-tuned in twenty minutes, got 62% of diagnoses right; the LLMs, 42%.</span></p>
+    <p class="info"><span><span class="l-es">Domingo, 25 de octubre de 2026</span><span class="l-en">Sunday, October 25, 2026</span></span><span>1 <span class="l-es">min de lectura</span><span class="l-en">min read</span></span></p>
+    <div class="long l-es"><p>Magnus Lynch, dermatólogo del Guy&#39;s Hospital de Londres, enseñó 200 lesiones de piel confirmadas por biopsia a GPT-6 Astra, a Claude Fable 5.1 y a Inception v3. Esta última es una red neuronal de imagen que Google publicó en 2015 y que él ajustó unos veinte minutos con fotos públicas de dermatología. La red acertó el diagnóstico en 125 casos (62 %); los dos LLM, en 84 y 85 (42 %). También reconoció más melanomas: 13 de 30, frente a 8 y 11.</p><p>Los LLM fallaron sobre todo con las lesiones inofensivas: casi nunca las daban de alta, mientras la red descartó 76 de 100. Cada LLM tendía a repetir un diagnóstico favorito. El autor admite límites: la muestra es pequeña, cada caso se probó una vez y los productos médicos actuales rinden bastante mejor que esa red. Su conclusión es que un modelo pequeño y especializado supera a los grandes generalistas en esta tarea.</p></div>
+    <div class="long l-en"><p>Magnus Lynch, a dermatologist at Guy&#39;s Hospital in London, showed 200 biopsy-confirmed skin lesions to GPT-6 Astra, Claude Fable 5.1 and Inception v3. The latter is an image neural network Google published in 2015, which he fine-tuned for about twenty minutes on public dermatology photos. The network got the diagnosis right in 125 cases (62%); the two LLMs, in 84 and 85 (42%). It also recognised more melanomas: 13 of 30, against 8 and 11.</p><p>The LLMs failed mostly with harmless lesions: they almost never discharged them, while the network cleared 76 of 100. Each LLM tended to repeat a favourite diagnosis. The author admits limits: the sample is small, each case was run once and current medical products perform considerably better than that network. His conclusion is that a small, specialised model beats the large generalists at this task.</p></div>
+    <h2><span class="l-es">Fuentes</span><span class="l-en">Sources</span></h2>
+    <ul>
+      
+      
+      <li><span class="kind"><span class="l-es">Artículo</span><span class="l-en">Article</span></span>
+        <span><a href="https://lynchlab.net/llm-skin-cancer" target="_blank" rel="noopener">lynchlab.net — A 10-year-old CNN outperforms frontier LLMs for skin cancer diagnosis</a></span></li>
+      
+      <li><span class="kind"><span class="l-es">HN</span><span class="l-en">HN</span></span>
+        <span><a href="https://news.ycombinator.com/item?id=50233779" target="_blank" rel="noopener">Hacker News · 529 puntos, 231 comentarios</a></span></li>
+      
+    </ul>
+  </article>
+  <a class="more" href="../index.html#n=2026-10-25-03"><span class="l-es">Ver todas las noticias de la semana</span><span class="l-en">See all of this week’s stories</span></a>
+</main>
+<footer class="wrap"><p><span class="l-es">Resumen generado con IA a partir de las fuentes enlazadas; puede contener errores.</span><span class="l-en">Summary written with AI from the linked sources; it may contain errors.</span></p></footer>
+<script>
+(() => {
+  const apply = lang => {
+    document.documentElement.lang = lang;
+    document.querySelectorAll(".lang [data-lang]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
+  };
+  document.querySelectorAll(".lang [data-lang]").forEach(b => b.addEventListener("click", () => {
+    try { localStorage.setItem("ai-news-lang", b.dataset.lang); } catch {}
+    apply(b.dataset.lang);
+  }));
+  apply(document.documentElement.lang === "en" ? "en" : "es");
+})();
+</script>
+</body>
+</html>
